@@ -51,21 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       await PreferenceHandler.setLogin(true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Login berhasil!',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Color(0xFF005BBF),
-        ),
-      );
       context.pushAndRemoveAll(BottomNavigator());
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Login gagal! email atau Password salah.',
+            'Login gagal! Email atau Password salah.',
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Color(0xFF005BBF),

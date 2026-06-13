@@ -147,6 +147,88 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
     });
   }
 
+  // Confirmation Alert Dialog
+  Future<bool> _showConfirmationAlert(String message) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Column(
+            children: const [
+              Icon(Icons.warning_rounded, color: Color(0xFF005BBF), size: 36),
+              SizedBox(height: 10),
+              Text(
+                "Konfirmasi Pendaftaran",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+              ),
+            ],
+          ),
+
+          content: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF4A4A4A),
+              height: 1.4,
+            ),
+          ),
+
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFCCCCCC)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      "Batal",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF005BBF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Yakin",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+
+    return confirmed ?? false;
+  }
+
   // Handle register for Reporter
   void _registerReporter() async {
     if (!_accountFormKey.currentState!.validate()) return;
@@ -157,6 +239,11 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
         ? null
         : _phoneController.text.trim();
     final password = _passwordController.text.trim();
+
+    final confirm = await _showConfirmationAlert(
+      "Apakah Anda yakin data pendaftaran Pelapor sudah benar?",
+    );
+    if (!confirm) return;
 
     setState(() => _isLoading = true);
 
@@ -254,6 +341,11 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
     final experience = _experienceController.text.trim();
     final reason = _reasonController.text.trim();
     final certificatePaths = _certificateFiles.map((f) => f.path).toList();
+
+    final confirm = await _showConfirmationAlert(
+      "Apakah Anda yakin ingin mengirim pengajuan pendaftaran relawan?",
+    );
+    if (!confirm) return;
 
     setState(() => _isLoading = true);
 
