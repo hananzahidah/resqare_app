@@ -4,6 +4,8 @@ import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/report_model.dart';
 import 'package:resqare_app/repositories/report_repository.dart';
 import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/utils/navigator.dart';
+import 'package:resqare_app/views/report/create/edit_form_screen.dart';
 
 class BottomActionSection extends StatefulWidget {
   final ReportModel report;
@@ -480,31 +482,84 @@ class _BottomActionSectionState extends State<BottomActionSection> {
       }
     } else {
       if (normalizedStatus == 'pending' && isMyReport) {
-        actionWidget = ElevatedButton(
-          onPressed: _isSubmitting ? null : () => _updateStatus('cancelled'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.emergency,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 0,
-            minimumSize: const Size(double.infinity, 48),
-          ),
-          child: _isSubmitting
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
+        actionWidget = Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: _isSubmitting
+                    ? null
+                    : () async {
+                        final confirm = await _showConfirmationDialog(
+                          title: "Batalkan Laporan",
+                          content:
+                              "Apakah Anda yakin ingin membatalkan laporan penyelamatan ini?",
+                          confirmText: "Batalkan",
+                          confirmColor: AppColors.emergency,
+                        );
+                        if (confirm) {
+                          _updateStatus('cancelled');
+                        }
+                      },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.emergency,
+                  side: const BorderSide(
+                    color: AppColors.emergency,
+                    width: 1.5,
                   ),
-                )
-              : const Text(
-                  "Batalkan Laporan",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  minimumSize: const Size(double.infinity, 48),
                 ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: AppColors.emergency,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        "Batalkan Laporan",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: _isSubmitting
+                    ? null
+                    : () async {
+                        final updated = await context.push(
+                          EditFormScreen(report: report),
+                        );
+                        if (updated == true) {
+                          widget.onActionCompleted();
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryBlue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                child: const Text(
+                  "Edit Laporan",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
         );
       } else if (normalizedStatus == 'on rescue' ||
           normalizedStatus == 'assigned') {

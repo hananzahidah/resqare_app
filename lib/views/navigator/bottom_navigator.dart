@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:resqare_app/views/explore/explore_map_screen.dart';
+import 'package:resqare_app/views/history/role_history_wrapper.dart';
 import 'package:resqare_app/views/home/home_wrapper_screen.dart';
 import 'package:resqare_app/views/profile/profile_screen.dart';
+import 'package:resqare_app/views/report/create/form_report_screen.dart';
 
 class BottomNavigator extends StatefulWidget {
   final int initialIndex;
@@ -16,9 +19,9 @@ class _BottomNavigatorState extends State<BottomNavigator> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     RoleHomeWrapper(),
-    RoleHomeWrapper(),
-    RoleHomeWrapper(),
-    RoleHomeWrapper(),
+    ExploreMapScreen(),
+    FormReportScreen(),
+    RoleHistoryWrapper(),
     ProfileScreen(),
   ];
 

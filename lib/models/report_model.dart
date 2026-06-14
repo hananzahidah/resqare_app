@@ -127,7 +127,9 @@ class ReportModel {
       cancelledAt: map['cancelledAt'] != null
           ? map['cancelledAt'] as String
           : null,
-      cancelledBy: map['cancelledBy'] != null ? map['cancelledBy'] as int : null,
+      cancelledBy: map['cancelledBy'] != null
+          ? map['cancelledBy'] as int
+          : null,
       createdAt: map['createdAt'] as String,
       updatedAt: map['updatedAt'] != null ? map['updatedAt'] as String : null,
     );

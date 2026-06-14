@@ -67,6 +67,24 @@ class ReportRepository {
     }
   }
 
+  // Delete single report image
+  Future<bool> deleteReportImage({
+    required int reportId,
+    required String imagePath,
+  }) async {
+    final db = await dbHelper.database;
+    try {
+      await db.delete(
+        'report_images',
+        where: 'reportId = ? AND image = ?',
+        whereArgs: [reportId, imagePath],
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // Get All Reports Data
   Future<List<ReportModel>> getAllReports() async {
     final db = await dbHelper.database;

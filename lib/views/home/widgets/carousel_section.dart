@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
+import 'package:resqare_app/database/preference_handler.dart';
+import 'package:resqare_app/repositories/user_repository.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
+import 'package:resqare_app/views/profile/volunteer_application_screen.dart';
 
 class CarouselSection extends StatefulWidget {
   const CarouselSection({super.key});
@@ -179,11 +182,28 @@ class _CarouselSectionState extends State<CarouselSection> {
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   if (index == 0) {
                                     context.pushReplacement(
                                       BottomNavigator(initialIndex: 2),
                                     );
+                                  } else if (index == 1) {
+                                    final userId = PreferenceHandler.userId;
+                                    if (userId > 0) {
+                                      final user = await UserRepository()
+                                          .getUserById(userId);
+                                      if (user != null && mounted) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                VolunteerApplicationScreen(
+                                                  user: user,
+                                                ),
+                                          ),
+                                        );
+                                      }
+                                    }
                                   }
                                 },
                                 child: Text(

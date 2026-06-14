@@ -10,14 +10,22 @@ import 'package:resqare_app/repositories/report_repository.dart';
 import 'package:resqare_app/repositories/user_repository.dart';
 import 'package:resqare_app/utils/color_badge.dart';
 import 'package:resqare_app/utils/date_formater.dart';
+import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
+import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/widget/bottom_action_section.dart';
 import 'package:resqare_app/views/report/detail/widget/maps_section.dart';
 import 'package:resqare_app/views/report/detail/widget/status_bar_section.dart';
 
 class DetailReportScreen extends StatefulWidget {
   final int reportId;
-  const DetailReportScreen({super.key, required this.reportId});
+  final bool backToHome;
+
+  const DetailReportScreen({
+    super.key,
+    required this.reportId,
+    this.backToHome = false,
+  });
 
   @override
   State<DetailReportScreen> createState() => _DetailReportScreenState();
@@ -181,26 +189,60 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
     return isActiveStatus && isParticipant;
   }
 
+  void _handleBack() {
+    if (widget.backToHome) {
+      context.pushAndRemoveAll(BottomNavigator(initialIndex: 0));
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return PopScope(
+        canPop: !widget.backToHome,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          _handleBack();
+        },
+        child: Scaffold(body: Center(child: CircularProgressIndicator())),
+      );
     }
 
     final report = _report;
     if (report == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text("Detail Laporan")),
-        body: Center(child: Text("Laporan tidak ditemukan.")),
+      return PopScope(
+        canPop: !widget.backToHome,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          _handleBack();
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text("Detail Laporan"),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: _handleBack,
+            ),
+          ),
+          body: Center(child: Text("Laporan tidak ditemukan.")),
+        ),
       );
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      bottomNavigationBar: BottomActionSection(
-        report: report,
-        onActionCompleted: _loadAllData,
-      ),
+    return PopScope(
+      canPop: !widget.backToHome,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBack();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        bottomNavigationBar: BottomActionSection(
+          report: report,
+          onActionCompleted: _loadAllData,
+        ),
       floatingActionButton: _shouldShowChatButton()
           ? FloatingActionButton(
               onPressed: () {
@@ -672,7 +714,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
             top: 48,
             left: 20,
             child: InkWell(
-              onTap: () => Navigator.pop(context),
+              onTap: _handleBack,
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -691,7 +733,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildReporterAvatar() {

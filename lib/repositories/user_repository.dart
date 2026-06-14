@@ -250,4 +250,121 @@ class UserRepository {
       return false;
     }
   }
+
+  // Get volunteer application by userId
+  Future<Map<String, dynamic>?> getVolunteerApplication(int userId) async {
+    final db = await dbHelper.database;
+    try {
+      final result = await db.query(
+        'volunteer_applications',
+        where: 'userId = ?',
+        whereArgs: [userId],
+        orderBy: 'createdAt DESC',
+        limit: 1,
+      );
+      if (result.isNotEmpty) {
+        return result.first;
+      }
+      return null;
+    } catch (e) {
+      log("Error getting volunteer application: ${e.toString()}");
+      return null;
+    }
+  }
+
+  // Submit new volunteer application for existing user
+  Future<bool> submitVolunteerApplication({
+    required int userId,
+    required String experience,
+    required String reason,
+    required List<String> certificateImages,
+    String? newPhone,
+  }) async {
+    final db = await dbHelper.database;
+    try {
+      return await db.transaction((txn) async {
+        // If there's a new phone number to save, update the user
+        if (newPhone != null && newPhone.trim().isNotEmpty) {
+          await txn.update(
+            'users',
+            {'phone': newPhone.trim()},
+            where: 'id = ?',
+            whereArgs: [userId],
+          );
+        }
+
+        // Prepare certificate images
+        final String? img1 = certificateImages.isNotEmpty ? certificateImages[0] : null;
+        final String? img2 = certificateImages.length > 1 ? certificateImages[1] : null;
+        final String? img3 = certificateImages.length > 2 ? certificateImages[2] : null;
+
+        final now = DateTime.now().toIso8601String();
+        await txn.insert('volunteer_applications', {
+          'userId': userId,
+          'experience': experience,
+          'reason': reason,
+          'image1': img1,
+          'image2': img2,
+          'image3': img3,
+          'status': 'pending',
+          'createdAt': now,
+          'updatedAt': now,
+        });
+
+        return true;
+      });
+    } catch (e) {
+      log("Error submitting volunteer application: ${e.toString()}");
+      return false;
+    }
+  }
+
+  // Update volunteer application for existing user
+  Future<bool> updateVolunteerApplicationWithTxn({
+    required int userId,
+    required String experience,
+    required String reason,
+    required List<String> certificateImages,
+    String? newPhone,
+  }) async {
+    final db = await dbHelper.database;
+    try {
+      return await db.transaction((txn) async {
+        // If there's a new phone number to save, update the user
+        if (newPhone != null && newPhone.trim().isNotEmpty) {
+          await txn.update(
+            'users',
+            {'phone': newPhone.trim()},
+            where: 'id = ?',
+            whereArgs: [userId],
+          );
+        }
+
+        // Prepare certificate images
+        final String? img1 = certificateImages.isNotEmpty ? certificateImages[0] : null;
+        final String? img2 = certificateImages.length > 1 ? certificateImages[1] : null;
+        final String? img3 = certificateImages.length > 2 ? certificateImages[2] : null;
+
+        final now = DateTime.now().toIso8601String();
+        await txn.update(
+          'volunteer_applications',
+          {
+            'experience': experience,
+            'reason': reason,
+            'image1': img1,
+            'image2': img2,
+            'image3': img3,
+            'updatedAt': now,
+          },
+          where: 'userId = ? AND status = ?',
+          whereArgs: [userId, 'pending'],
+        );
+
+        return true;
+      });
+    } catch (e) {
+      log("Error updating volunteer application: ${e.toString()}");
+      return false;
+    }
+  }
 }
