@@ -8,6 +8,7 @@ import 'package:resqare_app/repositories/report_repository.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/time.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
+import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
 
 class MyReportsSection extends StatefulWidget {
   const MyReportsSection({super.key});
@@ -159,22 +160,25 @@ class MyReportsSectionState extends State<MyReportsSection> {
                 statusLabel = "Menunggu";
                 break;
             }
-
-            return Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border, width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.01),
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
+            return GestureDetector(
+              onTap: () {
+                context.push(DetailReportScreen(reportId: report.id ?? 0));
+              },
+              child: Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.border, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.01),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
                 children: [
                   // Image Preview
                   ClipRRect(
@@ -320,8 +324,9 @@ class MyReportsSectionState extends State<MyReportsSection> {
                   ),
                 ],
               ),
-            );
-          },
+            ),
+          );
+        },
         ),
       ],
     );

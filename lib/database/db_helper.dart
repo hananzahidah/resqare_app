@@ -81,9 +81,11 @@ class DBHelper {
             onRescueAt TEXT,
             completedAt TEXT,
             cancelledAt TEXT,
+            cancelledBy INTEGER,
 
             createdAt TEXT,
-            updatedAt TEXT
+            updatedAt TEXT,
+            deletedAt TEXT
           )
         ''');
 

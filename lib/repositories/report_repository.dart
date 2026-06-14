@@ -76,7 +76,7 @@ class ReportRepository {
   }
 
   // Get Report by ID
-  Future<ReportModel?> getReport({required int reportId}) async {
+  Future<ReportModel?> getReportById({required int reportId}) async {
     final db = await dbHelper.database;
 
     final result = await db.query(
@@ -190,12 +190,7 @@ class ReportRepository {
       };
     } catch (e) {
       log("Error getting volunteer stats: ${e.toString()}");
-      return {
-        'total': 0,
-        'completed': 0,
-        'active': 0,
-        'cancelled': 0,
-      };
+      return {'total': 0, 'completed': 0, 'active': 0, 'cancelled': 0};
     }
   }
 }

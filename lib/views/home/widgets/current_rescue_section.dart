@@ -5,6 +5,8 @@ import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/report_model.dart';
 import 'package:resqare_app/repositories/report_repository.dart';
 import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/utils/navigator.dart';
+import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
 
 class CurrentRescueSection extends StatefulWidget {
   final ValueChanged<bool> onActiveStatusChanged;
@@ -178,89 +180,96 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
             ),
             const SizedBox(height: 10),
 
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border, width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryBlue.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
+            GestureDetector(
+              onTap: () {
+                context.push(
+                  DetailReportScreen(reportId: _activeMission!.id ?? 0),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.border, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                    child: const Icon(
-                      Icons.pets_rounded,
-                      color: AppColors.primaryBlue,
-                      size: 20,
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryBlue.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.pets_rounded,
+                        color: AppColors.primaryBlue,
+                        size: 20,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 14),
-                  // Title and Location
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _activeMission!.title,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors
-                                .textPrimary, // Coklat gelap, bukan hitam pekat
+                    const SizedBox(width: 14),
+                    // Title and Location
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _activeMission!.title,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors
+                                  .textPrimary, // Coklat gelap, bukan hitam pekat
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.near_me_rounded,
-                              size: 11,
-                              color: AppColors.textSecondary,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                _activeMission!.address,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textSecondary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.near_me_rounded,
+                                size: 11,
+                                color: AppColors.textSecondary,
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  _activeMission!.address,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  IconButton(
-                    onPressed: () {},
-                    constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(8),
-                    icon: const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: AppColors.primaryBlue,
-                      size: 16,
+                    const SizedBox(width: 10),
+                    IconButton(
+                      onPressed: () {},
+                      constraints: const BoxConstraints(),
+                      padding: const EdgeInsets.all(8),
+                      icon: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: AppColors.primaryBlue,
+                        size: 16,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ] else if (_isActive) ...[

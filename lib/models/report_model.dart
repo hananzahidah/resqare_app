@@ -31,6 +31,7 @@ class ReportModel {
   final String? onRescueAt;
   final String? completedAt;
   final String? cancelledAt;
+  final int? cancelledBy;
 
   final String createdAt;
   final String? updatedAt;
@@ -57,6 +58,7 @@ class ReportModel {
     this.onRescueAt,
     this.completedAt,
     this.cancelledAt,
+    this.cancelledBy,
     required this.createdAt,
     this.updatedAt,
   });
@@ -85,6 +87,7 @@ class ReportModel {
       'onRescueAt': onRescueAt,
       'completedAt': completedAt,
       'cancelledAt': cancelledAt,
+      'cancelledBy': cancelledBy,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -124,6 +127,7 @@ class ReportModel {
       cancelledAt: map['cancelledAt'] != null
           ? map['cancelledAt'] as String
           : null,
+      cancelledBy: map['cancelledBy'] != null ? map['cancelledBy'] as int : null,
       createdAt: map['createdAt'] as String,
       updatedAt: map['updatedAt'] != null ? map['updatedAt'] as String : null,
     );
