@@ -1,4 +1,5 @@
 import 'package:path/path.dart';
+import 'package:resqare_app/database/db_seed.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBHelper {
@@ -39,6 +40,7 @@ class DBHelper {
             updatedAt TEXT
           )
         ''');
+        // Role: "reporter"|"volunteer"|"admin"
 
         // 2. Volunteers
         await db.execute('''
@@ -145,7 +147,7 @@ class DBHelper {
           )
         ''');
 
-        // await DBSeed.seed(db);
+        await DBSeed.seed(db);
       },
     );
   }

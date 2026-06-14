@@ -51,6 +51,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       await PreferenceHandler.setLogin(true);
+      await PreferenceHandler.setUserId(user.id!);
+      await PreferenceHandler.setUserRole(user.role);
       context.pushAndRemoveAll(BottomNavigator());
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

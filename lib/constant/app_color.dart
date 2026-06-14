@@ -47,7 +47,7 @@ class AppColors {
   // BORDER & UI
   // =======================================================
 
-  static const Color border = Color(0xFFE5E7EB);
+  static const Color border = Color(0xFFEDEEF1);
   static const Color cardShadow = Color(0x14000000);
   static const Color divider = Color(0xFFEEEEEE);
 

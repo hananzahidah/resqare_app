@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/views/home/home_screen.dart';
+import 'package:resqare_app/views/home/home_wrapper_screen.dart';
 import 'package:resqare_app/views/profile/profile_screen.dart';
 
 class BottomNavigator extends StatefulWidget {
@@ -16,10 +16,10 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   late int _selectedIndex;
 
   static const List<Widget> _widgetOptions = <Widget>[
-    HomeScreen(),
-    HomeScreen(),
-    HomeScreen(),
-    HomeScreen(),
+    RoleHomeWrapper(),
+    RoleHomeWrapper(),
+    RoleHomeWrapper(),
+    RoleHomeWrapper(),
     ProfileScreen(),
   ];
 
