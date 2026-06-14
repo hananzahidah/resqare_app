@@ -31,7 +31,7 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
     try {
       final reports = await _reportRepository.getAllReports();
 
-      double userLat = -6.1754; // default Central Jakarta
+      double userLat = -6.1754;
       double userLng = 106.8271;
 
       final userId = PreferenceHandler.userId;
@@ -45,7 +45,19 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
         }
       }
 
-      reports.sort((a, b) {
+      List<ReportModel> targetedReports = reports;
+      final userRole = PreferenceHandler.userRole.toLowerCase();
+      if (userRole == 'volunteer') {
+        targetedReports = reports
+            .where(
+              (report) =>
+                  report.rescuedBy == null ||
+                  report.status.toLowerCase() == 'pending',
+            )
+            .toList();
+      }
+
+      targetedReports.sort((a, b) {
         final distA = Geolocator.distanceBetween(
           userLat,
           userLng,
@@ -61,7 +73,7 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
         return distA.compareTo(distB);
       });
 
-      final limited = reports.take(5).toList();
+      final limited = targetedReports.take(5).toList();
       if (mounted) {
         setState(() {
           dbReports = limited;

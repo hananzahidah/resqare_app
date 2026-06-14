@@ -154,4 +154,48 @@ class ReportRepository {
 
     return results.map((map) => ReportModel.fromMap(map)).toList();
   }
+
+  // Get statistics of rescue tasks for a volunteer
+  Future<Map<String, int>> getVolunteerStats(int userId) async {
+    final db = await dbHelper.database;
+    try {
+      final List<Map<String, dynamic>> results = await db.query(
+        'reports',
+        columns: ['status'],
+        where: 'rescuedBy = ?',
+        whereArgs: [userId],
+      );
+
+      int total = results.length;
+      int completed = 0;
+      int active = 0;
+      int cancelled = 0;
+
+      for (var row in results) {
+        final status = (row['status'] as String).toLowerCase();
+        if (status == 'completed' || status == 'rescued') {
+          completed++;
+        } else if (status == 'cancelled') {
+          cancelled++;
+        } else if (status == 'on rescue' || status == 'assigned') {
+          active++;
+        }
+      }
+
+      return {
+        'total': total,
+        'completed': completed,
+        'active': active,
+        'cancelled': cancelled,
+      };
+    } catch (e) {
+      log("Error getting volunteer stats: ${e.toString()}");
+      return {
+        'total': 0,
+        'completed': 0,
+        'active': 0,
+        'cancelled': 0,
+      };
+    }
+  }
 }

@@ -5,6 +5,7 @@ import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/repositories/user_repository.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
+import 'package:resqare_app/utils/time.dart';
 import 'package:resqare_app/views/home/widgets/carousel_section.dart';
 import 'package:resqare_app/views/home/widgets/location_card_section.dart';
 import 'package:resqare_app/views/home/widgets/my_reports_section.dart';
@@ -39,19 +40,6 @@ class _ReporterHomeScreenState extends State<ReporterHomeScreen> {
           _imgProfile = user.imgProfile;
         });
       }
-    }
-  }
-
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour >= 5 && hour < 11) {
-      return "Selamat Pagi,";
-    } else if (hour >= 11 && hour < 15) {
-      return "Selamat Siang,";
-    } else if (hour >= 15 && hour < 19) {
-      return "Selamat Sore,";
-    } else {
-      return "Selamat Malam,";
     }
   }
 
@@ -93,7 +81,7 @@ class _ReporterHomeScreenState extends State<ReporterHomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_getGreeting(), style: TextStyle(fontSize: 12)),
+                      Text(getGreeting(), style: TextStyle(fontSize: 12)),
                       Text(
                         _userName,
                         style: TextStyle(

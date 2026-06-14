@@ -43,13 +43,13 @@ class _CarouselSectionState extends State<CarouselSection> {
       ),
     },
     {
-      "title": "Donasi Medis",
+      "title": "Panduan Penyelamatan",
       "subtitle":
-          "Dukung biaya pengobatan dan makanan untuk hewan yang diselamatkan.",
-      "icon": Icons.volunteer_activism_rounded,
-      "buttonText": "Donasi Sekarang",
-      "gradient": LinearGradient(
-        colors: [Color(0xFF10B981), Color(0xFF059669)],
+          "Pelajari langkah pertama yang aman saat menemukan hewan terlantar atau terluka.",
+      "icon": Icons.menu_book_rounded,
+      "buttonText": "Baca Panduan",
+      "gradient": const LinearGradient(
+        colors: [Color(0xFF14B8A6), Color(0xFF0F766E)], // Warna Teal / Tosca
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/views/home/home_wrapper_screen.dart';
 import 'package:resqare_app/views/profile/profile_screen.dart';
 
@@ -38,7 +37,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   void _handleBack() {
     if (_selectedIndex != 0) {
       setState(() {
-        _selectedIndex = 0; // kembali ke Home
+        _selectedIndex = 0;
       });
     }
   }
@@ -49,56 +48,56 @@ class _BottomNavigatorState extends State<BottomNavigator> {
       canPop: _selectedIndex == 0,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-
         _handleBack();
       },
       child: Scaffold(
         body: IndexedStack(index: _selectedIndex, children: _widgetOptions),
 
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _onItemTapped(2),
-          backgroundColor: const Color(0xFF327AF4),
-          elevation: 8,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add, color: Colors.white, size: 32),
-        ),
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              top: BorderSide(
+                color: Color.fromARGB(160, 237, 238, 241),
+                width: 1,
+              ),
+            ),
+          ),
+          child: SafeArea(
+            child: SizedBox(
+              height: 68,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(
+                    icon: Icons.home_filled,
+                    outlineIcon: Icons.home_outlined,
+                    label: 'Home',
+                    index: 0,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.map_rounded,
+                    outlineIcon: Icons.map_outlined,
+                    label: 'Explore',
+                    index: 1,
+                  ),
 
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+                  _buildCenterAddButton(),
 
-        bottomNavigationBar: BottomAppBar(
-          color: AppColors.white,
-          shape: const CircularNotchedRectangle(),
-          notchMargin: 8,
-          elevation: 12,
-          child: SizedBox(
-            height: 70,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  icon: Icons.home_rounded,
-                  label: 'Home',
-                  index: 0,
-                ),
-                _buildNavItem(
-                  icon: Icons.map_rounded,
-                  label: 'Explore',
-                  index: 1,
-                ),
-
-                const SizedBox(width: 40),
-
-                _buildNavItem(
-                  icon: Icons.history_rounded,
-                  label: 'History',
-                  index: 3,
-                ),
-                _buildNavItem(
-                  icon: Icons.person_rounded,
-                  label: 'Profile',
-                  index: 4,
-                ),
-              ],
+                  _buildNavItem(
+                    icon: Icons.history_rounded,
+                    outlineIcon: Icons.history_outlined,
+                    label: 'History',
+                    index: 3,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.person_rounded,
+                    outlineIcon: Icons.person_outline_rounded,
+                    label: 'Profile',
+                    index: 4,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -106,29 +105,62 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     );
   }
 
+  // Desain Icon biasa dengan Teks
   Widget _buildNavItem({
     required IconData icon,
+    required IconData outlineIcon,
     required String label,
     required int index,
   }) {
     final isSelected = _selectedIndex == index;
+    final color = isSelected ? const Color(0xFF327AF4) : Colors.grey.shade400;
 
-    return InkWell(
-      onTap: () => _onItemTapped(index),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: isSelected ? const Color(0xFF327AF4) : Colors.grey),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: isSelected ? const Color(0xFF327AF4) : Colors.grey,
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _onItemTapped(index),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(isSelected ? icon : outlineIcon, color: color, size: 26),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: color,
+              ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCenterAddButton() {
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _onItemTapped(2),
+        child: Center(
+          child: Container(
+            height: 48,
+            width: 48,
+            decoration: const BoxDecoration(
+              color: Color(0xFF327AF4),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x4D327AF4),
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
           ),
-        ],
+        ),
       ),
     );
   }

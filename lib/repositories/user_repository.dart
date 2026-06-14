@@ -212,4 +212,42 @@ class UserRepository {
       return false;
     }
   }
+
+  // Check if a volunteer is active
+  Future<bool> isVolunteerActive(int userId) async {
+    final db = await dbHelper.database;
+    try {
+      final result = await db.query(
+        'volunteers',
+        columns: ['isActive'],
+        where: 'userId = ?',
+        whereArgs: [userId],
+        limit: 1,
+      );
+      if (result.isNotEmpty) {
+        return (result.first['isActive'] as int) == 1;
+      }
+      return false;
+    } catch (e) {
+      log("Error checking volunteer active state: ${e.toString()}");
+      return false;
+    }
+  }
+
+  // Update volunteer active state
+  Future<bool> updateVolunteerActive(int userId, bool isActive) async {
+    final db = await dbHelper.database;
+    try {
+      final rows = await db.update(
+        'volunteers',
+        {'isActive': isActive ? 1 : 0},
+        where: 'userId = ?',
+        whereArgs: [userId],
+      );
+      return rows > 0;
+    } catch (e) {
+      log("Error updating volunteer active state: ${e.toString()}");
+      return false;
+    }
+  }
 }
