@@ -68,7 +68,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                         ? FileImage(File(_imgProfile!))
                         : null,
                     child: (_imgProfile == null || _imgProfile!.isEmpty)
-                        ? const Icon(Icons.person)
+                        ? Icon(Icons.person)
                         : null,
                   ),
                   Column(
@@ -100,11 +100,11 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
         toolbarHeight: 75,
       ),
       body: ListView(
-        physics: const BouncingScrollPhysics(),
+        physics: BouncingScrollPhysics(),
         children: [
           Column(
             children: [
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // User Current Location
               LocationCardSection(
@@ -115,7 +115,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                   }
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // Current Rescue & Toggle active status
               CurrentRescueSection(
@@ -128,37 +128,34 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                   }
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               QuickActionSection(),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // Conditional Report List
               _isVolunteerActive
                   ? NearbyReportSection(key: _nearbyKey)
                   : Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      padding: const EdgeInsets.all(20),
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: AppColors.softBlue,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: const Color(0xFFFEF3C7),
-                          width: 1,
-                        ),
+                        border: Border.all(color: Color(0xFFFEF3C7), width: 1),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.nightlight_round_sharp,
                             color: AppColors.primaryBlue,
                             size: 28,
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   "Mode Istirahat Aktif",
                                   style: TextStyle(
@@ -182,7 +179,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                         ],
                       ),
                     ),
-              const SizedBox(height: 32),
+              SizedBox(height: 40),
             ],
           ),
         ],

@@ -10,6 +10,7 @@ import 'package:resqare_app/views/home/widgets/carousel_section.dart';
 import 'package:resqare_app/views/home/widgets/location_card_section.dart';
 import 'package:resqare_app/views/home/widgets/my_reports_section.dart';
 import 'package:resqare_app/views/home/widgets/nearby_report_section.dart';
+import 'package:resqare_app/views/home/widgets/quick_action_section.dart';
 
 class ReporterHomeScreen extends StatefulWidget {
   const ReporterHomeScreen({super.key});
@@ -73,7 +74,7 @@ class _ReporterHomeScreenState extends State<ReporterHomeScreen> {
                         ? FileImage(File(_imgProfile!))
                         : null,
                     child: (_imgProfile == null || _imgProfile!.isEmpty)
-                        ? const Icon(Icons.person)
+                        ? Icon(Icons.person)
                         : null,
                   ),
                   Column(
@@ -118,10 +119,13 @@ class _ReporterHomeScreenState extends State<ReporterHomeScreen> {
                   _myReportsKey.currentState?.loadMyReports();
                 },
               ),
-              SizedBox(height: 18),
+              SizedBox(height: 16),
 
               // Carousel Banner
               CarouselSection(),
+              SizedBox(height: 16),
+
+              QuickActionSection(isReporter: true),
               SizedBox(height: 30),
 
               NearbyReportSection(key: _nearbyKey),

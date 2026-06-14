@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class QuickActionSection extends StatefulWidget {
-  const QuickActionSection({super.key});
+  final bool isReporter;
+  const QuickActionSection({super.key, this.isReporter = false});
 
   @override
   State<QuickActionSection> createState() => _QuickActionSectionState();
 }
 
 class _QuickActionSectionState extends State<QuickActionSection> {
-  final List<Map<String, dynamic>> actions = [
+  final List<Map<String, dynamic>> volunteerActions = [
     {
       "title": "Misi Rescue",
       "subtitle": "Lihat tugas aktif",
       "icon": Icons.assignment_turned_in_rounded,
-      "color": const Color(0xFFEBF3FF),
+      "color": Color(0xFFEBF3FF),
       "iconColor": AppColors.primaryBlue,
       "onTap": () {},
     },
@@ -22,15 +24,24 @@ class _QuickActionSectionState extends State<QuickActionSection> {
       "title": "Kontak SOS",
       "subtitle": "Hubungi damkar",
       "icon": Icons.contact_phone_rounded,
-      "color": const Color(0xFFFFF2F2),
+      "color": Color(0xFFFFF2F2),
       "iconColor": AppColors.emergency,
-      "onTap": () {},
+      "onTap": () async {
+        final Uri url = Uri.parse('tel:113');
+        try {
+          if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+            debugPrint('Could not launch $url');
+          }
+        } catch (e) {
+          debugPrint('Error launching $url: $e');
+        }
+      },
     },
     {
       "title": "Statistik",
       "subtitle": "Evaluasi rescue",
       "icon": Icons.query_stats,
-      "color": const Color(0xFFE6F9F3),
+      "color": Color(0xFFE6F9F3),
       "iconColor": AppColors.success,
       "onTap": () {},
     },
@@ -38,23 +49,68 @@ class _QuickActionSectionState extends State<QuickActionSection> {
       "title": "Laporkan",
       "subtitle": "Kirim info baru",
       "icon": Icons.add_circle_rounded,
-      "color": const Color(0xFFFFF7E6),
+      "color": Color(0xFFFFF7E6),
       "iconColor": AppColors.waitingRescue,
       "onTap": () {},
     },
   ];
 
+  final List<Map<String, dynamic>> reporterActions = [
+    {
+      "title": "Laporkan",
+      "subtitle": "Kirim info baru",
+      "icon": Icons.add_alert_rounded,
+      "color": Color(0xFFFFF7E6),
+      "iconColor": AppColors.waitingRescue,
+      "onTap": () {},
+    },
+    {
+      "title": "Kontak SOS",
+      "subtitle": "Hubungi damkar",
+      "icon": Icons.phone_in_talk_rounded,
+      "color": Color(0xFFFFF2F2),
+      "iconColor": AppColors.emergency,
+      "onTap": () async {
+        final Uri url = Uri.parse('tel:113');
+        try {
+          if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+            debugPrint('Could not launch $url');
+          }
+        } catch (e) {
+          debugPrint('Error launching $url: $e');
+        }
+      },
+    },
+    {
+      "title": "Laporanku",
+      "subtitle": "Pantau status",
+      "icon": Icons.assignment_rounded,
+      "color": Color(0xFFEBF3FF),
+      "iconColor": AppColors.primaryBlue,
+      "onTap": () {},
+    },
+
+    {
+      "title": "Panduan",
+      "subtitle": "Tips pertolongan",
+      "icon": Icons.health_and_safety_rounded,
+      "color": Color(0xFFE6F9F3),
+      "iconColor": AppColors.success,
+      "onTap": () {},
+    },
+  ];
   @override
   Widget build(BuildContext context) {
+    final actions = widget.isReporter ? reporterActions : volunteerActions;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GridView.builder(
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            physics: NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 14,
               mainAxisSpacing: 14,
@@ -67,19 +123,16 @@ class _QuickActionSectionState extends State<QuickActionSection> {
                 onTap: action["onTap"] as VoidCallback,
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFFEDEEF1),
-                      width: 1,
-                    ),
+                    border: Border.all(color: Color(0xFFEDEEF1), width: 1),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.02),
+                        color: Colors.black.withValues(alpha: 0.02),
                         blurRadius: 8,
-                        offset: const Offset(0, 4),
+                        offset: Offset(0, 4),
                       ),
                     ],
                   ),
@@ -87,7 +140,7 @@ class _QuickActionSectionState extends State<QuickActionSection> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: action["color"],
                           borderRadius: BorderRadius.circular(10),
@@ -98,14 +151,14 @@ class _QuickActionSectionState extends State<QuickActionSection> {
                           size: 20,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               action["title"],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
@@ -113,10 +166,10 @@ class _QuickActionSectionState extends State<QuickActionSection> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(height: 2),
                             Text(
                               action["subtitle"],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
                                 color: AppColors.textSecondary,
                               ),
