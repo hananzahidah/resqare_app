@@ -697,8 +697,9 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {
-              context.push(DetailReportScreen(reportId: report.id ?? 0));
+            onTap: () async {
+              await context.push(DetailReportScreen(reportId: report.id ?? 0));
+              _loadReports();
             },
             child: Padding(
               padding: EdgeInsets.all(12.0),

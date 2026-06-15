@@ -44,6 +44,12 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
     }
   }
 
+  void _refreshAllData() {
+    _loadUser();
+    _currentRescueKey.currentState?.loadVolunteerData();
+    _nearbyKey.currentState?.loadReports();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,6 +133,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                     });
                   }
                 },
+                onRefreshRequired: _refreshAllData,
               ),
               SizedBox(height: 16),
 
@@ -135,7 +142,10 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
 
               // Conditional Report List
               _isVolunteerActive
-                  ? NearbyReportSection(key: _nearbyKey)
+                  ? NearbyReportSection(
+                      key: _nearbyKey,
+                      onRefreshRequired: _refreshAllData,
+                    )
                   : Container(
                       margin: EdgeInsets.symmetric(horizontal: 20),
                       padding: EdgeInsets.all(20),

@@ -161,8 +161,9 @@ class MyReportsSectionState extends State<MyReportsSection> {
                 break;
             }
             return GestureDetector(
-              onTap: () {
-                context.push(DetailReportScreen(reportId: report.id ?? 0));
+              onTap: () async {
+                await context.push(DetailReportScreen(reportId: report.id ?? 0));
+                loadMyReports();
               },
               child: Container(
                 padding: EdgeInsets.all(12),

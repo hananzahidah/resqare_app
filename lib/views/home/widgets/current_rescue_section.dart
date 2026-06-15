@@ -10,8 +10,13 @@ import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
 
 class CurrentRescueSection extends StatefulWidget {
   final ValueChanged<bool> onActiveStatusChanged;
+  final VoidCallback? onRefreshRequired;
 
-  const CurrentRescueSection({super.key, required this.onActiveStatusChanged});
+  const CurrentRescueSection({
+    super.key,
+    required this.onActiveStatusChanged,
+    this.onRefreshRequired,
+  });
 
   @override
   State<CurrentRescueSection> createState() => CurrentRescueSectionState();
@@ -181,10 +186,12 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
             const SizedBox(height: 10),
 
             GestureDetector(
-              onTap: () {
-                context.push(
+              onTap: () async {
+                await context.push(
                   DetailReportScreen(reportId: _activeMission!.id ?? 0),
                 );
+                loadVolunteerData();
+                widget.onRefreshRequired?.call();
               },
               child: Container(
                 padding: const EdgeInsets.all(12),

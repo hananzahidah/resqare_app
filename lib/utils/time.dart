@@ -4,11 +4,11 @@ String timeAgo(DateTime dateTime) {
   if (diff.inSeconds < 60) {
     return "baru saja";
   } else if (diff.inMinutes < 60) {
-    return "${diff.inMinutes} menit yang lalu";
+    return "${diff.inMinutes} mnt lalu";
   } else if (diff.inHours < 24) {
-    return "${diff.inHours} jam yang lalu";
+    return "${diff.inHours} jam lalu";
   } else if (diff.inDays < 7) {
-    return "${diff.inDays} hari yang lalu";
+    return "${diff.inDays} hr lalu";
   } else {
     final day = dateTime.day.toString().padLeft(2, '0');
     final month = dateTime.month.toString().padLeft(2, '0');

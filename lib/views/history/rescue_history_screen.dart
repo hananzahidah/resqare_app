@@ -470,8 +470,9 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            context.push(DetailReportScreen(reportId: report.id!));
+          onTap: () async {
+            await context.push(DetailReportScreen(reportId: report.id!));
+            _loadRescueReports();
           },
           child: Padding(
             padding: const EdgeInsets.all(12.0),

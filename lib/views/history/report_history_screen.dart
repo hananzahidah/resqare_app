@@ -364,9 +364,10 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () {
+          onTap: () async {
             if (report.id != null) {
-              context.push(DetailReportScreen(reportId: report.id!));
+              await context.push(DetailReportScreen(reportId: report.id!));
+              _loadReports();
             }
           },
           child: Padding(

@@ -14,7 +14,9 @@ import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
 
 class NearbyReportSection extends StatefulWidget {
-  const NearbyReportSection({super.key});
+  final VoidCallback? onRefreshRequired;
+
+  const NearbyReportSection({super.key, this.onRefreshRequired});
 
   @override
   State<NearbyReportSection> createState() => NearbyReportSectionState();
@@ -202,8 +204,10 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
                     }
 
                     return GestureDetector(
-                      onTap: () {
-                        context.push(DetailReportScreen(reportId: data.id ?? 0));
+                      onTap: () async {
+                        await context.push(DetailReportScreen(reportId: data.id ?? 0));
+                        loadReports();
+                        widget.onRefreshRequired?.call();
                       },
                       child: Container(
                         width: 155,
