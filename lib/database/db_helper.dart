@@ -21,7 +21,7 @@ class DBHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         // 1. Users
         await db.execute('''
@@ -142,6 +142,7 @@ class DBHelper {
           CREATE TABLE chat_messages(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             reportId INTEGER,
+            volunteerId INTEGER,
             senderId INTEGER,
             message TEXT,
             createdAt TEXT,

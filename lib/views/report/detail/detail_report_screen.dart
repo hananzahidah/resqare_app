@@ -16,6 +16,9 @@ import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/widget/bottom_action_section.dart';
 import 'package:resqare_app/views/report/detail/widget/maps_section.dart';
 import 'package:resqare_app/views/report/detail/widget/status_bar_section.dart';
+import 'package:resqare_app/repositories/chat_repository.dart';
+import 'package:resqare_app/views/report/detail/widget/chat_room_screen.dart';
+import 'package:resqare_app/views/report/detail/widget/chat_session_bottom_sheet.dart';
 
 class DetailReportScreen extends StatefulWidget {
   final int reportId;
@@ -50,7 +53,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
   String? _distanceText;
 
   String? _reporterProfilePath;
-  bool _isLoadingReporter = true;
+
 
   @override
   void initState() {
@@ -99,7 +102,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
     setState(() {
       _isLoading = true;
       _isLoadingImages = true;
-      _isLoadingReporter = true;
+
     });
 
     try {
@@ -152,7 +155,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
             _distanceText = newDistanceText;
             _isLoading = false;
             _isLoadingImages = false;
-            _isLoadingReporter = false;
+
           });
         }
       } else {
@@ -160,7 +163,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
           setState(() {
             _isLoading = false;
             _isLoadingImages = false;
-            _isLoadingReporter = false;
+
           });
         }
       }
@@ -170,7 +173,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
         setState(() {
           _isLoading = false;
           _isLoadingImages = false;
-          _isLoadingReporter = false;
+
         });
       }
     }
@@ -183,10 +186,92 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
     final isReporter = _report!.createdBy == currentUserId;
     final isVolunteer = _report!.rescuedBy == currentUserId;
 
-    final isActiveStatus = status == 'assigned' || status == 'on rescue';
+    final isValidStatus = status == 'assigned' || status == 'on rescue' || status == 'completed';
     final isParticipant = isReporter || isVolunteer;
 
-    return isActiveStatus && isParticipant;
+    return isValidStatus && isParticipant;
+  }
+
+  void _openChat() async {
+    final report = _report;
+    if (report == null) return;
+
+    final currentUserId = PreferenceHandler.userId;
+    final isReporter = report.createdBy == currentUserId;
+
+    if (!isReporter) {
+      // Volunteer: Langsung buka chat room dengan reporter
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ChatRoomScreen(
+            report: report,
+            volunteerId: currentUserId,
+            otherUserName: _reporter?.fullName ?? "Pelapor Laporan",
+          ),
+        ),
+      ).then((_) => _loadAllData());
+      return;
+    }
+
+    // Reporter: Cek riwayat chat di database
+    final chatRepo = ChatRepository();
+    final List<int> volunteersInChat = await chatRepo.getChatVolunteers(report.id ?? 0);
+
+    // Pastikan volunteer saat ini terdaftar di pilihan chat jika rescuedBy tidak null
+    if (report.rescuedBy != null && !volunteersInChat.contains(report.rescuedBy!)) {
+      volunteersInChat.add(report.rescuedBy!);
+    }
+
+    if (volunteersInChat.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Belum ada relawan yang ditugaskan ke laporan ini.")),
+        );
+      }
+      return;
+    }
+
+    if (volunteersInChat.length == 1) {
+      // Hanya 1 volunteer: langsung buka chat room
+      final vId = volunteersInChat.first;
+      final vUser = await _userRepository.getUserById(vId);
+      if (mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChatRoomScreen(
+              report: report,
+              volunteerId: vId,
+              otherUserName: vUser?.fullName ?? "Relawan #$vId",
+            ),
+          ),
+        ).then((_) => _loadAllData());
+      }
+    } else {
+      // Lebih dari 1 volunteer: tampilkan bottom sheet pemilihan
+      if (mounted) {
+        showModalBottomSheet(
+          context: context,
+          backgroundColor: Colors.transparent,
+          isScrollControlled: true,
+          builder: (context) => ChatSessionBottomSheet(
+            report: report,
+            volunteerIds: volunteersInChat,
+            onSessionSelected: (vId, name) {
+              Navigator.of(context).pop(); // Tutup bottom sheet
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ChatRoomScreen(
+                    report: report,
+                    volunteerId: vId,
+                    otherUserName: name,
+                  ),
+                ),
+              ).then((_) => _loadAllData());
+            },
+          ),
+        );
+      }
+    }
   }
 
   void _handleBack() {
@@ -245,14 +330,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
         ),
       floatingActionButton: _shouldShowChatButton()
           ? FloatingActionButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Fitur live chat akan datang segera!"),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
+              onPressed: _openChat,
               backgroundColor: AppColors.primaryBlue,
               shape: const CircleBorder(),
               child: const Icon(Icons.chat_rounded, color: Colors.white),

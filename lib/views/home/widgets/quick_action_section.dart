@@ -14,7 +14,7 @@ class _QuickActionSectionState extends State<QuickActionSection> {
   final List<Map<String, dynamic>> volunteerActions = [
     {
       "title": "Misi Rescue",
-      "subtitle": "Lihat tugas aktif",
+      "subtitle": "Lihat tugas",
       "icon": Icons.assignment_turned_in_rounded,
       "color": Color(0xFFEBF3FF),
       "iconColor": AppColors.primaryBlue,
@@ -22,7 +22,7 @@ class _QuickActionSectionState extends State<QuickActionSection> {
     },
     {
       "title": "Kontak SOS",
-      "subtitle": "Hubungi damkar",
+      "subtitle": "Telp damkar",
       "icon": Icons.contact_phone_rounded,
       "color": Color(0xFFFFF2F2),
       "iconColor": AppColors.emergency,
@@ -58,7 +58,7 @@ class _QuickActionSectionState extends State<QuickActionSection> {
   final List<Map<String, dynamic>> reporterActions = [
     {
       "title": "Laporkan",
-      "subtitle": "Kirim info baru",
+      "subtitle": "Kirim info",
       "icon": Icons.add_alert_rounded,
       "color": Color(0xFFFFF7E6),
       "iconColor": AppColors.waitingRescue,
@@ -66,7 +66,7 @@ class _QuickActionSectionState extends State<QuickActionSection> {
     },
     {
       "title": "Kontak SOS",
-      "subtitle": "Hubungi damkar",
+      "subtitle": "Telp damkar",
       "icon": Icons.phone_in_talk_rounded,
       "color": Color(0xFFFFF2F2),
       "iconColor": AppColors.emergency,
@@ -92,7 +92,7 @@ class _QuickActionSectionState extends State<QuickActionSection> {
 
     {
       "title": "Panduan",
-      "subtitle": "Tips pertolongan",
+      "subtitle": "Tips bantuan",
       "icon": Icons.health_and_safety_rounded,
       "color": Color(0xFFE6F9F3),
       "iconColor": AppColors.success,

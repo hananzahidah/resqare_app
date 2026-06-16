@@ -432,7 +432,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
                       content:
                           "Apakah Anda yakin laporan penyelamatan ini telah selesai ditangani?",
                       confirmText: "Selesaikan",
-                      confirmColor: AppColors.success,
+                      confirmColor: AppColors.primaryBlue,
                     );
                     if (confirm) {
                       _updateStatus('completed');

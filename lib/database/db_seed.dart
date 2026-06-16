@@ -497,6 +497,7 @@ class DBSeed {
 
     await db.insert('chat_messages', {
       'reportId': 1,
+      'volunteerId': 4,
       'senderId': 2,
       'message': 'Halo, apakah sudah ditangani?',
       'createdAt': now,
@@ -505,6 +506,7 @@ class DBSeed {
 
     await db.insert('chat_messages', {
       'reportId': 1,
+      'volunteerId': 4,
       'senderId': 4,
       'message': 'Iya, saya sedang menuju lokasi',
       'createdAt': now,
@@ -513,6 +515,7 @@ class DBSeed {
 
     await db.insert('chat_messages', {
       'reportId': 1,
+      'volunteerId': 4,
       'senderId': 2,
       'message': 'Baik, hati-hati ya',
       'createdAt': now,
