@@ -6,6 +6,7 @@ import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/report_model.dart';
 import 'package:resqare_app/models/user_model_sql.dart';
+import 'package:resqare_app/repositories/chat_repository.dart';
 import 'package:resqare_app/repositories/report_repository.dart';
 import 'package:resqare_app/repositories/user_repository.dart';
 import 'package:resqare_app/utils/color_badge.dart';
@@ -14,11 +15,10 @@ import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/widget/bottom_action_section.dart';
-import 'package:resqare_app/views/report/detail/widget/maps_section.dart';
-import 'package:resqare_app/views/report/detail/widget/status_bar_section.dart';
-import 'package:resqare_app/repositories/chat_repository.dart';
 import 'package:resqare_app/views/report/detail/widget/chat_room_screen.dart';
 import 'package:resqare_app/views/report/detail/widget/chat_session_bottom_sheet.dart';
+import 'package:resqare_app/views/report/detail/widget/maps_section.dart';
+import 'package:resqare_app/views/report/detail/widget/status_bar_section.dart';
 
 class DetailReportScreen extends StatefulWidget {
   final int reportId;
@@ -51,9 +51,6 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
   double? _userLng;
 
   String? _distanceText;
-
-  String? _reporterProfilePath;
-
 
   @override
   void initState() {
@@ -102,7 +99,6 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
     setState(() {
       _isLoading = true;
       _isLoadingImages = true;
-
     });
 
     try {
@@ -155,7 +151,6 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
             _distanceText = newDistanceText;
             _isLoading = false;
             _isLoadingImages = false;
-
           });
         }
       } else {
@@ -163,7 +158,6 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
           setState(() {
             _isLoading = false;
             _isLoadingImages = false;
-
           });
         }
       }
@@ -173,7 +167,6 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
         setState(() {
           _isLoading = false;
           _isLoadingImages = false;
-
         });
       }
     }
@@ -186,7 +179,8 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
     final isReporter = _report!.createdBy == currentUserId;
     final isVolunteer = _report!.rescuedBy == currentUserId;
 
-    final isValidStatus = status == 'assigned' || status == 'on rescue' || status == 'completed';
+    final isValidStatus =
+        status == 'assigned' || status == 'on rescue' || status == 'completed';
     final isParticipant = isReporter || isVolunteer;
 
     return isValidStatus && isParticipant;
@@ -201,31 +195,38 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
 
     if (!isReporter) {
       // Volunteer: Langsung buka chat room dengan reporter
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => ChatRoomScreen(
-            report: report,
-            volunteerId: currentUserId,
-            otherUserName: _reporter?.fullName ?? "Pelapor Laporan",
-          ),
-        ),
-      ).then((_) => _loadAllData());
+      Navigator.of(context)
+          .push(
+            MaterialPageRoute(
+              builder: (context) => ChatRoomScreen(
+                report: report,
+                volunteerId: currentUserId,
+                otherUserName: _reporter?.fullName ?? "Pelapor Laporan",
+              ),
+            ),
+          )
+          .then((_) => _loadAllData());
       return;
     }
 
     // Reporter: Cek riwayat chat di database
     final chatRepo = ChatRepository();
-    final List<int> volunteersInChat = await chatRepo.getChatVolunteers(report.id ?? 0);
+    final List<int> volunteersInChat = await chatRepo.getChatVolunteers(
+      report.id ?? 0,
+    );
 
     // Pastikan volunteer saat ini terdaftar di pilihan chat jika rescuedBy tidak null
-    if (report.rescuedBy != null && !volunteersInChat.contains(report.rescuedBy!)) {
+    if (report.rescuedBy != null &&
+        !volunteersInChat.contains(report.rescuedBy!)) {
       volunteersInChat.add(report.rescuedBy!);
     }
 
     if (volunteersInChat.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Belum ada relawan yang ditugaskan ke laporan ini.")),
+          const SnackBar(
+            content: Text("Belum ada relawan yang ditugaskan ke laporan ini."),
+          ),
         );
       }
       return;
@@ -236,15 +237,17 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
       final vId = volunteersInChat.first;
       final vUser = await _userRepository.getUserById(vId);
       if (mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => ChatRoomScreen(
-              report: report,
-              volunteerId: vId,
-              otherUserName: vUser?.fullName ?? "Relawan #$vId",
-            ),
-          ),
-        ).then((_) => _loadAllData());
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                builder: (context) => ChatRoomScreen(
+                  report: report,
+                  volunteerId: vId,
+                  otherUserName: vUser?.fullName ?? "Relawan #$vId",
+                ),
+              ),
+            )
+            .then((_) => _loadAllData());
       }
     } else {
       // Lebih dari 1 volunteer: tampilkan bottom sheet pemilihan
@@ -258,15 +261,17 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
             volunteerIds: volunteersInChat,
             onSessionSelected: (vId, name) {
               Navigator.of(context).pop(); // Tutup bottom sheet
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => ChatRoomScreen(
-                    report: report,
-                    volunteerId: vId,
-                    otherUserName: name,
-                  ),
-                ),
-              ).then((_) => _loadAllData());
+              Navigator.of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (context) => ChatRoomScreen(
+                        report: report,
+                        volunteerId: vId,
+                        otherUserName: name,
+                      ),
+                    ),
+                  )
+                  .then((_) => _loadAllData());
             },
           ),
         );
@@ -328,357 +333,284 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
           report: report,
           onActionCompleted: _loadAllData,
         ),
-      floatingActionButton: _shouldShowChatButton()
-          ? FloatingActionButton(
-              onPressed: _openChat,
-              backgroundColor: AppColors.primaryBlue,
-              shape: const CircleBorder(),
-              child: const Icon(Icons.chat_rounded, color: Colors.white),
-            )
-          : null,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Carousel Image
-                Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    SizedBox(
-                      height: 340,
-                      width: double.infinity,
-                      child: _isLoadingImages
-                          ? Center(child: CircularProgressIndicator())
-                          : _images.isEmpty
-                          ? Container(
-                              color: AppColors.border,
-                              child: Icon(
-                                Icons.image_not_supported_rounded,
-                                size: 64,
-                                color: AppColors.textSecondary,
+        floatingActionButton: _shouldShowChatButton()
+            ? FloatingActionButton(
+                onPressed: _openChat,
+                backgroundColor: AppColors.primaryBlue,
+                shape: const CircleBorder(),
+                child: const Icon(Icons.chat_rounded, color: Colors.white),
+              )
+            : null,
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Carousel Image
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      SizedBox(
+                        height: 340,
+                        width: double.infinity,
+                        child: _isLoadingImages
+                            ? Center(child: CircularProgressIndicator())
+                            : _images.isEmpty
+                            ? Container(
+                                color: AppColors.border,
+                                child: Icon(
+                                  Icons.image_not_supported_rounded,
+                                  size: 64,
+                                  color: AppColors.textSecondary,
+                                ),
+                              )
+                            : PageView.builder(
+                                itemCount: _images.length,
+                                onPageChanged: (index) {
+                                  setState(() {
+                                    _currentImageIndex = index;
+                                  });
+                                },
+                                itemBuilder: (context, index) {
+                                  final img = _images[index];
+                                  final isAsset = img.startsWith('assets/');
+                                  return isAsset
+                                      ? Image.asset(img, fit: BoxFit.cover)
+                                      : Image.file(
+                                          File(img),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, _, _) {
+                                            return Container(
+                                              color: AppColors.border,
+                                              child: Icon(
+                                                Icons.broken_image_rounded,
+                                                size: 64,
+                                                color: AppColors.textSecondary,
+                                              ),
+                                            );
+                                          },
+                                        );
+                                },
                               ),
-                            )
-                          : PageView.builder(
-                              itemCount: _images.length,
-                              onPageChanged: (index) {
-                                setState(() {
-                                  _currentImageIndex = index;
-                                });
-                              },
-                              itemBuilder: (context, index) {
-                                final img = _images[index];
-                                final isAsset = img.startsWith('assets/');
-                                return isAsset
-                                    ? Image.asset(img, fit: BoxFit.cover)
-                                    : Image.file(
-                                        File(img),
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, _, _) {
-                                          return Container(
-                                            color: AppColors.border,
-                                            child: Icon(
-                                              Icons.broken_image_rounded,
-                                              size: 64,
-                                              color: AppColors.textSecondary,
-                                            ),
-                                          );
-                                        },
-                                      );
-                              },
-                            ),
-                    ),
+                      ),
 
-                    // Gradient
-                    Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            AppColors.background,
-                            AppColors.background.withOpacity(0.0),
+                      // Gradient
+                      Container(
+                        height: 100,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              AppColors.background,
+                              AppColors.background.withOpacity(0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Indicator for multiple images
+                      if (_images.length > 1)
+                        Positioned(
+                          bottom: 16,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              _images.length,
+                              (index) => AnimatedContainer(
+                                duration: Duration(milliseconds: 250),
+                                margin: EdgeInsets.symmetric(horizontal: 4),
+                                height: 6,
+                                width: _currentImageIndex == index ? 20 : 6,
+                                decoration: BoxDecoration(
+                                  color: _currentImageIndex == index
+                                      ? AppColors.primaryBlue
+                                      : Colors.white70,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Category, Urgency
+                        Row(
+                          spacing: 10,
+                          children: [
+                            // level
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: ColorUtils.getPriorityColor(
+                                  report.priorityLevel,
+                                ),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Text(
+                                report.priorityLevel,
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+
+                            // animal category
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryBlue.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                spacing: 6,
+                                children: [
+                                  Icon(
+                                    Icons.pets,
+                                    size: 13,
+                                    color: AppColors.primaryBlue,
+                                  ),
+                                  Text(
+                                    report.animalCategory,
+                                    style: const TextStyle(
+                                      color: AppColors.primaryBlue,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ),
 
-                    // Indicator for multiple images
-                    if (_images.length > 1)
-                      Positioned(
-                        bottom: 16,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            _images.length,
-                            (index) => AnimatedContainer(
-                              duration: Duration(milliseconds: 250),
-                              margin: EdgeInsets.symmetric(horizontal: 4),
-                              height: 6,
-                              width: _currentImageIndex == index ? 20 : 6,
-                              decoration: BoxDecoration(
-                                color: _currentImageIndex == index
-                                    ? AppColors.primaryBlue
-                                    : Colors.white70,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+                        SizedBox(height: 14),
 
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Category, Urgency
-                      Row(
-                        spacing: 10,
-                        children: [
-                          // level
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: ColorUtils.getPriorityColor(
-                                report.priorityLevel,
-                              ),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: Text(
-                              report.priorityLevel,
+                        // Title, Date & Distance
+                        Column(
+                          spacing: 12,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              report.title,
                               style: TextStyle(
-                                color: AppColors.white,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 11,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-
-                          // animal category
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryBlue.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              spacing: 6,
+                            Row(
+                              spacing: 20,
                               children: [
-                                Icon(
-                                  Icons.pets,
-                                  size: 13,
-                                  color: AppColors.primaryBlue,
+                                Row(
+                                  spacing: 6,
+                                  children: [
+                                    Icon(Icons.access_time_filled, size: 12),
+                                    Text(
+                                      DateFormatter.toReadableDateTime(
+                                        report.createdAt,
+                                      ),
+                                      style: TextStyle(fontSize: 11),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  report.animalCategory,
-                                  style: const TextStyle(
-                                    color: AppColors.primaryBlue,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                  ),
+
+                                Row(
+                                  spacing: 6,
+
+                                  children: [
+                                    Icon(Icons.navigation, size: 12),
+                                    Text(
+                                      _distanceText ?? '-',
+                                      style: TextStyle(fontSize: 11),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: 14),
-
-                      // Title, Date & Distance
-                      Column(
-                        spacing: 12,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            report.title,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Row(
-                            spacing: 20,
-                            children: [
-                              Row(
-                                spacing: 6,
-                                children: [
-                                  Icon(Icons.access_time_filled, size: 12),
-                                  Text(
-                                    DateFormatter.toReadableDateTime(
-                                      report.createdAt,
-                                    ),
-                                    style: TextStyle(fontSize: 11),
-                                  ),
-                                ],
-                              ),
-
-                              Row(
-                                spacing: 6,
-
-                                children: [
-                                  Icon(Icons.navigation, size: 12),
-                                  Text(
-                                    _distanceText ?? '-',
-                                    style: TextStyle(fontSize: 11),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 14),
-
-                      // Status Bar
-                      StatusBarSection(status: report.status),
-                      SizedBox(height: 14),
-
-                      // Description
-                      Column(
-                        spacing: 10,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Deskripsi Laporan",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            report.description!,
-                            style: TextStyle(fontSize: 13),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 24),
-
-                      // Animal Condition
-                      Column(
-                        spacing: 12,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Kondisi Hewan",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              if (report.hasInjury)
-                                _buildConditionTag("Luka Fisik"),
-                              if (report.hasBleeding)
-                                _buildConditionTag("Berdarah"),
-                              if (report.cannotWalk)
-                                _buildConditionTag("Sulit Bergerak"),
-                              if (report.isTrapped)
-                                _buildConditionTag("Terjebak"),
-                              if (report.isSick)
-                                _buildConditionTag("Sakit / Lemas"),
-                              if (report.isAbandoned)
-                                _buildConditionTag("Terlantar"),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 32),
-
-                      // Reporter Account
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Color(0xFFEDEEF1)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.02),
-                              blurRadius: 10,
-                              offset: Offset(0, 4),
-                            ),
                           ],
                         ),
+                        SizedBox(height: 14),
 
-                        child: Row(
-                          spacing: 14,
+                        // Status Bar
+                        StatusBarSection(status: report.status),
+                        SizedBox(height: 14),
+
+                        // Description
+                        Column(
+                          spacing: 10,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildReporterAvatar(),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    spacing: 6,
-                                    children: [
-                                      Text.rich(
-                                        TextSpan(
-                                          text: "Dilaporkan oleh",
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: AppColors.textSecondary,
-                                          ),
-
-                                          children: [
-                                            TextSpan(
-                                              text:
-                                                  PreferenceHandler.userId ==
-                                                      _reporter!.id
-                                                  ? " (Anda)"
-                                                  : "",
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    _reporter!.fullName.toTitleCase(),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                            Text(
+                              "Deskripsi Laporan",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.arrow_forward_ios,
-                                color: AppColors.primaryBlue,
-                              ),
+                            Text(
+                              report.description!,
+                              style: TextStyle(fontSize: 13),
                             ),
                           ],
                         ),
-                      ),
-                      SizedBox(height: 16),
+                        SizedBox(height: 24),
 
-                      // Volunteer Account
-                      if (_volunteer != null) ...[
+                        // Animal Condition
+                        Column(
+                          spacing: 12,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Kondisi Hewan",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                if (report.hasInjury)
+                                  _buildConditionTag("Luka Fisik"),
+                                if (report.hasBleeding)
+                                  _buildConditionTag("Berdarah"),
+                                if (report.cannotWalk)
+                                  _buildConditionTag("Sulit Bergerak"),
+                                if (report.isTrapped)
+                                  _buildConditionTag("Terjebak"),
+                                if (report.isSick)
+                                  _buildConditionTag("Sakit / Lemas"),
+                                if (report.isAbandoned)
+                                  _buildConditionTag("Terlantar"),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 32),
+
+                        // Reporter Account
                         Container(
                           padding: EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -702,27 +634,32 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text.rich(
-                                      TextSpan(
-                                        text: "Ditangani oleh",
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: AppColors.textSecondary,
-                                        ),
-
-                                        children: [
+                                    Row(
+                                      spacing: 6,
+                                      children: [
+                                        Text.rich(
                                           TextSpan(
-                                            text:
-                                                PreferenceHandler.userId ==
-                                                    _volunteer!.id
-                                                ? " (Anda)"
-                                                : "",
+                                            text: "Dilaporkan oleh",
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: AppColors.textSecondary,
+                                            ),
+
+                                            children: [
+                                              TextSpan(
+                                                text:
+                                                    PreferenceHandler.userId ==
+                                                        _reporter!.id
+                                                    ? " (Anda)"
+                                                    : "",
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                     Text(
-                                      _volunteer!.fullName.toTitleCase(),
+                                      _reporter!.fullName.toTitleCase(),
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
@@ -744,79 +681,165 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                           ),
                         ),
                         SizedBox(height: 16),
-                      ] else ...[
-                        Container(
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Color(0xFFEDEEF1)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.02),
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
 
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            spacing: 14,
-                            children: [
-                              Text(
-                                "Laporan belum ditugaskan",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textSecondary,
+                        // Volunteer Account
+                        if (_volunteer != null) ...[
+                          Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Color(0xFFEDEEF1)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.02),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+
+                            child: Row(
+                              spacing: 14,
+                              children: [
+                                _buildVolunteerAvatar(),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text.rich(
+                                        TextSpan(
+                                          text: "Ditangani oleh",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: AppColors.textSecondary,
+                                          ),
+
+                                          children: [
+                                            TextSpan(
+                                              text:
+                                                  PreferenceHandler.userId ==
+                                                      _volunteer!.id
+                                                  ? " (Anda)"
+                                                  : "",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        _volunteer!.fullName.toTitleCase(),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: AppColors.primaryBlue,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          SizedBox(height: 16),
+                        ] else ...[
+                          Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Color(0xFFEDEEF1)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.02),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              spacing: 14,
+                              children: [
+                                Text(
+                                  "Laporan belum ditugaskan",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                        ],
                         SizedBox(height: 16),
+
+                        // Maps
+                        MapsSection(report: report),
+                        SizedBox(height: 50),
                       ],
-                      SizedBox(height: 16),
-
-                      // Maps
-                      MapsSection(report: report),
-                      SizedBox(height: 50),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          Positioned(
-            top: 48,
-            left: 20,
-            child: InkWell(
-              onTap: _handleBack,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white,
-                  size: 18,
+            Positioned(
+              top: 48,
+              left: 20,
+              child: InkWell(
+                onTap: _handleBack,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildReporterAvatar() {
-    if (_reporterProfilePath != null && _reporterProfilePath!.isNotEmpty) {
-      final file = File(_reporterProfilePath!);
+    final imgProfile = _reporter?.imgProfile;
+    if (imgProfile != null && imgProfile.isNotEmpty) {
+      final file = File(imgProfile);
+      if (file.existsSync()) {
+        return CircleAvatar(radius: 20, backgroundImage: FileImage(file));
+      }
+    }
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: AppColors.primaryBlue,
+      child: Icon(Icons.person_rounded, color: Colors.white),
+    );
+  }
+
+  Widget _buildVolunteerAvatar() {
+    final imgProfile = _volunteer?.imgProfile;
+    if (imgProfile != null && imgProfile.isNotEmpty) {
+      final file = File(imgProfile);
       if (file.existsSync()) {
         return CircleAvatar(radius: 20, backgroundImage: FileImage(file));
       }

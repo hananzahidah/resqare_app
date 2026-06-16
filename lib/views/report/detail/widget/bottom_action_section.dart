@@ -439,7 +439,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
                     }
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.success,
+              backgroundColor: AppColors.primaryBlue,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(

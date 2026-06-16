@@ -11,7 +11,8 @@ import 'package:resqare_app/views/home/widgets/nearby_report_section.dart';
 import 'package:resqare_app/views/home/widgets/quick_action_section.dart';
 
 class VolunteerHomeScreen extends StatefulWidget {
-  const VolunteerHomeScreen({super.key});
+  final bool isActive;
+  const VolunteerHomeScreen({super.key, this.isActive = false});
 
   @override
   State<VolunteerHomeScreen> createState() => _VolunteerHomeScreenState();
@@ -29,6 +30,14 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
   void initState() {
     super.initState();
     _loadUser();
+  }
+
+  @override
+  void didUpdateWidget(covariant VolunteerHomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) {
+      _refreshAllData();
+    }
   }
 
   Future<void> _loadUser() async {
@@ -105,94 +114,101 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
         backgroundColor: AppColors.white,
         toolbarHeight: 75,
       ),
-      body: ListView(
-        physics: BouncingScrollPhysics(),
-        children: [
-          Column(
-            children: [
-              SizedBox(height: 16),
-
-              // User Current Location
-              LocationCardSection(
-                onLocationUpdated: () {
-                  _currentRescueKey.currentState?.loadVolunteerData();
-                  if (_isVolunteerActive) {
-                    _nearbyKey.currentState?.loadReports();
-                  }
-                },
-              ),
-              SizedBox(height: 16),
-
-              // Current Rescue & Toggle active status
-              CurrentRescueSection(
-                key: _currentRescueKey,
-                onActiveStatusChanged: (isActive) {
-                  if (mounted && _isVolunteerActive != isActive) {
-                    setState(() {
-                      _isVolunteerActive = isActive;
-                    });
-                  }
-                },
-                onRefreshRequired: _refreshAllData,
-              ),
-              SizedBox(height: 16),
-
-              QuickActionSection(),
-              SizedBox(height: 16),
-
-              // Conditional Report List
-              _isVolunteerActive
-                  ? NearbyReportSection(
-                      key: _nearbyKey,
-                      onRefreshRequired: _refreshAllData,
-                    )
-                  : Container(
-                      margin: EdgeInsets.symmetric(horizontal: 20),
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: AppColors.softBlue,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Color(0xFFFEF3C7), width: 1),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.nightlight_round_sharp,
-                            color: AppColors.primaryBlue,
-                            size: 28,
-                          ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Mode Istirahat Aktif",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "Aktifkan mode Relawan untuk melihat laporan masuk terdekat dari posisi Anda saat ini.",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-              SizedBox(height: 40),
-            ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          _refreshAllData();
+        },
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
           ),
-        ],
+          children: [
+            Column(
+              children: [
+                SizedBox(height: 16),
+
+                // User Current Location
+                LocationCardSection(
+                  onLocationUpdated: () {
+                    _currentRescueKey.currentState?.loadVolunteerData();
+                    if (_isVolunteerActive) {
+                      _nearbyKey.currentState?.loadReports();
+                    }
+                  },
+                ),
+                SizedBox(height: 16),
+
+                // Current Rescue & Toggle active status
+                CurrentRescueSection(
+                  key: _currentRescueKey,
+                  onActiveStatusChanged: (isActive) {
+                    if (mounted && _isVolunteerActive != isActive) {
+                      setState(() {
+                        _isVolunteerActive = isActive;
+                      });
+                    }
+                  },
+                  onRefreshRequired: _refreshAllData,
+                ),
+                SizedBox(height: 16),
+
+                QuickActionSection(),
+                SizedBox(height: 16),
+
+                // Conditional Report List
+                _isVolunteerActive
+                    ? NearbyReportSection(
+                        key: _nearbyKey,
+                        onRefreshRequired: _refreshAllData,
+                      )
+                    : Container(
+                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: AppColors.softBlue,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.border, width: 1),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.nightlight_round_sharp,
+                              color: AppColors.primaryBlue,
+                              size: 28,
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Mode Istirahat Aktif",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Aktifkan mode Relawan untuk melihat laporan masuk terdekat dari posisi Anda saat ini.",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                SizedBox(height: 40),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

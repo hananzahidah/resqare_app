@@ -622,15 +622,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -696,7 +688,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
     );
   }
 
-  // --- STEP 0: ROLE SELECTION ---
+  // Role Selection
   Widget _buildStep0RoleSelection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -764,7 +756,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                       ),
                       const SizedBox(height: 4),
                       const Text(
-                        'Laporkan hewan telantar, terluka, atau membutuhkan bantuan penyelamatan di sekitar Anda.',
+                        'Laporkan hewan telantar, terluka, atau membutuhkan bantuan di sekitar Anda.',
                         style: TextStyle(
                           fontSize: 13,
                           color: Color(0xFF6B7280),
@@ -843,7 +835,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                       ),
                       const SizedBox(height: 4),
                       const Text(
-                        'Daftar sebagai anggota penyelamat hewan dan ikut serta dalam misi penyelamatan secara langsung.',
+                        'Daftar sebagai anggota penyelamat hewan & ikut serta dalam misi penyelamatan.',
                         style: TextStyle(
                           fontSize: 13,
                           color: Color(0xFF6B7280),
@@ -890,7 +882,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
     );
   }
 
-  // --- STEP 1: ACCOUNT FORM ---
+  // Account Form Field
   Widget _buildStep1AccountForm() {
     final isVolunteer = _selectedRole == 'volunteer';
 
@@ -1098,7 +1090,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
     );
   }
 
-  // --- STEP 2: VOLUNTEER ADDITIONAL QUESTIONS ---
+  // Volunteer Application Form
   Widget _buildStep2VolunteerForm() {
     return Form(
       key: _volunteerFormKey,

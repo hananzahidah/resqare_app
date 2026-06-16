@@ -73,7 +73,8 @@ class MainContentWidget extends StatelessWidget {
     required bool isLoading,
     required this.widget,
     required Map<int, UserModelSql> volunteersData,
-  }) : _isLoading = isLoading, _volunteersData = volunteersData;
+  }) : _isLoading = isLoading,
+       _volunteersData = volunteersData;
 
   final bool _isLoading;
   final ChatSessionBottomSheet widget;
@@ -114,10 +115,7 @@ class MainContentWidget extends StatelessWidget {
         const SizedBox(height: 6),
         const Text(
           "Laporan ini ditangani oleh beberapa relawan. Pilih sesi obrolan yang ingin Anda lihat.",
-          style: TextStyle(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
+          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 20),
         Flexible(
@@ -125,16 +123,18 @@ class MainContentWidget extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: widget.volunteerIds.length,
-            separatorBuilder: (context, index) => const Divider(color: AppColors.border, height: 1),
+            separatorBuilder: (context, index) =>
+                const Divider(color: AppColors.border, height: 1),
             itemBuilder: (context, index) {
               final vId = widget.volunteerIds[index];
               final volunteer = _volunteersData[vId];
               final name = volunteer?.fullName ?? "Relawan #$vId";
-              
+
               final isRescuer = widget.report.rescuedBy == vId;
               final reportStatus = widget.report.status.toLowerCase();
-              final isCompleted = reportStatus == 'completed' || reportStatus == 'rescued';
-              
+              final isCompleted =
+                  reportStatus == 'completed' || reportStatus == 'rescued';
+
               final String subtitleText;
               final String badgeText;
               final Color badgeColor;
@@ -192,14 +192,19 @@ class MainContentWidget extends StatelessWidget {
                   subtitleText,
                   style: TextStyle(
                     fontSize: 11,
-                    color: isRescuer ? AppColors.primaryBlue : AppColors.textSecondary,
+                    color: isRescuer
+                        ? AppColors.primaryBlue
+                        : AppColors.textSecondary,
                   ),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: badgeBgColor,
                         borderRadius: BorderRadius.circular(100),
@@ -214,7 +219,11 @@ class MainContentWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textSecondary),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 14,
+                      color: AppColors.textSecondary,
+                    ),
                   ],
                 ),
                 onTap: () => widget.onSessionSelected(vId, name),

@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/models/user_model_sql.dart';
 import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/utils/date_formater.dart';
 
 class VolunteerApplicationScreen extends StatefulWidget {
   final UserModelSql user;
@@ -14,10 +15,12 @@ class VolunteerApplicationScreen extends StatefulWidget {
   const VolunteerApplicationScreen({super.key, required this.user});
 
   @override
-  State<VolunteerApplicationScreen> createState() => _VolunteerApplicationScreenState();
+  State<VolunteerApplicationScreen> createState() =>
+      _VolunteerApplicationScreenState();
 }
 
-class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen> {
+class _VolunteerApplicationScreenState
+    extends State<VolunteerApplicationScreen> {
   final UserRepository _userRepository = UserRepository();
   final _formKey = GlobalKey<FormState>();
 
@@ -30,8 +33,12 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
 
   bool _isLoading = true;
   bool _isSubmitting = false;
-  String _status = ''; // 'pending', 'approved', 'rejected', or 'none'
+  String _status = '';
   UserModelSql? _currentUser;
+  String? _reviewedAt;
+  String? _createdAt;
+  String? _updatedAt;
+  bool _isEditMode = false;
 
   @override
   void initState() {
@@ -60,11 +67,17 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
       _phoneController.text = _currentUser?.phone ?? '';
     }
 
-    final app = await _userRepository.getVolunteerApplication(_currentUser!.id!);
+    final app = await _userRepository.getVolunteerApplication(
+      _currentUser!.id!,
+    );
     if (app != null) {
       _status = (app['status'] as String).toLowerCase();
       _experienceController.text = app['experience'] ?? '';
       _reasonController.text = app['reason'] ?? '';
+      _reviewedAt = app['reviewedAt'];
+      _createdAt = app['createdAt'];
+      _updatedAt = app['updatedAt'];
+      _isEditMode = false;
 
       _certificateFiles.clear();
       if (app['image1'] != null && app['image1'].toString().isNotEmpty) {
@@ -78,6 +91,10 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
       }
     } else {
       _status = 'none';
+      _reviewedAt = null;
+      _createdAt = null;
+      _updatedAt = null;
+      _isEditMode = true;
     }
 
     setState(() {
@@ -256,7 +273,7 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
         }
       }
 
-      // Save local certificate files if they are newly added (i.e. currently in cache/temp folders)
+      // Save local certificate files if they are newly added
       final appDir = await getApplicationDocumentsDirectory();
       final List<String> savedPaths = [];
       for (int i = 0; i < _certificateFiles.length; i++) {
@@ -266,7 +283,8 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
         } else {
           // Copy new file
           final ext = p.extension(file.path);
-          final fileName = 'volunteer_cert_${_currentUser!.id}_$i${DateTime.now().millisecondsSinceEpoch}$ext';
+          final fileName =
+              'volunteer_cert_${_currentUser!.id}_$i${DateTime.now().millisecondsSinceEpoch}$ext';
           final savedFile = await file.copy('${appDir.path}/$fileName');
           savedPaths.add(savedFile.path);
         }
@@ -312,9 +330,80 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
     }
   }
 
+  Future<void> _showConfirmDialog() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final isNew = _status == 'none';
+    final title = isNew ? "Kirim Pengajuan" : "Simpan Perubahan";
+    final content = isNew
+        ? "Apakah Anda yakin ingin mengirim pengajuan relawan Anda?"
+        : "Apakah Anda yakin ingin menyimpan perubahan pada pengajuan relawan Anda?";
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              fontSize: 16,
+            ),
+          ),
+          content: Text(
+            content,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text(
+                "Batal",
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryBlue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 0,
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text(
+                "Ya, Yakin",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      _submitOrUpdate();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bool isEditable = _status == 'none' || _status == 'pending';
+    final bool isEditable =
+        _status == 'none' || (_status == 'pending' && _isEditMode);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -323,7 +412,9 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
-          _status == 'none' ? "Daftar Menjadi Relawan" : "Status Pengajuan Relawan",
+          _status == 'none'
+              ? "Daftar Menjadi Relawan"
+              : "Status Pengajuan Relawan",
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -331,11 +422,33 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
           ),
         ),
         centerTitle: true,
+        actions: [
+          if (_status == 'pending')
+            IconButton(
+              icon: Icon(
+                _isEditMode ? Icons.close_rounded : Icons.edit_rounded,
+                color: _isEditMode
+                    ? AppColors.emergency
+                    : AppColors.primaryBlue,
+              ),
+              onPressed: () {
+                if (_isEditMode) {
+                  _loadApplicationData();
+                } else {
+                  setState(() {
+                    _isEditMode = true;
+                  });
+                }
+              },
+            ),
+        ],
       ),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryBlue),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  AppColors.primaryBlue,
+                ),
               ),
             )
           : SingleChildScrollView(
@@ -358,7 +471,10 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: const Color(0xFFEDEEF1), width: 1),
+                          border: Border.all(
+                            color: const Color(0xFFEDEEF1),
+                            width: 1,
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.02),
@@ -372,7 +488,11 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                           children: [
                             const Row(
                               children: [
-                                Icon(Icons.volunteer_activism_rounded, color: AppColors.primaryBlue, size: 20),
+                                Icon(
+                                  Icons.volunteer_activism_rounded,
+                                  color: AppColors.primaryBlue,
+                                  size: 20,
+                                ),
                                 SizedBox(width: 8),
                                 Text(
                                   "Formulir Pendaftaran",
@@ -408,20 +528,29 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                               },
                               decoration: InputDecoration(
                                 hintText: "Contoh: 081234567890",
-                                prefixIcon: const Icon(Icons.phone_rounded, size: 20),
+                                prefixIcon: const Icon(
+                                  Icons.phone_rounded,
+                                  size: 20,
+                                ),
                                 filled: true,
-                                fillColor: isEditable ? AppColors.background : Colors.grey.shade100,
+                                fillColor: isEditable
+                                    ? AppColors.background
+                                    : Colors.grey.shade100,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide.none,
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: AppColors.border),
+                                  borderSide: const BorderSide(
+                                    color: AppColors.border,
+                                  ),
                                 ),
                                 disabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: AppColors.border),
+                                  borderSide: const BorderSide(
+                                    color: AppColors.border,
+                                  ),
                                 ),
                               ),
                             ),
@@ -449,20 +578,27 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                                 return null;
                               },
                               decoration: InputDecoration(
-                                hintText: "Ceritakan pengalaman Anda merawat atau mengevakuasi hewan...",
+                                hintText:
+                                    "Ceritakan pengalaman Anda merawat atau mengevakuasi hewan...",
                                 filled: true,
-                                fillColor: isEditable ? AppColors.background : Colors.grey.shade100,
+                                fillColor: isEditable
+                                    ? AppColors.background
+                                    : Colors.grey.shade100,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide.none,
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: AppColors.border),
+                                  borderSide: const BorderSide(
+                                    color: AppColors.border,
+                                  ),
                                 ),
                                 disabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: AppColors.border),
+                                  borderSide: const BorderSide(
+                                    color: AppColors.border,
+                                  ),
                                 ),
                               ),
                             ),
@@ -490,20 +626,27 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                                 return null;
                               },
                               decoration: InputDecoration(
-                                hintText: "Mengapa Anda tertarik menjadi relawan ResQare...",
+                                hintText:
+                                    "Mengapa Anda tertarik menjadi relawan ResQare...",
                                 filled: true,
-                                fillColor: isEditable ? AppColors.background : Colors.grey.shade100,
+                                fillColor: isEditable
+                                    ? AppColors.background
+                                    : Colors.grey.shade100,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide.none,
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: AppColors.border),
+                                  borderSide: const BorderSide(
+                                    color: AppColors.border,
+                                  ),
                                 ),
                                 disabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: AppColors.border),
+                                  borderSide: const BorderSide(
+                                    color: AppColors.border,
+                                  ),
                                 ),
                               ),
                             ),
@@ -524,7 +667,9 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                             Row(
                               spacing: 12,
                               children: [
-                                ...List.generate(_certificateFiles.length, (index) {
+                                ...List.generate(_certificateFiles.length, (
+                                  index,
+                                ) {
                                   final file = _certificateFiles[index];
                                   final exists = file.existsSync();
 
@@ -536,8 +681,12 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                                         height: 80,
                                         decoration: BoxDecoration(
                                           color: AppColors.background,
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(color: AppColors.border),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          border: Border.all(
+                                            color: AppColors.border,
+                                          ),
                                           image: exists
                                               ? DecorationImage(
                                                   image: FileImage(file),
@@ -547,7 +696,11 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                                         ),
                                         child: !exists
                                             ? const Center(
-                                                child: Icon(Icons.broken_image_rounded, color: AppColors.textSecondary),
+                                                child: Icon(
+                                                  Icons.broken_image_rounded,
+                                                  color:
+                                                      AppColors.textSecondary,
+                                                ),
                                               )
                                             : null,
                                       ),
@@ -556,7 +709,8 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                                           top: -6,
                                           right: -6,
                                           child: GestureDetector(
-                                            onTap: () => _removeCertificateImage(index),
+                                            onTap: () =>
+                                                _removeCertificateImage(index),
                                             child: Container(
                                               padding: const EdgeInsets.all(4),
                                               decoration: const BoxDecoration(
@@ -590,7 +744,8 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                                         ),
                                       ),
                                       child: const Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Icon(
                                             Icons.add_photo_alternate_outlined,
@@ -631,20 +786,33 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                               ),
                               elevation: 0,
                             ),
-                            onPressed: _isSubmitting ? null : _submitOrUpdate,
+                            onPressed: _isSubmitting
+                                ? null
+                                : _showConfirmDialog,
                             child: _isSubmitting
                                 ? const SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(_status == 'none' ? Icons.send_rounded : Icons.save_rounded, color: Colors.white, size: 18),
+                                      Icon(
+                                        _status == 'none'
+                                            ? Icons.send_rounded
+                                            : Icons.save_rounded,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        _status == 'none' ? "Kirim Pengajuan Relawan" : "Simpan Perubahan",
+                                        _status == 'none'
+                                            ? "Kirim Pengajuan Relawan"
+                                            : "Simpan Perubahan",
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
@@ -669,6 +837,7 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
     IconData icon;
     String title;
     String desc;
+    String? dateInfo;
 
     switch (_status) {
       case 'pending':
@@ -676,21 +845,38 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
         textColor = AppColors.waitingRescue;
         icon = Icons.hourglass_empty_rounded;
         title = "Pengajuan Sedang Ditinjau";
-        desc = "Tim kami sedang memeriksa data pengajuan Anda. Anda masih dapat memperbarui data pengajuan Anda selagi status masih pending.";
+        desc =
+            "Tim kami sedang memeriksa data pengajuan Anda. Anda masih dapat memperbarui data pengajuan Anda selagi status masih pending.";
+        if (_createdAt != null) {
+          dateInfo =
+              "Diajukan pada: ${DateFormatter.toReadableDateTime(_createdAt!)}";
+        }
         break;
       case 'approved':
         cardColor = AppColors.success.withOpacity(0.1);
         textColor = AppColors.success;
         icon = Icons.check_circle_rounded;
         title = "Pengajuan Disetujui";
-        desc = "Selamat! Pengajuan relawan Anda telah disetujui. Akun Anda kini memiliki hak akses penuh sebagai Relawan Penyelamat.";
+        desc =
+            "Selamat! Pengajuan relawan Anda telah disetujui. Akun Anda kini memiliki hak akses penuh sebagai Relawan Penyelamat.";
+        final reviewDate = _reviewedAt ?? _updatedAt;
+        if (reviewDate != null) {
+          dateInfo =
+              "Diterima pada: ${DateFormatter.toReadableDateTime(reviewDate)}";
+        }
         break;
       case 'rejected':
         cardColor = AppColors.emergency.withOpacity(0.1);
         textColor = AppColors.emergency;
         icon = Icons.cancel_rounded;
         title = "Pengajuan Ditolak";
-        desc = "Maaf, pengajuan relawan Anda belum dapat disetujui saat ini. Silakan hubungi pusat bantuan kami untuk informasi selengkapnya.";
+        desc =
+            "Maaf, pengajuan relawan Anda belum dapat disetujui saat ini. Silakan hubungi pusat bantuan kami untuk informasi selengkapnya.";
+        final reviewDate = _reviewedAt ?? _updatedAt;
+        if (reviewDate != null) {
+          dateInfo =
+              "Ditolak pada: ${DateFormatter.toReadableDateTime(reviewDate)}";
+        }
         break;
       default:
         return const SizedBox.shrink();
@@ -729,6 +915,38 @@ class _VolunteerApplicationScreenState extends State<VolunteerApplicationScreen>
                     height: 1.4,
                   ),
                 ),
+                if (dateInfo != null) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: textColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.access_time_filled_rounded,
+                          color: textColor,
+                          size: 12,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          dateInfo,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

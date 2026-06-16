@@ -7,7 +7,8 @@ import 'package:resqare_app/views/home/reporter_home_screen.dart';
 import 'package:resqare_app/views/home/volunteer_home_screen.dart';
 
 class RoleHomeWrapper extends StatefulWidget {
-  const RoleHomeWrapper({super.key});
+  final bool isActive;
+  const RoleHomeWrapper({super.key, this.isActive = false});
 
   @override
   State<RoleHomeWrapper> createState() => _RoleHomeWrapperState();
@@ -22,6 +23,14 @@ class _RoleHomeWrapperState extends State<RoleHomeWrapper> {
   void initState() {
     super.initState();
     _checkUserRole();
+  }
+
+  @override
+  void didUpdateWidget(covariant RoleHomeWrapper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) {
+      _checkUserRole();
+    }
   }
 
   Future<void> _checkUserRole() async {
@@ -66,7 +75,9 @@ class _RoleHomeWrapperState extends State<RoleHomeWrapper> {
     }
 
     return Scaffold(
-      body: _isVolunteer ? VolunteerHomeScreen() : ReporterHomeScreen(),
+      body: _isVolunteer
+          ? VolunteerHomeScreen(isActive: widget.isActive)
+          : ReporterHomeScreen(isActive: widget.isActive),
     );
   }
 }

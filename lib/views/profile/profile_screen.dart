@@ -12,7 +12,8 @@ import 'package:resqare_app/views/profile/volunteer_application_screen.dart';
 import 'package:sqlite_viewer2/sqlite_viewer.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool isActive;
+  const ProfileScreen({super.key, this.isActive = false});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -29,6 +30,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _loadUserProfile();
+  }
+
+  @override
+  void didUpdateWidget(covariant ProfileScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) {
+      _loadUserProfile();
+    }
   }
 
   Future<void> _loadUserProfile() async {
@@ -712,7 +721,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           subtitle: "Perbarui kata sandi akun Anda",
                           onTap: _showChangePasswordBottomSheet,
                         ),
-                        if (!isVolunteer) ...[
+                        if (_user?.role.toLowerCase() != 'admin') ...[
                           Divider(height: 1, color: AppColors.divider),
                           _buildMenuTile(
                             icon: Icons.volunteer_activism_outlined,

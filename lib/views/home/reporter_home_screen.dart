@@ -13,7 +13,8 @@ import 'package:resqare_app/views/home/widgets/nearby_report_section.dart';
 import 'package:resqare_app/views/home/widgets/quick_action_section.dart';
 
 class ReporterHomeScreen extends StatefulWidget {
-  const ReporterHomeScreen({super.key});
+  final bool isActive;
+  const ReporterHomeScreen({super.key, this.isActive = false});
 
   @override
   State<ReporterHomeScreen> createState() => _ReporterHomeScreenState();
@@ -29,6 +30,20 @@ class _ReporterHomeScreenState extends State<ReporterHomeScreen> {
   void initState() {
     super.initState();
     _loadUser();
+  }
+
+  @override
+  void didUpdateWidget(covariant ReporterHomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) {
+      _refreshAllData();
+    }
+  }
+
+  void _refreshAllData() {
+    _loadUser();
+    _nearbyKey.currentState?.loadReports();
+    _myReportsKey.currentState?.loadMyReports();
   }
 
   Future<void> _loadUser() async {
@@ -105,37 +120,50 @@ class _ReporterHomeScreenState extends State<ReporterHomeScreen> {
         backgroundColor: AppColors.white,
         toolbarHeight: 75,
       ),
-      body: ListView(
-        physics: BouncingScrollPhysics(),
-        children: [
-          Column(
-            children: [
-              SizedBox(height: 16),
-
-              // User Current Location
-              LocationCardSection(
-                onLocationUpdated: () {
-                  _nearbyKey.currentState?.loadReports();
-                  _myReportsKey.currentState?.loadMyReports();
-                },
-              ),
-              SizedBox(height: 16),
-
-              // Carousel Banner
-              CarouselSection(),
-              SizedBox(height: 16),
-
-              QuickActionSection(isReporter: true),
-              SizedBox(height: 30),
-
-              NearbyReportSection(key: _nearbyKey),
-              SizedBox(height: 30),
-
-              MyReportsSection(key: _myReportsKey),
-              SizedBox(height: 40),
-            ],
-          ),
-        ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _loadUser();
+          _nearbyKey.currentState?.loadReports();
+          _myReportsKey.currentState?.loadMyReports();
+        },
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          children: [
+            Column(
+              children: [
+                SizedBox(height: 16),
+  
+                // User Current Location
+                LocationCardSection(
+                  onLocationUpdated: () {
+                    _nearbyKey.currentState?.loadReports();
+                    _myReportsKey.currentState?.loadMyReports();
+                  },
+                ),
+                SizedBox(height: 16),
+  
+                // Carousel Banner
+                CarouselSection(),
+                SizedBox(height: 16),
+  
+                QuickActionSection(isReporter: true),
+                SizedBox(height: 30),
+  
+                NearbyReportSection(
+                  key: _nearbyKey,
+                  onRefreshRequired: _refreshAllData,
+                ),
+                SizedBox(height: 30),
+  
+                MyReportsSection(
+                  key: _myReportsKey,
+                  onRefreshRequired: _refreshAllData,
+                ),
+                SizedBox(height: 40),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -11,7 +11,8 @@ import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
 
 class MyReportsSection extends StatefulWidget {
-  const MyReportsSection({super.key});
+  final VoidCallback? onRefreshRequired;
+  const MyReportsSection({super.key, this.onRefreshRequired});
 
   @override
   State<MyReportsSection> createState() => MyReportsSectionState();
@@ -164,6 +165,7 @@ class MyReportsSectionState extends State<MyReportsSection> {
               onTap: () async {
                 await context.push(DetailReportScreen(reportId: report.id ?? 0));
                 loadMyReports();
+                widget.onRefreshRequired?.call();
               },
               child: Container(
                 padding: EdgeInsets.all(12),

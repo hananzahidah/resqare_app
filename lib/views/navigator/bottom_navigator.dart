@@ -16,14 +16,7 @@ class BottomNavigator extends StatefulWidget {
 
 class _BottomNavigatorState extends State<BottomNavigator> {
   late int _selectedIndex;
-
-  static const List<Widget> _widgetOptions = <Widget>[
-    RoleHomeWrapper(),
-    ExploreMapScreen(),
-    FormReportScreen(),
-    RoleHistoryWrapper(),
-    ProfileScreen(),
-  ];
+  final List<int> _reloadCounters = [0, 0, 0, 0, 0];
 
   @override
   void initState() {
@@ -32,9 +25,15 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (_selectedIndex == index) {
+      setState(() {
+        _reloadCounters[index]++;
+      });
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   void _handleBack() {
@@ -47,6 +46,14 @@ class _BottomNavigatorState extends State<BottomNavigator> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      RoleHomeWrapper(isActive: _selectedIndex == 0, key: ValueKey('home_${_reloadCounters[0]}')),
+      ExploreMapScreen(key: ValueKey('explore_${_reloadCounters[1]}')),
+      FormReportScreen(key: ValueKey('form_${_reloadCounters[2]}')),
+      RoleHistoryWrapper(key: ValueKey('history_${_reloadCounters[3]}')),
+      ProfileScreen(isActive: _selectedIndex == 4, key: ValueKey('profile_${_reloadCounters[4]}')),
+    ];
+
     return PopScope(
       canPop: _selectedIndex == 0,
       onPopInvokedWithResult: (didPop, result) {
@@ -54,7 +61,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
         _handleBack();
       },
       child: Scaffold(
-        body: IndexedStack(index: _selectedIndex, children: _widgetOptions),
+        body: IndexedStack(index: _selectedIndex, children: pages),
 
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
