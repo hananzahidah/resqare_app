@@ -9,7 +9,6 @@ import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/auth/login_screen.dart';
 import 'package:resqare_app/views/profile/edit_profile_screen.dart';
 import 'package:resqare_app/views/profile/volunteer_application_screen.dart';
-import 'package:sqlite_viewer2/sqlite_viewer.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool isActive;
@@ -346,6 +345,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     final isVolunteer = _user?.role.toLowerCase() == 'volunteer';
+    final isAdmin = _user?.role.toLowerCase() == 'admin';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -503,41 +503,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   SizedBox(height: 8),
                                   // Role Badge
                                   Container(
-                                    padding: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                       horizontal: 10,
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: isVolunteer
-                                          ? AppColors.primaryBlue.withOpacity(
-                                              0.12,
-                                            )
-                                          : AppColors.success.withOpacity(0.12),
+                                      color: AppColors.primaryBlue.withOpacity(
+                                        0.12,
+                                      ),
                                       borderRadius: BorderRadius.circular(100),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Icon(
-                                          isVolunteer
+                                          isAdmin
+                                              ? Icons
+                                                    .admin_panel_settings_rounded
+                                              : isVolunteer
                                               ? Icons.shield_rounded
                                               : Icons.person_pin_rounded,
                                           size: 12,
-                                          color: isVolunteer
-                                              ? AppColors.primaryBlue
-                                              : AppColors.success,
+                                          color: AppColors.primaryBlue,
                                         ),
-                                        SizedBox(width: 4),
+                                        const SizedBox(width: 4),
                                         Text(
-                                          isVolunteer
+                                          isAdmin
+                                              ? "Admin / Pengelola"
+                                              : isVolunteer
                                               ? "Volunteer / Relawan"
                                               : "Reporter / Pelapor",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
-                                            color: isVolunteer
-                                                ? AppColors.primaryBlue
-                                                : AppColors.success,
+                                            color: AppColors.primaryBlue,
                                           ),
                                         ),
                                       ],
@@ -555,200 +554,215 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
 
-            SizedBox(height: 12),
-
-            // 2. Statistic
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-              child: Row(
-                children: [
-                  // Stat Card 1: Reports
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Color(0xFFEDEEF1), width: 1),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.01),
-                            blurRadius: 8,
-                            offset: Offset(0, 4),
+            if (!isAdmin) ...[
+              const SizedBox(height: 12),
+              // 2. Statistic
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 12.0,
+                ),
+                child: Row(
+                  children: [
+                    // Stat Card 1: Reports
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFFEDEEF1),
+                            width: 1,
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.softBlue,
-                              borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.01),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
                             ),
-                            child: Icon(
-                              Icons.campaign_rounded,
-                              color: AppColors.primaryBlue,
-                              size: 18,
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.softBlue,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.campaign_rounded,
+                                color: AppColors.primaryBlue,
+                                size: 18,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 12),
-                          Text(
-                            "$_reportsCreated",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                            const SizedBox(height: 12),
+                            Text(
+                              "$_reportsCreated",
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "Laporan Dibuat",
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.textSecondary,
+                            const Text(
+                              "Laporan Dibuat",
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 14),
-                  // Stat Card 2: Rescues
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Color(0xFFEDEEF1), width: 1),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.01),
-                            blurRadius: 8,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.success.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.check_circle_rounded,
-                              color: AppColors.success,
-                              size: 18,
-                            ),
-                          ),
-                          SizedBox(height: 12),
-                          Text(
-                            "$_rescueCount",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          Text(
-                            "Penyelamatan",
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 14),
+                    // Stat Card 2: Rescues
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFFEDEEF1),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.01),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.success.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.check_circle_rounded,
+                                color: AppColors.success,
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              "$_rescueCount",
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const Text(
+                              "Penyelamatan",
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
 
             // 3. Settings
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 12),
-                  // Group 1: Akun & Keamanan
-                  Text(
-                    "Akun & Keamanan",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textSecondary,
+                  if (!isAdmin) ...[
+                    const SizedBox(height: 12),
+                    // Group 1: Akun & Keamanan
+                    const Text(
+                      "Akun & Keamanan",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Color(0xFFEDEEF1), width: 1),
-                    ),
-                    child: Column(
-                      children: [
-                        _buildMenuTile(
-                          icon: Icons.person_outline_rounded,
-                          title: "Edit Profil",
-                          subtitle: "Nama, nomor HP, detail kontak",
-                          onTap: () {
-                            if (_user != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditProfileScreen(user: _user!),
-                                ),
-                              ).then((value) {
-                                if (value == true) {
-                                  _loadUserProfile();
-                                }
-                              });
-                            }
-                          },
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: const Color(0xFFEDEEF1),
+                          width: 1,
                         ),
-                        Divider(height: 1, color: AppColors.divider),
-                        _buildMenuTile(
-                          icon: Icons.lock_outline_rounded,
-                          title: "Ganti Kata Sandi",
-                          subtitle: "Perbarui kata sandi akun Anda",
-                          onTap: _showChangePasswordBottomSheet,
-                        ),
-                        if (_user?.role.toLowerCase() != 'admin') ...[
-                          Divider(height: 1, color: AppColors.divider),
+                      ),
+                      child: Column(
+                        children: [
                           _buildMenuTile(
-                            icon: Icons.volunteer_activism_outlined,
-                            title: "Relawan",
-                            subtitle: "Pantau pengajuan relawan Anda",
+                            icon: Icons.person_outline_rounded,
+                            title: "Edit Profil",
+                            subtitle: "Nama, nomor HP, detail kontak",
                             onTap: () {
                               if (_user != null) {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        VolunteerApplicationScreen(
-                                          user: _user!,
-                                        ),
+                                        EditProfileScreen(user: _user!),
                                   ),
-                                ).then((_) {
-                                  _loadUserProfile();
+                                ).then((value) {
+                                  if (value == true) {
+                                    _loadUserProfile();
+                                  }
                                 });
                               }
                             },
                           ),
+                          const Divider(height: 1, color: AppColors.divider),
+                          _buildMenuTile(
+                            icon: Icons.lock_outline_rounded,
+                            title: "Ganti Kata Sandi",
+                            subtitle: "Perbarui kata sandi akun Anda",
+                            onTap: _showChangePasswordBottomSheet,
+                          ),
+                          if (_user?.role.toLowerCase() != 'admin') ...[
+                            const Divider(height: 1, color: AppColors.divider),
+                            _buildMenuTile(
+                              icon: Icons.volunteer_activism_outlined,
+                              title: "Relawan",
+                              subtitle: "Pantau pengajuan relawan Anda",
+                              onTap: () {
+                                if (_user != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          VolunteerApplicationScreen(
+                                            user: _user!,
+                                          ),
+                                    ),
+                                  ).then((_) {
+                                    _loadUserProfile();
+                                  });
+                                }
+                              },
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-
-                  SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                  ] else
+                    const SizedBox(height: 20),
 
                   // Group 3: Dukungan & Lainnya
                   Text(
@@ -812,15 +826,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ],
                             );
-                          },
-                        ),
-                        Divider(height: 1, color: AppColors.divider),
-                        _buildMenuTile(
-                          icon: Icons.storage_rounded,
-                          title: "Database Aplikasi",
-                          subtitle: "Lihat seluruh data aplikasi",
-                          onTap: () {
-                            context.push(DatabaseList());
                           },
                         ),
                       ],

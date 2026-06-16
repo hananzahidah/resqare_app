@@ -739,32 +739,30 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                           children: [
                             Container(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
+                                vertical: 4,
+                                horizontal: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: _getPriorityColor(
-                                  priority,
-                                ).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
+                                color: _getPriorityColor(priority),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 priority,
                                 style: TextStyle(
-                                  color: _getPriorityColor(priority),
+                                  color: AppColors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                             Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
                               ),
                               decoration: BoxDecoration(
                                 color: _getStatusColor(status).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 status,
@@ -777,13 +775,13 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                             ),
                             // Proximity Badge
                             Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
                               ),
                               decoration: BoxDecoration(
                                 color: AppColors.primaryBlue.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,

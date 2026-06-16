@@ -137,12 +137,12 @@ class MyReportsSectionState extends State<MyReportsSection> {
               case 'on rescue':
                 statusBgColor = Color(0xFFEFF6FF);
                 statusTextColor = AppColors.onRescue;
-                statusLabel = "Sedang Ditangani";
+                statusLabel = "Ditangani";
                 break;
               case 'assigned':
                 statusBgColor = Color(0xFFEEF2F6);
                 statusTextColor = AppColors.primaryBlue;
-                statusLabel = "Telah Ditugaskan";
+                statusLabel = "Ditugaskan";
                 break;
               case 'completed':
                 statusBgColor = Color(0xFFECFDF5);
@@ -163,7 +163,9 @@ class MyReportsSectionState extends State<MyReportsSection> {
             }
             return GestureDetector(
               onTap: () async {
-                await context.push(DetailReportScreen(reportId: report.id ?? 0));
+                await context.push(
+                  DetailReportScreen(reportId: report.id ?? 0),
+                );
                 loadMyReports();
                 widget.onRefreshRequired?.call();
               },
@@ -182,154 +184,154 @@ class MyReportsSectionState extends State<MyReportsSection> {
                   ],
                 ),
                 child: Row(
-                children: [
-                  // Image Preview
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: SizedBox(
-                      width: 80,
-                      height: 80,
-                      child: FutureBuilder<List<String>>(
-                        future: _reportRepository.getReportImages(
-                          reportId: report.id ?? 0,
-                        ),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                            final file = File(snapshot.data!.first);
-                            if (file.existsSync()) {
-                              return Image.file(file, fit: BoxFit.cover);
+                  children: [
+                    // Image Preview
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: SizedBox(
+                        width: 80,
+                        height: 80,
+                        child: FutureBuilder<List<String>>(
+                          future: _reportRepository.getReportImages(
+                            reportId: report.id ?? 0,
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                              final file = File(snapshot.data!.first);
+                              if (file.existsSync()) {
+                                return Image.file(file, fit: BoxFit.cover);
+                              }
                             }
-                          }
-                          return Container(
-                            color: Colors.grey[200],
-                            child: Icon(
-                              Icons.pets_rounded,
-                              color: Color(0xFF9CA3AF),
-                              size: 24,
-                            ),
-                          );
-                        },
+                            return Container(
+                              color: Colors.grey[200],
+                              child: Icon(
+                                Icons.pets_rounded,
+                                color: Color(0xFF9CA3AF),
+                                size: 24,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 14),
-                  // Details Column
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title
-                        Row(
-                          spacing: 10,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                report.title,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        // Location
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on_outlined,
-                              size: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                report.address,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: AppColors.textSecondary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-                        // Status & Created time
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Status
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 4,
-                                    horizontal: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: statusBgColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        width: 6,
-                                        height: 6,
-                                        decoration: BoxDecoration(
-                                          color: statusTextColor,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        statusLabel,
-                                        style: TextStyle(
-                                          color: statusTextColor,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            // Time
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.history,
-                                  size: 12,
-                                  color: AppColors.textSecondary,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  timeAgo(DateTime.parse(report.createdAt)),
+                    SizedBox(width: 14),
+                    // Details Column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title
+                          Row(
+                            spacing: 10,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  report.title,
                                   style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          // Location
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on_outlined,
+                                size: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  report.address,
+                                  style: const TextStyle(
                                     fontSize: 10,
                                     color: AppColors.textSecondary,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          // Status & Created time
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Status
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 4,
+                                      horizontal: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: statusBgColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: 6,
+                                          height: 6,
+                                          decoration: BoxDecoration(
+                                            color: statusTextColor,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          statusLabel,
+                                          style: TextStyle(
+                                            color: statusTextColor,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // Time
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.history,
+                                    size: 12,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    timeAgo(DateTime.parse(report.createdAt)),
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
         ),
       ],
     );

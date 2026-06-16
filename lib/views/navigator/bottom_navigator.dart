@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:resqare_app/database/preference_handler.dart';
+import 'package:resqare_app/views/admin/dashboard/admin_dashboard_screen.dart';
+import 'package:resqare_app/views/admin/volunteer/admin_volunteers_screen.dart';
 import 'package:resqare_app/views/explore/explore_map_screen.dart';
 import 'package:resqare_app/views/history/role_history_wrapper.dart';
 import 'package:resqare_app/views/home/home_wrapper_screen.dart';
@@ -46,13 +49,37 @@ class _BottomNavigatorState extends State<BottomNavigator> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [
-      RoleHomeWrapper(isActive: _selectedIndex == 0, key: ValueKey('home_${_reloadCounters[0]}')),
-      ExploreMapScreen(key: ValueKey('explore_${_reloadCounters[1]}')),
-      FormReportScreen(key: ValueKey('form_${_reloadCounters[2]}')),
-      RoleHistoryWrapper(key: ValueKey('history_${_reloadCounters[3]}')),
-      ProfileScreen(isActive: _selectedIndex == 4, key: ValueKey('profile_${_reloadCounters[4]}')),
-    ];
+    final bool isAdmin = PreferenceHandler.userRole.toLowerCase() == 'admin';
+
+    final List<Widget> pages = isAdmin
+        ? [
+            AdminDashboardScreen(
+              isActive: _selectedIndex == 0,
+              key: ValueKey('admin_dashboard_${_reloadCounters[0]}'),
+            ),
+            ExploreMapScreen(key: ValueKey('explore_${_reloadCounters[1]}')),
+            AdminVolunteersScreen(
+              key: ValueKey('admin_volunteers_${_reloadCounters[2]}'),
+            ),
+
+            ProfileScreen(
+              isActive: _selectedIndex == 3,
+              key: ValueKey('profile_${_reloadCounters[4]}'),
+            ),
+          ]
+        : [
+            RoleHomeWrapper(
+              isActive: _selectedIndex == 0,
+              key: ValueKey('home_${_reloadCounters[0]}'),
+            ),
+            ExploreMapScreen(key: ValueKey('explore_${_reloadCounters[1]}')),
+            FormReportScreen(key: ValueKey('form_${_reloadCounters[2]}')),
+            RoleHistoryWrapper(key: ValueKey('history_${_reloadCounters[3]}')),
+            ProfileScreen(
+              isActive: _selectedIndex == 4,
+              key: ValueKey('profile_${_reloadCounters[4]}'),
+            ),
+          ];
 
     return PopScope(
       canPop: _selectedIndex == 0,
@@ -78,35 +105,60 @@ class _BottomNavigatorState extends State<BottomNavigator> {
               height: 68,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNavItem(
-                    icon: Icons.home_filled,
-                    outlineIcon: Icons.home_outlined,
-                    label: 'Home',
-                    index: 0,
-                  ),
-                  _buildNavItem(
-                    icon: Icons.map_rounded,
-                    outlineIcon: Icons.map_outlined,
-                    label: 'Explore',
-                    index: 1,
-                  ),
-
-                  _buildCenterAddButton(),
-
-                  _buildNavItem(
-                    icon: Icons.history_rounded,
-                    outlineIcon: Icons.history_outlined,
-                    label: 'History',
-                    index: 3,
-                  ),
-                  _buildNavItem(
-                    icon: Icons.person_rounded,
-                    outlineIcon: Icons.person_outline_rounded,
-                    label: 'Profile',
-                    index: 4,
-                  ),
-                ],
+                children: isAdmin
+                    ? [
+                        _buildNavItem(
+                          icon: Icons.dashboard_rounded,
+                          outlineIcon: Icons.dashboard_outlined,
+                          label: 'Dashboard',
+                          index: 0,
+                        ),
+                        _buildNavItem(
+                          icon: Icons.assignment_rounded,
+                          outlineIcon: Icons.assignment_outlined,
+                          label: 'Report',
+                          index: 1,
+                        ),
+                        _buildNavItem(
+                          icon: Icons.people_rounded,
+                          outlineIcon: Icons.people_outline_rounded,
+                          label: 'Relawan',
+                          index: 2,
+                        ),
+                        _buildNavItem(
+                          icon: Icons.person_rounded,
+                          outlineIcon: Icons.person_outline_rounded,
+                          label: 'Profile',
+                          index: 3,
+                        ),
+                      ]
+                    : [
+                        _buildNavItem(
+                          icon: Icons.home_filled,
+                          outlineIcon: Icons.home_outlined,
+                          label: 'Home',
+                          index: 0,
+                        ),
+                        _buildNavItem(
+                          icon: Icons.map_rounded,
+                          outlineIcon: Icons.map_outlined,
+                          label: 'Explore',
+                          index: 1,
+                        ),
+                        _buildCenterAddButton(),
+                        _buildNavItem(
+                          icon: Icons.history_rounded,
+                          outlineIcon: Icons.history_outlined,
+                          label: 'History',
+                          index: 3,
+                        ),
+                        _buildNavItem(
+                          icon: Icons.person_rounded,
+                          outlineIcon: Icons.person_outline_rounded,
+                          label: 'Profile',
+                          index: 4,
+                        ),
+                      ],
               ),
             ),
           ),

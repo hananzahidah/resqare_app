@@ -517,13 +517,14 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
                     children: [
                       // Name & Urgency
                       Row(
+                        spacing: 6,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: Text(
                               report.title,
-                              style: const TextStyle(
-                                fontSize: 15,
+                              style: TextStyle(
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
@@ -532,32 +533,32 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 10,
                             ),
                             decoration: BoxDecoration(
-                              color: levelColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6),
+                              color: levelColor,
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
                               report.priorityLevel,
                               style: TextStyle(
-                                color: levelColor,
-                                fontSize: 10,
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
+                                fontSize: 10,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 2),
                       // Location
                       Row(
                         children: [
                           const Icon(
                             Icons.location_on_outlined,
-                            size: 14,
+                            size: 12,
                             color: AppColors.textSecondary,
                           ),
                           const SizedBox(width: 4),
@@ -565,7 +566,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
                             child: Text(
                               report.address,
                               style: const TextStyle(
-                                fontSize: 12,
+                                fontSize: 10,
                                 color: AppColors.textSecondary,
                               ),
                               maxLines: 1,
@@ -613,12 +614,22 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
                             ),
                           ),
                           // Time
-                          Text(
-                            timeAgo(DateTime.parse(report.createdAt)),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: AppColors.textSecondary,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.history,
+                                size: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                timeAgo(DateTime.parse(report.createdAt)),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
