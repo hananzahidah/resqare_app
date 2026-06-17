@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/utils/navigator.dart';
-import 'package:resqare_app/views/home/home_wrapper_screen.dart';
+import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
 
 class SuccessReportScreen extends StatelessWidget {
@@ -46,7 +46,9 @@ class SuccessReportScreen extends StatelessWidget {
               const SizedBox(height: 32),
               // Success Header
               Text(
-                isUpdate ? "Data Laporan Berhasil Diperbarui!" : "Laporan Berhasil Dikirim!",
+                isUpdate
+                    ? "Data Laporan Berhasil Diperbarui!"
+                    : "Laporan Berhasil Dikirim!",
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -74,10 +76,9 @@ class SuccessReportScreen extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.pushReplacement(DetailReportScreen(
-                      reportId: reportId,
-                      backToHome: true,
-                    ));
+                    context.pushReplacement(
+                      DetailReportScreen(reportId: reportId, backToHome: true),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryBlue,
@@ -89,10 +90,7 @@ class SuccessReportScreen extends StatelessWidget {
                   ),
                   child: const Text(
                     "Lihat Detail Laporan",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -102,7 +100,7 @@ class SuccessReportScreen extends StatelessWidget {
                 height: 50,
                 child: OutlinedButton(
                   onPressed: () {
-                    context.pushAndRemoveAll(RoleHomeWrapper());
+                    context.pushAndRemoveAll(BottomNavigator(initialIndex: 0));
                   },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primaryBlue,
@@ -116,10 +114,7 @@ class SuccessReportScreen extends StatelessWidget {
                   ),
                   child: const Text(
                     "Kembali ke Beranda",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
