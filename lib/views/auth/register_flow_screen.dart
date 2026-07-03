@@ -5,8 +5,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:resqare_app/constant/app_image.dart';
-import 'package:resqare_app/models/user_model_sql.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/user_model_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/auth/helper/icon_form.dart';
 import 'package:resqare_app/views/auth/login_screen.dart';
@@ -44,7 +44,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
   final List<File> _certificateFiles = [];
   final ImagePicker _picker = ImagePicker();
 
-  final UserRepository _userRepository = UserRepository();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
 
   @override
   void dispose() {
@@ -266,7 +266,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
       }
 
       // Create reporter user
-      final user = UserModelSql(
+      final user = UserModelFirebase(
         email: email,
         password: password,
         fullName: name,
@@ -351,7 +351,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
 
     try {
       // Create user data. Note: primary role in users table is 'reporter' initially!
-      final user = UserModelSql(
+      final user = UserModelFirebase(
         email: email,
         password: password,
         fullName: name,

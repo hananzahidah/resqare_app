@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "407008405238",
+    "project_id": "resqare-project",
+    "storage_bucket": "resqare-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:407008405238:android:afd24a220b3f2441adaed7",
+        "android_client_info": {
+          "package_name": "com.example.resqare_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYfXWHtjwVky1jkKLJ0J52c2up4h-JI_I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
