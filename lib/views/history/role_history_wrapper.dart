@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/views/history/report_history_screen.dart';
 import 'package:resqare_app/views/history/rescue_history_screen.dart';
 
@@ -12,7 +12,7 @@ class RoleHistoryWrapper extends StatefulWidget {
 }
 
 class _RoleHistoryWrapperState extends State<RoleHistoryWrapper> {
-  final UserRepository _userRepository = UserRepository();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
   bool _isVolunteer = false;
   bool _isLoading = true;
 
@@ -25,7 +25,7 @@ class _RoleHistoryWrapperState extends State<RoleHistoryWrapper> {
   Future<void> _checkUserRole() async {
     try {
       final userId = PreferenceHandler.userId;
-      if (userId > 0) {
+      if (userId.isNotEmpty) {
         final user = await _userRepository.getUserById(userId);
         if (user != null) {
           setState(() {

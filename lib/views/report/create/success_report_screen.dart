@@ -5,7 +5,7 @@ import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
 
 class SuccessReportScreen extends StatelessWidget {
-  final int reportId;
+  final String reportId;
   final bool isUpdate;
 
   const SuccessReportScreen({

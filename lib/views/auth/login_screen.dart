@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_image.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/login_model.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/auth/helper/form_field.dart';
 import 'package:resqare_app/views/auth/register_flow_screen.dart';
@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool passVisible = false;
-  final UserRepository repository = UserRepository();
+  final UserRepositoryFirebase repository = UserRepositoryFirebase();
 
   void login() async {
     if (!_formKey.currentState!.validate()) {

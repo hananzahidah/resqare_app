@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_image.dart';
-import 'package:resqare_app/models/user_model_sql.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/user_model_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/auth/helper/form_field.dart';
 import 'package:resqare_app/views/auth/login_screen.dart';
@@ -25,7 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   );
   bool passVisible = false;
 
-  final UserRepository repository = UserRepository();
+  final UserRepositoryFirebase repository = UserRepositoryFirebase();
 
   void register() async {
     if (!_formKey.currentState!.validate()) {
@@ -88,11 +88,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     if (inputRole.toLowerCase() != 'general' &&
-        inputRole.toLowerCase() != 'volunteer') {
+        inputRole.toLowerCase() != 'volunteer' &&
+        inputRole.toLowerCase() != 'reporter') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Role hanya boleh general atau volunteer!',
+            'Role hanya boleh general, volunteer, atau reporter!',
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Color(0xFF005BBF),
@@ -102,7 +103,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    final user = UserModelSql(
+    final user = UserModelFirebase(
       email: inputEmail,
       password: inputPass,
       fullName: inputFullname,

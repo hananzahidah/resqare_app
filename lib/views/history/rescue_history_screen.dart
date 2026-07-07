@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/utils/color_badge.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/time.dart';
@@ -18,9 +18,9 @@ class RescueHistoryScreen extends StatefulWidget {
 }
 
 class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
-  final ReportRepository _reportRepository = ReportRepository();
-  List<ReportModel> _rescueReports = [];
-  List<ReportModel> _userReports = [];
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
+  List<ReportModelFirebase> _rescueReports = [];
+  List<ReportModelFirebase> _userReports = [];
   bool _showRescueHistory = true; // true = Riwayat Rescue, false = Laporan Saya
   bool _isLoading = true;
 
@@ -76,14 +76,20 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
 
     try {
       final userId = PreferenceHandler.userId;
-      final rescueList = await _reportRepository.getVolunteerReports(userId);
-      final userList = await _reportRepository.getUserReports(userId);
+      if (userId.isNotEmpty) {
+        final rescueList = await _reportRepository.getVolunteerReports(userId);
+        final userList = await _reportRepository.getUserReports(userId);
 
-      setState(() {
-        _rescueReports = rescueList;
-        _userReports = userList;
-        _isLoading = false;
-      });
+        setState(() {
+          _rescueReports = rescueList;
+          _userReports = userList;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } catch (_) {
       setState(() {
         _isLoading = false;
@@ -441,7 +447,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
     );
   }
 
-  Widget _buildHistoryCard(ReportModel report) {
+  Widget _buildHistoryCard(ReportModelFirebase report) {
     final statusColor = ColorUtils.getStatusColor(report.status);
     final isUrgent = report.priorityLevel.toLowerCase() == 'urgent';
     final isMedium = report.priorityLevel.toLowerCase() == 'medium';
@@ -471,7 +477,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () async {
-            await context.push(DetailReportScreen(reportId: report.id!));
+            await context.push(DetailReportScreen(reportId: report.id ?? ""));
             _loadRescueReports();
           },
           child: Padding(
@@ -483,7 +489,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
                   borderRadius: BorderRadius.circular(14),
                   child: FutureBuilder<List<String>>(
                     future: _reportRepository.getReportImages(
-                      reportId: report.id ?? 0,
+                      reportId: report.id ?? "",
                     ),
                     builder: (context, snapshot) {
                       if (snapshot.hasData && snapshot.data!.isNotEmpty) {

@@ -2,14 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/chat_message_model.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/chat_repository.dart';
+import 'package:resqare_app/models/chat_message_model_firebase.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/chat_repository_firebase.dart';
 import 'package:resqare_app/utils/date_formater.dart';
 
 class ChatRoomScreen extends StatefulWidget {
-  final ReportModel report;
-  final int volunteerId;
+  final ReportModelFirebase report;
+  final String volunteerId;
   final String otherUserName;
 
   const ChatRoomScreen({
@@ -24,15 +24,15 @@ class ChatRoomScreen extends StatefulWidget {
 }
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
-  final ChatRepository _chatRepository = ChatRepository();
+  final ChatRepositoryFirebase _chatRepository = ChatRepositoryFirebase();
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   
-  List<ChatMessageModel> _messages = [];
+  List<ChatMessageModelFirebase> _messages = [];
   Timer? _pollingTimer;
   bool _isLoading = true;
   bool _isReadOnly = false;
-  late int _currentUserId;
+  late String _currentUserId;
 
   @override
   void initState() {
@@ -75,13 +75,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     try {
       final messages = await _chatRepository.getMessages(
-        widget.report.id ?? 0,
+        widget.report.id ?? "",
         widget.volunteerId,
       );
 
       // Tandai pesan belum dibaca sebagai dibaca
       await _chatRepository.markAsRead(
-        widget.report.id ?? 0,
+        widget.report.id ?? "",
         widget.volunteerId,
         _currentUserId,
       );
@@ -125,8 +125,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     _messageController.clear();
 
-    final newMessage = ChatMessageModel(
-      reportId: widget.report.id ?? 0,
+    final newMessage = ChatMessageModelFirebase(
+      reportId: widget.report.id ?? "",
       volunteerId: widget.volunteerId,
       senderId: _currentUserId,
       message: text,
@@ -261,7 +261,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
-  Widget _buildChatBubble(ChatMessageModel msg, bool isMe) {
+  Widget _buildChatBubble(ChatMessageModelFirebase msg, bool isMe) {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(

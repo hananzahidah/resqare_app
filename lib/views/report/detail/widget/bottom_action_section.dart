@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/report/create/edit_form_screen.dart';
 
 class BottomActionSection extends StatefulWidget {
-  final ReportModel report;
+  final ReportModelFirebase report;
   final VoidCallback onActionCompleted;
 
   const BottomActionSection({
@@ -22,8 +22,8 @@ class BottomActionSection extends StatefulWidget {
 }
 
 class _BottomActionSectionState extends State<BottomActionSection> {
-  final ReportRepository _reportRepository = ReportRepository();
-  final UserRepository _userRepository = UserRepository();
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
   bool _isSubmitting = false;
   bool _hasActiveMission = false;
   bool _isLoadingActiveMission = true;
@@ -156,7 +156,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
         // 1 laporan hanya bisa ditangani oleh 1 volunteer.
         // Volunteer hanya bisa ambil laporan jika status laporan “pending” dan rescuedBy kosong.
         final latestReport = await _reportRepository.getReportById(
-          reportId: widget.report.id ?? 0,
+          reportId: widget.report.id ?? "",
         );
         if (latestReport == null ||
             latestReport.status.toLowerCase() != 'pending' ||
@@ -207,7 +207,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
       }
 
       final success = await _reportRepository.updateReport(
-        reportId: widget.report.id ?? 0,
+        reportId: widget.report.id ?? "",
         data: updateData,
       );
 

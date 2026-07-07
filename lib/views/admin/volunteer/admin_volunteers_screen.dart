@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/repositories/admin_repository.dart';
+import 'package:resqare_app/repositories/admin_repository_firebase.dart';
 import 'package:resqare_app/utils/date_formater.dart';
 import 'package:resqare_app/views/admin/volunteer/volunteer_application_detail_screen.dart';
 
@@ -15,7 +15,7 @@ class AdminVolunteersScreen extends StatefulWidget {
 
 class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
     with SingleTickerProviderStateMixin {
-  final AdminRepository _adminRepository = AdminRepository();
+  final AdminRepositoryFirebase _adminRepository = AdminRepositoryFirebase();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;

@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/models/user_model_sql.dart';
-import 'package:resqare_app/repositories/chat_repository.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/models/user_model_firebase.dart';
+import 'package:resqare_app/repositories/chat_repository_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/color_badge.dart';
 import 'package:resqare_app/utils/date_formater.dart';
 import 'package:resqare_app/utils/navigator.dart';
@@ -21,7 +21,7 @@ import 'package:resqare_app/views/report/detail/widget/maps_section.dart';
 import 'package:resqare_app/views/report/detail/widget/status_bar_section.dart';
 
 class DetailReportScreen extends StatefulWidget {
-  final int reportId;
+  final String reportId;
   final bool backToHome;
 
   const DetailReportScreen({
@@ -35,12 +35,12 @@ class DetailReportScreen extends StatefulWidget {
 }
 
 class _DetailReportScreenState extends State<DetailReportScreen> {
-  final ReportRepository _reportRepository = ReportRepository();
-  final UserRepository _userRepository = UserRepository();
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
 
-  ReportModel? _report;
-  UserModelSql? _reporter;
-  UserModelSql? _volunteer;
+  ReportModelFirebase? _report;
+  UserModelFirebase? _reporter;
+  UserModelFirebase? _volunteer;
   List<String> _images = [];
   bool _isLoading = true;
 
@@ -113,7 +113,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
         );
 
         // Fetch Volunteer
-        UserModelSql? volunteerData;
+        UserModelFirebase? volunteerData;
         if (reportData.rescuedBy != null) {
           volunteerData = await _userRepository.getUserById(
             reportData.rescuedBy!,
@@ -210,9 +210,9 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
     }
 
     // Reporter: Cek riwayat chat di database
-    final chatRepo = ChatRepository();
-    final List<int> volunteersInChat = await chatRepo.getChatVolunteers(
-      report.id ?? 0,
+    final chatRepo = ChatRepositoryFirebase();
+    final List<String> volunteersInChat = await chatRepo.getChatVolunteers(
+      report.id ?? "",
     );
 
     // Pastikan volunteer saat ini terdaftar di pilihan chat jika rescuedBy tidak null
@@ -568,7 +568,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                               ),
                             ),
                             Text(
-                              report.description!,
+                              report.description ?? "",
                               style: TextStyle(fontSize: 13),
                             ),
                           ],

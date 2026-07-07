@@ -3,7 +3,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 
 class LocationCardSection extends StatefulWidget {
   final VoidCallback? onLocationUpdated;
@@ -16,7 +16,7 @@ class LocationCardSection extends StatefulWidget {
 class _LocationCardSectionState extends State<LocationCardSection> {
   bool _isLoadingLocation = true;
   String _currentAddress = "Mendeteksi lokasi...";
-  final UserRepository _userRepository = UserRepository();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
   double? latitude;
   double? longitude;
 
@@ -86,7 +86,7 @@ class _LocationCardSectionState extends State<LocationCardSection> {
     double? savedLat;
     double? savedLng;
 
-    if (userId > 0) {
+    if (userId.isNotEmpty) {
       final user = await _userRepository.getUserById(userId);
       if (user != null) {
         savedLat = user.currentLatitude;
@@ -110,7 +110,7 @@ class _LocationCardSectionState extends State<LocationCardSection> {
         latitude = position.latitude;
         longitude = position.longitude;
 
-        if (userId > 0) {
+        if (userId.isNotEmpty) {
           await _userRepository.updateUser(
             userId: userId,
             data: {

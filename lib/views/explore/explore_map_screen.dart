@@ -5,8 +5,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
 
@@ -18,15 +18,15 @@ class ExploreMapScreen extends StatefulWidget {
 }
 
 class _ExploreMapScreenState extends State<ExploreMapScreen> {
-  final ReportRepository _reportRepository = ReportRepository();
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
   final MapController _mapController = MapController();
 
-  List<dynamic> _allReports = [];
-  List<dynamic> _filteredReports = [];
+  List<ReportModelFirebase> _allReports = [];
+  List<ReportModelFirebase> _filteredReports = [];
   bool _isLoading = true;
 
   // Selected Report for Bottom Info Card
-  dynamic _selectedReport;
+  ReportModelFirebase? _selectedReport;
 
   // Filters State
   String _searchQuery = "";
@@ -157,7 +157,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
     setState(() {
       _filteredReports = _allReports.where((report) {
         final String title = report.title;
-        final String desc = report.description;
+        final String desc = report.description ?? "";
         final String loc = report.address;
         final String cat = report.animalCategory;
         final String priority = report.priorityLevel;
@@ -227,7 +227,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   }
 
   LatLng _getReportCoordinates(dynamic report) {
-    if (report is ReportModel) {
+    if (report is ReportModelFirebase) {
       return LatLng(report.latitude, report.longitude);
     }
     return LatLng(-6.917464, 107.619122);
@@ -662,7 +662,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
 
     // Fetch DB image, get the first one or placeholder
     imageWidget = FutureBuilder<List<String>>(
-      future: _reportRepository.getReportImages(reportId: report.id ?? 0),
+      future: _reportRepository.getReportImages(reportId: report.id ?? ""),
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           final file = File(snapshot.data!.first);
@@ -698,7 +698,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () async {
-              await context.push(DetailReportScreen(reportId: report.id ?? 0));
+              await context.push(DetailReportScreen(reportId: report.id ?? ""));
               _loadReports();
             },
             child: Padding(

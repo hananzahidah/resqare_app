@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/models/user_model_sql.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/models/user_model_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 
 class ChatSessionBottomSheet extends StatefulWidget {
-  final ReportModel report;
-  final List<int> volunteerIds;
-  final Function(int volunteerId, String volunteerName) onSessionSelected;
+  final ReportModelFirebase report;
+  final List<String> volunteerIds;
+  final Function(String volunteerId, String volunteerName) onSessionSelected;
 
   const ChatSessionBottomSheet({
     super.key,
@@ -21,8 +21,8 @@ class ChatSessionBottomSheet extends StatefulWidget {
 }
 
 class _ChatSessionBottomSheetState extends State<ChatSessionBottomSheet> {
-  final UserRepository _userRepository = UserRepository();
-  final Map<int, UserModelSql> _volunteersData = {};
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
+  final Map<String, UserModelFirebase> _volunteersData = {};
   bool _isLoading = true;
 
   @override
@@ -72,13 +72,13 @@ class MainContentWidget extends StatelessWidget {
     super.key,
     required bool isLoading,
     required this.widget,
-    required Map<int, UserModelSql> volunteersData,
+    required Map<String, UserModelFirebase> volunteersData,
   }) : _isLoading = isLoading,
        _volunteersData = volunteersData;
 
   final bool _isLoading;
   final ChatSessionBottomSheet widget;
-  final Map<int, UserModelSql> _volunteersData;
+  final Map<String, UserModelFirebase> _volunteersData;
 
   @override
   Widget build(BuildContext context) {

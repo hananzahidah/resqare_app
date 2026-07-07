@@ -5,12 +5,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/models/user_model_sql.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/user_model_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/date_formater.dart';
 
 class VolunteerApplicationScreen extends StatefulWidget {
-  final UserModelSql user;
+  final UserModelFirebase user;
 
   const VolunteerApplicationScreen({super.key, required this.user});
 
@@ -21,7 +21,7 @@ class VolunteerApplicationScreen extends StatefulWidget {
 
 class _VolunteerApplicationScreenState
     extends State<VolunteerApplicationScreen> {
-  final UserRepository _userRepository = UserRepository();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _phoneController = TextEditingController();
@@ -34,7 +34,7 @@ class _VolunteerApplicationScreenState
   bool _isLoading = true;
   bool _isSubmitting = false;
   String _status = '';
-  UserModelSql? _currentUser;
+  UserModelFirebase? _currentUser;
   String? _reviewedAt;
   String? _createdAt;
   String? _updatedAt;

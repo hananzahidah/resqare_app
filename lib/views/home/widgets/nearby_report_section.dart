@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
 import 'package:resqare_app/utils/time.dart';
@@ -23,9 +23,9 @@ class NearbyReportSection extends StatefulWidget {
 }
 
 class NearbyReportSectionState extends State<NearbyReportSection> {
-  final ReportRepository _reportRepository = ReportRepository();
-  final UserRepository _userRepository = UserRepository();
-  List<ReportModel> dbReports = [];
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
+  List<ReportModelFirebase> dbReports = [];
   bool isLoadingReports = true;
   double? _userLat;
   double? _userLng;
@@ -38,7 +38,7 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
       double userLng = 106.8271;
 
       final userId = PreferenceHandler.userId;
-      if (userId > 0) {
+      if (userId.isNotEmpty) {
         final user = await _userRepository.getUserById(userId);
         if (user != null &&
             user.currentLatitude != null &&
@@ -48,7 +48,7 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
         }
       }
 
-      List<ReportModel> targetedReports = reports;
+      List<ReportModelFirebase> targetedReports = reports;
       final userRole = PreferenceHandler.userRole.toLowerCase();
       if (userRole == 'volunteer') {
         targetedReports = reports
@@ -205,7 +205,7 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
 
                     return GestureDetector(
                       onTap: () async {
-                        await context.push(DetailReportScreen(reportId: data.id ?? 0));
+                        await context.push(DetailReportScreen(reportId: data.id ?? ""));
                         loadReports();
                         widget.onRefreshRequired?.call();
                       },
@@ -238,7 +238,7 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
                                     width: double.infinity,
                                     child: FutureBuilder<List<String>>(
                                       future: _reportRepository.getReportImages(
-                                        reportId: data.id ?? 0,
+                                        reportId: data.id ?? "",
                                       ),
                                       builder: (context, snapshot) {
                                         if (snapshot.hasData &&

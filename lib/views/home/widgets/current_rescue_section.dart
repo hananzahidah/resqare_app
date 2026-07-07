@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
 
@@ -23,17 +23,17 @@ class CurrentRescueSection extends StatefulWidget {
 }
 
 class CurrentRescueSectionState extends State<CurrentRescueSection> {
-  final UserRepository _userRepository = UserRepository();
-  final ReportRepository _reportRepository = ReportRepository();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
 
   bool _isActive = false;
   bool _isLoading = true;
-  ReportModel? _activeMission;
+  ReportModelFirebase? _activeMission;
 
   Future<void> loadVolunteerData() async {
     try {
       final userId = PreferenceHandler.userId;
-      if (userId > 0) {
+      if (userId.isNotEmpty) {
         final active = await _userRepository.isVolunteerActive(userId);
         final mission = await _reportRepository.getActiveMission(userId);
 
@@ -70,7 +70,7 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
 
   Future<void> _toggleStatus(bool newValue) async {
     final userId = PreferenceHandler.userId;
-    if (userId > 0) {
+    if (userId.isNotEmpty) {
       final success = await _userRepository.updateVolunteerActive(
         userId,
         newValue,
@@ -188,7 +188,7 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
             GestureDetector(
               onTap: () async {
                 await context.push(
-                  DetailReportScreen(reportId: _activeMission!.id ?? 0),
+                  DetailReportScreen(reportId: _activeMission!.id ?? ""),
                 );
                 loadVolunteerData();
                 widget.onRefreshRequired?.call();

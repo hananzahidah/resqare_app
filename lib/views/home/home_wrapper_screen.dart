@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/auth/login_screen.dart';
 import 'package:resqare_app/views/home/reporter_home_screen.dart';
@@ -15,7 +15,7 @@ class RoleHomeWrapper extends StatefulWidget {
 }
 
 class _RoleHomeWrapperState extends State<RoleHomeWrapper> {
-  final UserRepository _userRepository = UserRepository();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
   bool _isVolunteer = false;
   bool _isLoading = true;
 
@@ -37,7 +37,7 @@ class _RoleHomeWrapperState extends State<RoleHomeWrapper> {
     try {
       final userId = PreferenceHandler.userId;
 
-      if (userId <= 0) {
+      if (userId.isEmpty) {
         setState(() => _isLoading = false);
         return;
       }

@@ -19,12 +19,12 @@ class PreferenceHandler {
 
   static const _keyUserId = "userId";
 
-  static Future<void> setUserId(int userId) async {
-    await _prefs.setInt(_keyUserId, userId);
+  static Future<void> setUserId(String userId) async {
+    await _prefs.setString(_keyUserId, userId);
   }
 
-  static int get userId {
-    return _prefs.getInt(_keyUserId) ?? 0;
+  static String get userId {
+    return _prefs.getString(_keyUserId) ?? "";
   }
 
   static const _keyUserRole = "userRole";

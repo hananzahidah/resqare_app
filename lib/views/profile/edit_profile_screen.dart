@@ -5,11 +5,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/models/user_model_sql.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/user_model_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  final UserModelSql user;
+  final UserModelFirebase user;
   const EditProfileScreen({super.key, required this.user});
 
   @override
@@ -21,7 +21,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
-  final UserRepository _userRepository = UserRepository();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
 
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();

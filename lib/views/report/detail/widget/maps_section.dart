@@ -3,11 +3,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/models/report_model.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MapsSection extends StatefulWidget {
-  final ReportModel report;
+  final ReportModelFirebase report;
 
   const MapsSection({super.key, required this.report});
 

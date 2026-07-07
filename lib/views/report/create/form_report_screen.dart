@@ -10,8 +10,8 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
 import 'package:resqare_app/views/report/create/success_report_screen.dart';
@@ -34,7 +34,7 @@ class _FormReportScreenState extends State<FormReportScreen> {
   final TextEditingController _customCategoryController =
       TextEditingController();
 
-  final ReportRepository _reportRepository = ReportRepository();
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
 
   // Selected image files (max 3)
   final List<File> _selectedImages = [];
@@ -363,7 +363,7 @@ class _FormReportScreenState extends State<FormReportScreen> {
           ? _customCategoryController.text.trim().capitalizeFirst()
           : _selectedCategory;
 
-      final report = ReportModel(
+      final report = ReportModelFirebase(
         createdBy: userId,
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
@@ -386,7 +386,7 @@ class _FormReportScreenState extends State<FormReportScreen> {
       // Save report and get reportId
       final reportId = await _reportRepository.createReport(report);
 
-      if (reportId != -1) {
+      if (reportId.isNotEmpty) {
         // Save images
         final appDir = await getApplicationDocumentsDirectory();
 
@@ -428,7 +428,7 @@ class _FormReportScreenState extends State<FormReportScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Gagal menyimpan laporan ke database SQLite."),
+            content: Text("Gagal menyimpan laporan ke Firebase Firestore."),
             backgroundColor: AppColors.emergency,
           ),
         );

@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/time.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
@@ -19,14 +19,14 @@ class MyReportsSection extends StatefulWidget {
 }
 
 class MyReportsSectionState extends State<MyReportsSection> {
-  final ReportRepository _reportRepository = ReportRepository();
-  List<ReportModel> myReports = [];
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
+  List<ReportModelFirebase> myReports = [];
   bool isLoading = true;
 
   Future<void> loadMyReports() async {
     try {
       final userId = PreferenceHandler.userId;
-      if (userId > 0) {
+      if (userId.isNotEmpty) {
         final reports = await _reportRepository.getMyActiveReports(userId);
         if (mounted) {
           setState(() {
@@ -164,7 +164,7 @@ class MyReportsSectionState extends State<MyReportsSection> {
             return GestureDetector(
               onTap: () async {
                 await context.push(
-                  DetailReportScreen(reportId: report.id ?? 0),
+                  DetailReportScreen(reportId: report.id ?? ""),
                 );
                 loadMyReports();
                 widget.onRefreshRequired?.call();
@@ -193,7 +193,7 @@ class MyReportsSectionState extends State<MyReportsSection> {
                         height: 80,
                         child: FutureBuilder<List<String>>(
                           future: _reportRepository.getReportImages(
-                            reportId: report.id ?? 0,
+                            reportId: report.id ?? "",
                           ),
                           builder: (context, snapshot) {
                             if (snapshot.hasData && snapshot.data!.isNotEmpty) {

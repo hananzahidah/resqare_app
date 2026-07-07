@@ -97,6 +97,29 @@ class UserRepository {
     return UserModelSql.fromMap(result.first);
   }
 
+  // Get User by Email
+  Future<UserModelSql?> getUserByEmail(String email) async {
+    final db = await dbHelper.database;
+    final result = await db.query(
+      'users',
+      where: 'email = ?',
+      whereArgs: [email],
+      limit: 1,
+    );
+
+    if (result.isEmpty) {
+      return null;
+    }
+
+    return UserModelSql.fromMap(result.first);
+  }
+
+  // Insert New User directly (returns local row ID)
+  Future<int> insertUser(UserModelSql pengguna) async {
+    final db = await dbHelper.database;
+    return await db.insert('users', pengguna.toMap());
+  }
+
   // Legacy name for Get User by ID (kept for safety if needed, though unused)
   Future<UserModelSql?> getReport({required int reportId}) async {
     return getUserById(reportId);

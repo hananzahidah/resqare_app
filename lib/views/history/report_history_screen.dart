@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/utils/color_badge.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/time.dart';
@@ -18,8 +18,8 @@ class ReportHistoryScreen extends StatefulWidget {
 }
 
 class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
-  final ReportRepository _reportRepository = ReportRepository();
-  List<ReportModel> _userReports = [];
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
+  List<ReportModelFirebase> _userReports = [];
   bool _isLoading = true;
 
   String _searchQuery = '';
@@ -333,7 +333,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
     );
   }
 
-  Widget _buildHistoryCard(ReportModel report) {
+  Widget _buildHistoryCard(ReportModelFirebase report) {
     final statusColor = ColorUtils.getStatusColor(report.status);
     final isUrgent =
         report.priorityLevel.toLowerCase() == 'urgent' ||
@@ -379,7 +379,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                   borderRadius: BorderRadius.circular(14),
                   child: FutureBuilder<List<String>>(
                     future: _reportRepository.getReportImages(
-                      reportId: report.id ?? 0,
+                      reportId: report.id ?? "",
                     ),
                     builder: (context, snapshot) {
                       if (snapshot.hasData && snapshot.data!.isNotEmpty) {

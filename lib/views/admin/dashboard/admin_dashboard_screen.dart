@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/repositories/admin_repository.dart';
+import 'package:resqare_app/repositories/admin_repository_firebase.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   final bool isActive;
@@ -11,7 +11,7 @@ class AdminDashboardScreen extends StatefulWidget {
 }
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
-  final AdminRepository _adminRepository = AdminRepository();
+  final AdminRepositoryFirebase _adminRepository = AdminRepositoryFirebase();
   Map<String, int> _stats = {};
   bool _isLoading = true;
 

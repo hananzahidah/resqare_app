@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/models/user_model_sql.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/models/user_model_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/auth/login_screen.dart';
 import 'package:resqare_app/views/profile/edit_profile_screen.dart';
@@ -19,8 +19,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final UserRepository _userRepository = UserRepository();
-  UserModelSql? _user;
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
+  UserModelFirebase? _user;
   int _reportsCreated = 0;
   int _rescueCount = 0;
   bool _isLoading = true;
@@ -45,13 +45,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     final userId = PreferenceHandler.userId;
-    final user = await _userRepository.getUserById(userId);
-    if (user != null) {
-      _user = user;
-      if (user.id != null) {
-        final stats = await _userRepository.getUserStats(user.id!);
-        _reportsCreated = stats['reportsCreated'] ?? 0;
-        _rescueCount = stats['rescueCount'] ?? 0;
+    if (userId.isNotEmpty) {
+      final user = await _userRepository.getUserById(userId);
+      if (user != null) {
+        _user = user;
+        if (user.id != null) {
+          final stats = await _userRepository.getUserStats(user.id!);
+          _reportsCreated = stats['reportsCreated'] ?? 0;
+          _rescueCount = stats['rescueCount'] ?? 0;
+        }
       }
     }
 

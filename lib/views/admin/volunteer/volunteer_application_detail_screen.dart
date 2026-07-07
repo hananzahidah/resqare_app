@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/repositories/admin_repository.dart';
+import 'package:resqare_app/repositories/admin_repository_firebase.dart';
 import 'package:resqare_app/utils/date_formater.dart';
 
 class VolunteerApplicationDetailScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class VolunteerApplicationDetailScreen extends StatefulWidget {
 
 class _VolunteerApplicationDetailScreenState
     extends State<VolunteerApplicationDetailScreen> {
-  final AdminRepository _adminRepository = AdminRepository();
+  final AdminRepositoryFirebase _adminRepository = AdminRepositoryFirebase();
   bool _isSubmitting = false;
 
   late final Map<String, dynamic> _app;

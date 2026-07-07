@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
-import 'package:resqare_app/repositories/user_repository.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/profile/volunteer_application_screen.dart';
@@ -189,8 +189,8 @@ class _CarouselSectionState extends State<CarouselSection> {
                                     );
                                   } else if (index == 1) {
                                     final userId = PreferenceHandler.userId;
-                                    if (userId > 0) {
-                                      final user = await UserRepository()
+                                    if (userId.isNotEmpty) {
+                                      final user = await UserRepositoryFirebase()
                                           .getUserById(userId);
                                       if (user != null && mounted) {
                                         Navigator.push(

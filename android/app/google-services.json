@@ -12,7 +12,20 @@
           "package_name": "com.example.resqare_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "407008405238-m8f7d54n6kb2h8ac439oqgdrfa3qtc0m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.resqare_app",
+            "certificate_hash": "f9b04f06a0c8cd8b29188624a1ff0c2fedd86626"
+          }
+        },
+        {
+          "client_id": "407008405238-srm3tiipop82g8ipkh0m2ikpjcmq9b24.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAYfXWHtjwVky1jkKLJ0J52c2up4h-JI_I"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "407008405238-srm3tiipop82g8ipkh0m2ikpjcmq9b24.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

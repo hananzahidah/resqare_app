@@ -9,8 +9,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:resqare_app/constant/app_color.dart';
-import 'package:resqare_app/models/report_model.dart';
-import 'package:resqare_app/repositories/report_repository.dart';
+import 'package:resqare_app/models/report_model_firebase.dart';
+import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
 import 'package:resqare_app/views/report/create/success_report_screen.dart';
@@ -20,7 +20,7 @@ import 'package:resqare_app/views/report/create/widget/report_details_section.da
 import 'package:resqare_app/views/report/create/widget/urgency_section.dart';
 
 class EditFormScreen extends StatefulWidget {
-  final ReportModel report;
+  final ReportModelFirebase report;
 
   const EditFormScreen({super.key, required this.report});
 
@@ -34,7 +34,7 @@ class _EditFormScreenState extends State<EditFormScreen> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _customCategoryController;
 
-  final ReportRepository _reportRepository = ReportRepository();
+  final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
 
   // Selected image files (max 3)
   final List<File> _selectedImages = [];
@@ -151,7 +151,7 @@ class _EditFormScreenState extends State<EditFormScreen> {
   Future<void> _loadReportImages() async {
     try {
       final images = await _reportRepository.getReportImages(
-        reportId: widget.report.id ?? 0,
+        reportId: widget.report.id ?? "",
       );
       if (mounted) {
         setState(() {
@@ -420,7 +420,7 @@ class _EditFormScreenState extends State<EditFormScreen> {
     });
 
     try {
-      final reportId = widget.report.id ?? 0;
+      final reportId = widget.report.id ?? "";
       final animalCategory = _selectedCategory == "Lainnya"
           ? _customCategoryController.text.trim().capitalizeFirst()
           : _selectedCategory;
@@ -434,12 +434,12 @@ class _EditFormScreenState extends State<EditFormScreen> {
         'latitude': _currentPosition?.latitude ?? widget.report.latitude,
         'longitude': _currentPosition?.longitude ?? widget.report.longitude,
         'address': _locationAddress,
-        'hasInjury': _hasInjury ? 1 : 0,
-        'hasBleeding': _hasBleeding ? 1 : 0,
-        'cannotWalk': _cannotWalk ? 1 : 0,
-        'isTrapped': _isTrapped ? 1 : 0,
-        'isSick': _isSick ? 1 : 0,
-        'isAbandoned': _isAbandoned ? 1 : 0,
+        'hasInjury': _hasInjury,
+        'hasBleeding': _hasBleeding,
+        'cannotWalk': _cannotWalk,
+        'isTrapped': _isTrapped,
+        'isSick': _isSick,
+        'isAbandoned': _isAbandoned,
         'updatedAt': DateTime.now().toIso8601String(),
       };
 
