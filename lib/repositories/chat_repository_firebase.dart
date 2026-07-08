@@ -24,7 +24,9 @@ class ChatRepositoryFirebase {
         .orderBy('createdAt', descending: false)
         .get();
 
-    return snapshot.docs.map((doc) => ChatMessageModelFirebase.fromFirestore(doc)).toList();
+    return snapshot.docs
+        .map((doc) => ChatMessageModelFirebase.fromFirestore(doc))
+        .toList();
   }
 
   // Get all volunteers who have a chat history on a report
