@@ -82,34 +82,79 @@ class _BottomActionSectionState extends State<BottomActionSection> {
   }) async {
     return await showDialog<bool>(
           context: context,
+          barrierDismissible: false,
           builder: (BuildContext context) {
             return AlertDialog(
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
               ),
-              title: Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              content: Text(content),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text(
-                    "Batal",
-                    style: TextStyle(color: AppColors.textSecondary),
+              title: Column(
+                children: [
+                  Icon(
+                    Icons.warning_rounded,
+                    color: confirmColor,
+                    size: 36,
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: confirmColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 10),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                      fontSize: 20,
                     ),
                   ),
-                  child: Text(confirmText),
+                ],
+              ),
+              content: Text(
+                content,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFFCCCCCC)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text(
+                          "Batal",
+                          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: confirmColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          confirmText,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -132,6 +177,23 @@ class _BottomActionSectionState extends State<BottomActionSection> {
 
       // Verification checks before assigning a volunteer to a report
       if (status == 'assigned') {
+        if (widget.report.createdBy == currentUserId) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Anda tidak dapat menangani laporan yang Anda buat sendiri.",
+                ),
+                backgroundColor: AppColors.emergency,
+              ),
+            );
+          }
+          setState(() {
+            _isSubmitting = false;
+          });
+          return;
+        }
+
         // 1 volunteer hanya bisa menangani 1 laporan aktif.
         final activeMission = await _reportRepository.getActiveMission(
           currentUserId,
@@ -261,7 +323,41 @@ class _BottomActionSectionState extends State<BottomActionSection> {
 
     if (currentUserRole == 'volunteer') {
       if (normalizedStatus == 'pending') {
-        if (_hasActiveMission) {
+        if (isMyReport) {
+          actionWidget = Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: AppColors.emergency.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppColors.emergency.withValues(alpha: 0.2),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: AppColors.emergency,
+                  size: 20,
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    "Anda tidak dapat menangani laporan yang Anda buat sendiri.",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.emergency,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else if (_hasActiveMission) {
           actionWidget = Container(
             width: double.infinity,
             height: 48,
@@ -412,7 +508,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
             height: 48,
             alignment: Alignment.center,
             child: const Text(
-              "Laporan sedang ditangani oleh relawan lain",
+              "Laporan telah diterima oleh relawan lain",
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -430,7 +526,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
                     final confirm = await _showConfirmationDialog(
                       title: "Selesaikan Laporan",
                       content:
-                          "Apakah Anda yakin laporan penyelamatan ini telah selesai ditangani?",
+                          "Apakah Anda yakin laporan penyelamatan ini telah selesai dievakuasi?",
                       confirmText: "Selesaikan",
                       confirmColor: AppColors.primaryBlue,
                     );
@@ -468,7 +564,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
             height: 48,
             alignment: Alignment.center,
             child: const Text(
-              "Laporan sedang ditangani oleh relawan lain",
+              "Laporan sedang dievakuasi oleh relawan lain",
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,

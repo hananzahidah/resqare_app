@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/models/user_model_firebase.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
+import 'package:resqare_app/utils/firebase_storage_helper.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final UserModelFirebase user;
@@ -167,8 +167,93 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Future<bool> _showConfirmationAlert(String message) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Column(
+            children: [
+              Icon(Icons.warning_rounded, color: AppColors.primaryBlue, size: 36),
+              SizedBox(height: 10),
+              Text(
+                "Konfirmasi Perubahan",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFCCCCCC)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      "Batal",
+                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Simpan",
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+    return confirmed ?? false;
+  }
+
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final confirm = await _showConfirmationAlert(
+      "Apakah Anda yakin ingin menyimpan perubahan profil Anda?",
+    );
+    if (!confirm) return;
 
     setState(() {
       _isSaving = true;
@@ -178,14 +263,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       String? savedImagePath = widget.user.imgProfile;
 
       if (_selectedImage != null) {
-        final appDir = await getApplicationDocumentsDirectory();
-        final extensionName = p.extension(_selectedImage!.path);
-        final fileName =
-            'profile_${widget.user.id}_${DateTime.now().millisecondsSinceEpoch}$extensionName';
-        final savedImage = await _selectedImage!.copy(
-          '${appDir.path}/$fileName',
+        final downloadUrl = await FirebaseStorageHelper.uploadProfileImage(
+          _selectedImage!,
+          widget.user.id!,
         );
-        savedImagePath = savedImage.path;
+        if (downloadUrl != null) {
+          // Delete old image from Storage if it was a network image
+          if (widget.user.imgProfile != null) {
+            await FirebaseStorageHelper.deleteFile(widget.user.imgProfile!);
+          }
+          savedImagePath = downloadUrl;
+        } else {
+          throw Exception("Gagal mengunggah foto profil ke Firebase Storage.");
+        }
       }
 
       final success = await _userRepository.updateUser(
@@ -240,21 +330,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (_selectedImage != null) {
       return FileImage(_selectedImage!);
     }
-    if (widget.user.imgProfile != null && widget.user.imgProfile!.isNotEmpty) {
-      final file = File(widget.user.imgProfile!);
-      if (file.existsSync()) {
-        return FileImage(file);
-      }
+    final imgProfile = widget.user.imgProfile;
+    if (imgProfile != null && imgProfile.isNotEmpty) {
+      final provider = ImageLoaderHelper.getImageProvider(imgProfile);
+      if (provider != null) return provider;
     }
     return AssetImage("");
   }
 
   bool _hasProfileImage() {
     if (_selectedImage != null) return true;
-    if (widget.user.imgProfile != null && widget.user.imgProfile!.isNotEmpty) {
-      return File(widget.user.imgProfile!).existsSync();
-    }
-    return false;
+    final imgProfile = widget.user.imgProfile;
+    return ImageLoaderHelper.hasImage(imgProfile);
   }
 
   @override

@@ -6,6 +6,7 @@ import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
 import 'package:resqare_app/utils/time.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/views/home/widgets/carousel_section.dart';
 import 'package:resqare_app/views/home/widgets/location_card_section.dart';
 import 'package:resqare_app/views/home/widgets/my_reports_section.dart';
@@ -80,18 +81,14 @@ class _ReporterHomeScreenState extends State<ReporterHomeScreen> {
               Row(
                 spacing: 12,
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.grey[200],
-
-                    radius: 22,
-                    backgroundImage:
-                        (_imgProfile != null && _imgProfile!.isNotEmpty)
-                        ? FileImage(File(_imgProfile!))
-                        : null,
-                    child: (_imgProfile == null || _imgProfile!.isEmpty)
-                        ? Icon(Icons.person)
-                        : null,
-                  ),
+                   CircleAvatar(
+                     backgroundColor: Colors.grey[200],
+                     radius: 22,
+                     backgroundImage: ImageLoaderHelper.getImageProvider(_imgProfile),
+                     child: !ImageLoaderHelper.hasImage(_imgProfile)
+                         ? const Icon(Icons.person)
+                         : null,
+                   ),
                   Column(
                     spacing: 2,
                     mainAxisAlignment: MainAxisAlignment.center,

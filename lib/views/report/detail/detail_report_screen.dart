@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:resqare_app/constant/app_color.dart';
@@ -13,6 +11,7 @@ import 'package:resqare_app/utils/color_badge.dart';
 import 'package:resqare_app/utils/date_formater.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/widget/bottom_action_section.dart';
 import 'package:resqare_app/views/report/detail/widget/chat_room_screen.dart';
@@ -225,7 +224,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Belum ada relawan yang ditugaskan ke laporan ini."),
+            content: Text("Belum ada relawan yang menerima laporan ini."),
           ),
         );
       }
@@ -375,23 +374,18 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                                 },
                                 itemBuilder: (context, index) {
                                   final img = _images[index];
-                                  final isAsset = img.startsWith('assets/');
-                                  return isAsset
-                                      ? Image.asset(img, fit: BoxFit.cover)
-                                      : Image.file(
-                                          File(img),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, _, _) {
-                                            return Container(
-                                              color: AppColors.border,
-                                              child: Icon(
-                                                Icons.broken_image_rounded,
-                                                size: 64,
-                                                color: AppColors.textSecondary,
-                                              ),
-                                            );
-                                          },
-                                        );
+                                  return ImageLoaderHelper.loadImage(
+                                    img,
+                                    fit: BoxFit.cover,
+                                    errorWidget: Container(
+                                      color: AppColors.border,
+                                      child: Icon(
+                                        Icons.broken_image_rounded,
+                                        size: 64,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  );
                                 },
                               ),
                       ),
@@ -771,7 +765,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                               spacing: 14,
                               children: [
                                 Text(
-                                  "Laporan belum ditugaskan",
+                                  "Laporan belum diterima",
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: AppColors.textSecondary,
@@ -823,31 +817,27 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
 
   Widget _buildReporterAvatar() {
     final imgProfile = _reporter?.imgProfile;
-    if (imgProfile != null && imgProfile.isNotEmpty) {
-      final file = File(imgProfile);
-      if (file.existsSync()) {
-        return CircleAvatar(radius: 20, backgroundImage: FileImage(file));
-      }
-    }
+    final imageProvider = ImageLoaderHelper.getImageProvider(imgProfile);
     return CircleAvatar(
       radius: 20,
       backgroundColor: AppColors.primaryBlue,
-      child: Icon(Icons.person_rounded, color: Colors.white),
+      backgroundImage: imageProvider,
+      child: imageProvider == null
+          ? const Icon(Icons.person_rounded, color: Colors.white)
+          : null,
     );
   }
 
   Widget _buildVolunteerAvatar() {
     final imgProfile = _volunteer?.imgProfile;
-    if (imgProfile != null && imgProfile.isNotEmpty) {
-      final file = File(imgProfile);
-      if (file.existsSync()) {
-        return CircleAvatar(radius: 20, backgroundImage: FileImage(file));
-      }
-    }
+    final imageProvider = ImageLoaderHelper.getImageProvider(imgProfile);
     return CircleAvatar(
       radius: 20,
       backgroundColor: AppColors.primaryBlue,
-      child: Icon(Icons.person_rounded, color: Colors.white),
+      backgroundImage: imageProvider,
+      child: imageProvider == null
+          ? const Icon(Icons.person_rounded, color: Colors.white)
+          : null,
     );
   }
 

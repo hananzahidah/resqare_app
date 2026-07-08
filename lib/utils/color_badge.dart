@@ -25,6 +25,27 @@ class ColorUtils {
     }
   }
 
+  static String getStatusLabel(String status) {
+    switch (status.toLowerCase()) {
+      case 'waiting':
+      case 'waiting rescue':
+      case 'pending':
+        return 'Dilaporkan';
+      case 'assigned':
+        return 'Diterima';
+      case 'on progress':
+      case 'on rescue':
+        return 'Evakuasi';
+      case 'completed':
+      case 'rescued':
+        return 'Selesai';
+      case 'cancelled':
+        return 'Dibatalkan';
+      default:
+        return status;
+    }
+  }
+
   static Color getPriorityColor(String priority) {
     switch (priority.toLowerCase()) {
       case 'urgent':

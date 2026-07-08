@@ -5,6 +5,7 @@ import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/time.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/views/home/widgets/current_rescue_section.dart';
 import 'package:resqare_app/views/home/widgets/location_card_section.dart';
 import 'package:resqare_app/views/home/widgets/nearby_report_section.dart';
@@ -78,12 +79,9 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                   CircleAvatar(
                     backgroundColor: AppColors.softBlue,
                     radius: 22,
-                    backgroundImage:
-                        (_imgProfile != null && _imgProfile!.isNotEmpty)
-                        ? FileImage(File(_imgProfile!))
-                        : null,
-                    child: (_imgProfile == null || _imgProfile!.isEmpty)
-                        ? Icon(Icons.person)
+                    backgroundImage: ImageLoaderHelper.getImageProvider(_imgProfile),
+                    child: !ImageLoaderHelper.hasImage(_imgProfile)
+                        ? const Icon(Icons.person)
                         : null,
                   ),
                   Column(

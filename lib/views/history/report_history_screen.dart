@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/utils/color_badge.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/time.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
@@ -27,11 +26,11 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
 
   final List<String> _statuses = [
     'Semua',
-    'Pending',
-    'Assigned',
-    'On Rescue',
-    'Completed',
-    'Cancelled',
+    'Dilaporkan',
+    'Diterima',
+    'Evakuasi',
+    'Selesai',
+    'Dibatalkan',
   ];
 
   @override
@@ -64,28 +63,27 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
   bool _matchStatus(String reportStatus, String selectedStatus) {
     if (selectedStatus == 'Semua') return true;
     final rStatus = reportStatus.toLowerCase().trim();
-    final sStatus = selectedStatus.toLowerCase().trim();
 
-    if (sStatus == 'pending') {
+    if (selectedStatus == 'Dilaporkan') {
       return rStatus == 'pending' ||
           rStatus == 'waiting' ||
           rStatus == 'waiting rescue';
     }
-    if (sStatus == 'assigned') {
+    if (selectedStatus == 'Diterima') {
       return rStatus == 'assigned';
     }
-    if (sStatus == 'on rescue') {
+    if (selectedStatus == 'Evakuasi') {
       return rStatus == 'on rescue' ||
           rStatus == 'on progress' ||
           rStatus == 'on progress rescue';
     }
-    if (sStatus == 'completed') {
+    if (selectedStatus == 'Selesai') {
       return rStatus == 'completed' || rStatus == 'rescued';
     }
-    if (sStatus == 'cancelled') {
+    if (selectedStatus == 'Dibatalkan') {
       return rStatus == 'cancelled';
     }
-    return rStatus == sStatus;
+    return rStatus == selectedStatus.toLowerCase().trim();
   }
 
   @override
@@ -382,24 +380,23 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                       reportId: report.id ?? "",
                     ),
                     builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                        final file = File(snapshot.data!.first);
-                        if (file.existsSync()) {
-                          return Image.file(
-                            file,
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
-                          );
-                        }
-                      }
-                      return Container(
+                      final path =
+                          (snapshot.hasData && snapshot.data!.isNotEmpty)
+                          ? snapshot.data!.first
+                          : null;
+                      return ImageLoaderHelper.loadImage(
+                        path,
                         width: 80,
                         height: 80,
-                        color: AppColors.border,
-                        child: const Icon(
-                          Icons.broken_image,
-                          color: AppColors.textSecondary,
+                        fit: BoxFit.cover,
+                        errorWidget: Container(
+                          width: 80,
+                          height: 80,
+                          color: AppColors.border,
+                          child: const Icon(
+                            Icons.broken_image,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       );
                     },
@@ -499,7 +496,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  report.status,
+                                  ColorUtils.getStatusLabel(report.status),
                                   style: TextStyle(
                                     color: statusColor,
                                     fontSize: 11,

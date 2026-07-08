@@ -89,6 +89,7 @@ class UserModelFirebase {
   factory UserModelFirebase.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>? ?? {};
     return UserModelFirebase.fromJson({
+      'password': '',
       ...data,
       'id': doc.id,
     });

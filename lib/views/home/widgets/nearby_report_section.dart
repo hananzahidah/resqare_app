@@ -12,6 +12,7 @@ import 'package:resqare_app/utils/string_exntension.dart';
 import 'package:resqare_app/utils/time.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 
 class NearbyReportSection extends StatefulWidget {
   final VoidCallback? onRefreshRequired;
@@ -241,23 +242,18 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
                                         reportId: data.id ?? "",
                                       ),
                                       builder: (context, snapshot) {
-                                        if (snapshot.hasData &&
-                                            snapshot.data!.isNotEmpty) {
-                                          final file = File(
-                                            snapshot.data!.first,
-                                          );
-                                          if (file.existsSync()) {
-                                            return Image.file(
-                                              file,
-                                              fit: BoxFit.cover,
-                                            );
-                                          }
-                                        }
-                                        return Container(
-                                          color: Colors.grey[200],
-                                          child: Icon(
-                                            Icons.broken_image,
-                                            color: Colors.grey,
+                                        final path = (snapshot.hasData && snapshot.data!.isNotEmpty)
+                                            ? snapshot.data!.first
+                                            : null;
+                                        return ImageLoaderHelper.loadImage(
+                                          path,
+                                          fit: BoxFit.cover,
+                                          errorWidget: Container(
+                                            color: Colors.grey[200],
+                                            child: Icon(
+                                              Icons.broken_image,
+                                              color: Colors.grey,
+                                            ),
                                           ),
                                         );
                                       },

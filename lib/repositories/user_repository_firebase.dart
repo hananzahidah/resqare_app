@@ -12,14 +12,27 @@ class UserRepositoryFirebase {
   // Register New User
   Future<bool> registerUser(UserModelFirebase pengguna) async {
     try {
-      final docRef = pengguna.id != null
-          ? _firestore.collection('users').doc(pengguna.id)
-          : _firestore.collection('users').doc();
+      // 1. Create FirebaseAuth user
+      final UserCredential credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: pengguna.email.trim(),
+            password: pengguna.password,
+          );
 
-      final userToSave = pengguna.id != null
-          ? pengguna
-          : pengguna.copyWith(id: docRef.id);
-      await docRef.set(userToSave.toMap());
+      final User? firebaseUser = credential.user;
+      if (firebaseUser == null) return false;
+
+      // 2. Save user document in Firestore using uid
+      final docRef = _firestore.collection('users').doc(firebaseUser.uid);
+      final userToSave = pengguna.copyWith(
+        id: firebaseUser.uid,
+        password: "", // Exclude password from model
+      );
+
+      final data = userToSave.toMap();
+      data.remove('password'); // Ensure password is not stored in Firestore
+
+      await docRef.set(data);
       return true;
     } catch (e) {
       log("Error registering user: ${e.toString()}");
@@ -62,15 +75,23 @@ class UserRepositoryFirebase {
   // Login User
   Future<UserModelFirebase?> loginUser(LoginModel pengguna) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: pengguna.email)
-          .where('password', isEqualTo: pengguna.password)
-          .limit(1)
-          .get();
+      // 1. Sign in with FirebaseAuth
+      final UserCredential credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: pengguna.email.trim(),
+            password: pengguna.password,
+          );
 
-      if (querySnapshot.docs.isNotEmpty) {
-        return UserModelFirebase.fromFirestore(querySnapshot.docs.first);
+      final User? firebaseUser = credential.user;
+      if (firebaseUser == null) return null;
+
+      // 2. Fetch user profile from Firestore
+      final doc = await _firestore
+          .collection('users')
+          .doc(firebaseUser.uid)
+          .get();
+      if (doc.exists) {
+        return UserModelFirebase.fromFirestore(doc);
       }
       return null;
     } catch (e) {
@@ -138,6 +159,34 @@ class UserRepositoryFirebase {
     } catch (e) {
       log("Error updating user: ${e.toString()}");
       return false;
+    }
+  }
+
+  // Change Password via FirebaseAuth
+  Future<String?> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null || user.email == null) {
+        return "Pengguna tidak terautentikasi";
+      }
+
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: oldPassword,
+      );
+      await user.reauthenticateWithCredential(credential);
+      await user.updatePassword(newPassword);
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        return "Kata sandi lama salah";
+      }
+      return e.message ?? "Gagal memperbarui kata sandi";
+    } catch (e) {
+      return e.toString();
     }
   }
 
@@ -236,16 +285,25 @@ class UserRepositoryFirebase {
     required List<String> certificateImages,
   }) async {
     try {
+      // 1. Create FirebaseAuth user
+      final UserCredential credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: user.email.trim(),
+            password: user.password,
+          );
+
+      final User? firebaseUser = credential.user;
+      if (firebaseUser == null) return false;
+
       final batch = _firestore.batch();
 
-      final userDocRef = user.id != null
-          ? _firestore.collection('users').doc(user.id)
-          : _firestore.collection('users').doc();
-      final userToSave = user.id != null
-          ? user
-          : user.copyWith(id: userDocRef.id);
+      final userDocRef = _firestore.collection('users').doc(firebaseUser.uid);
+      final userToSave = user.copyWith(id: firebaseUser.uid, password: "");
 
-      batch.set(userDocRef, userToSave.toMap());
+      final userData = userToSave.toMap();
+      userData.remove('password'); // Ensure password is not stored in Firestore
+
+      batch.set(userDocRef, userData);
 
       final String? img1 = certificateImages.isNotEmpty
           ? certificateImages[0]
@@ -260,10 +318,10 @@ class UserRepositoryFirebase {
       final now = DateTime.now().toIso8601String();
       final appDocRef = _firestore
           .collection('volunteer_applications')
-          .doc(userToSave.id);
+          .doc(firebaseUser.uid);
 
       batch.set(appDocRef, {
-        'userId': userToSave.id,
+        'userId': firebaseUser.uid,
         'experience': experience,
         'reason': reason,
         'image1': img1,

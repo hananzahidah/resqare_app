@@ -6,11 +6,10 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/report_repository_firebase.dart';
+import 'package:resqare_app/utils/firebase_storage_helper.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
 import 'package:resqare_app/views/report/create/success_report_screen.dart';
@@ -106,7 +105,9 @@ class _EditFormScreenState extends State<EditFormScreen> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.report.title);
-    _descriptionController = TextEditingController(text: widget.report.description);
+    _descriptionController = TextEditingController(
+      text: widget.report.description,
+    );
     _customCategoryController = TextEditingController();
 
     if (_animalCategories.contains(widget.report.animalCategory)) {
@@ -445,16 +446,22 @@ class _EditFormScreenState extends State<EditFormScreen> {
 
       // 1. Identify deleted images (in _initialImagePaths but not in _selectedImages)
       for (final initialPath in _initialImagePaths) {
-        final stillSelected = _selectedImages.any((file) => file.path == initialPath);
+        final stillSelected = _selectedImages.any(
+          (file) => file.path == initialPath,
+        );
         if (!stillSelected) {
-          // Delete from local file system
-          try {
-            final file = File(initialPath);
-            if (await file.exists()) {
-              await file.delete();
+          if (initialPath.startsWith('http')) {
+            await FirebaseStorageHelper.deleteFile(initialPath);
+          } else {
+            // Delete from local file system
+            try {
+              final file = File(initialPath);
+              if (await file.exists()) {
+                await file.delete();
+              }
+            } catch (e) {
+              debugPrint("Error physically deleting file: $e");
             }
-          } catch (e) {
-            debugPrint("Error physically deleting file: $e");
           }
           // Delete database record
           await _reportRepository.deleteReportImage(
@@ -465,19 +472,21 @@ class _EditFormScreenState extends State<EditFormScreen> {
       }
 
       // 2. Add newly added images (in _selectedImages but not in _initialImagePaths)
-      final appDir = await getApplicationDocumentsDirectory();
       for (int i = 0; i < _selectedImages.length; i++) {
         final file = _selectedImages[i];
         if (!_initialImagePaths.contains(file.path)) {
-          final ext = p.extension(file.path);
-          final fileName =
-              'report_${reportId}_img_${i}_${DateTime.now().millisecondsSinceEpoch}$ext';
-          final savedImageFile = await file.copy('${appDir.path}/$fileName');
-
-          await _reportRepository.addReportImage(
-            reportId: reportId,
-            imagePath: savedImageFile.path,
+          final downloadUrl = await FirebaseStorageHelper.uploadReportImage(
+            file,
+            reportId,
+            i,
           );
+
+          if (downloadUrl != null) {
+            await _reportRepository.addReportImage(
+              reportId: reportId,
+              imagePath: downloadUrl,
+            );
+          }
         }
       }
 
@@ -490,10 +499,9 @@ class _EditFormScreenState extends State<EditFormScreen> {
       if (success) {
         if (!mounted) return;
         // Redirect to Success Screen
-        context.pushReplacement(SuccessReportScreen(
-          reportId: reportId,
-          isUpdate: true,
-        ));
+        context.pushReplacement(
+          SuccessReportScreen(reportId: reportId, isUpdate: true),
+        );
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -550,64 +558,77 @@ class _EditFormScreenState extends State<EditFormScreen> {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(20),
           ),
-          title: const Row(
+          title: const Column(
             children: [
               Icon(
                 Icons.warning_amber_rounded,
                 color: AppColors.primaryBlue,
-                size: 28,
+                size: 36,
               ),
-              SizedBox(width: 8),
+              SizedBox(height: 10),
               Text(
                 "Konfirmasi Pembaruan",
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
-                  fontSize: 18,
+                  fontSize: 20,
                 ),
               ),
             ],
           ),
           content: const Text(
             "Apakah Anda yakin ingin memperbarui data laporan ini?",
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
-          ),
-          actionsPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 12,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                "Periksa Kembali",
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.bold,
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFCCCCCC)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      "Batal",
+                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryBlue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close dialog
+                      _updateReport();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Perbarui",
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-                elevation: 0,
-              ),
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-                _updateReport();
-              },
-              child: const Text(
-                "Perbarui Laporan",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              ],
             ),
           ],
         );

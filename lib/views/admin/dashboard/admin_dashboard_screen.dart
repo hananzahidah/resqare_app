@@ -393,7 +393,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
           const Divider(height: 30),
           _buildStatusRow(
-            label: "Pending (Menunggu)",
+            label: "Dilaporkan",
             count: _stats['pendingReports'] ?? 0,
             color: AppColors.waitingRescue,
             percentage: total > 0
@@ -402,7 +402,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
           const SizedBox(height: 16),
           _buildStatusRow(
-            label: "Assigned (Ditugaskan)",
+            label: "Diterima",
             count: _stats['assignedReports'] ?? 0,
             color: AppColors.primaryBlue,
             percentage: total > 0
@@ -411,7 +411,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
           const SizedBox(height: 16),
           _buildStatusRow(
-            label: "On Rescue (Penyelamatan)",
+            label: "Evakuasi",
             count: _stats['onRescueReports'] ?? 0,
             color: const Color(0xFF3F51B5),
             percentage: total > 0
@@ -420,7 +420,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
           const SizedBox(height: 16),
           _buildStatusRow(
-            label: "Completed (Selesai)",
+            label: "Selesai",
             count: _stats['completedReports'] ?? 0,
             color: AppColors.success,
             percentage: total > 0
@@ -429,7 +429,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
           const SizedBox(height: 16),
           _buildStatusRow(
-            label: "Cancelled (Dibatalkan)",
+            label: "Dibatalkan",
             count: _stats['cancelledReports'] ?? 0,
             color: AppColors.emergency,
             percentage: total > 0

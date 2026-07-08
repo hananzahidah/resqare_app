@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/models/user_model_firebase.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/date_formater.dart';
+import 'package:resqare_app/utils/firebase_storage_helper.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 
 class VolunteerApplicationScreen extends StatefulWidget {
   final UserModelFirebase user;
@@ -29,6 +29,7 @@ class _VolunteerApplicationScreenState
   final TextEditingController _reasonController = TextEditingController();
 
   final List<File> _certificateFiles = [];
+  final List<String> _initialCertificateUrls = [];
   final ImagePicker _picker = ImagePicker();
 
   bool _isLoading = true;
@@ -80,14 +81,18 @@ class _VolunteerApplicationScreenState
       _isEditMode = false;
 
       _certificateFiles.clear();
+      _initialCertificateUrls.clear();
       if (app['image1'] != null && app['image1'].toString().isNotEmpty) {
         _certificateFiles.add(File(app['image1']));
+        _initialCertificateUrls.add(app['image1']);
       }
       if (app['image2'] != null && app['image2'].toString().isNotEmpty) {
         _certificateFiles.add(File(app['image2']));
+        _initialCertificateUrls.add(app['image2']);
       }
       if (app['image3'] != null && app['image3'].toString().isNotEmpty) {
         _certificateFiles.add(File(app['image3']));
+        _initialCertificateUrls.add(app['image3']);
       }
     } else {
       _status = 'none';
@@ -274,19 +279,30 @@ class _VolunteerApplicationScreenState
       }
 
       // Save local certificate files if they are newly added
-      final appDir = await getApplicationDocumentsDirectory();
       final List<String> savedPaths = [];
       for (int i = 0; i < _certificateFiles.length; i++) {
         final file = _certificateFiles[i];
-        if (file.path.startsWith(appDir.path)) {
+        if (file.path.startsWith('http')) {
           savedPaths.add(file.path);
         } else {
-          // Copy new file
-          final ext = p.extension(file.path);
-          final fileName =
-              'volunteer_cert_${_currentUser!.id}_$i${DateTime.now().millisecondsSinceEpoch}$ext';
-          final savedFile = await file.copy('${appDir.path}/$fileName');
-          savedPaths.add(savedFile.path);
+          // Upload new file to Firebase Storage
+          final downloadUrl = await FirebaseStorageHelper.uploadCertificateImage(
+            file,
+            _currentUser!.id!,
+            i,
+          );
+          if (downloadUrl != null) {
+            savedPaths.add(downloadUrl);
+          } else {
+            throw Exception("Gagal mengunggah sertifikat ke Firebase Storage.");
+          }
+        }
+      }
+
+      // Delete removed certificate images from Storage
+      for (final url in _initialCertificateUrls) {
+        if (!savedPaths.contains(url)) {
+          await FirebaseStorageHelper.deleteFile(url);
         }
       }
 
@@ -341,54 +357,79 @@ class _VolunteerApplicationScreenState
 
     final confirmed = await showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              fontSize: 16,
-            ),
+          title: Column(
+            children: [
+              const Icon(
+                Icons.warning_rounded,
+                color: AppColors.primaryBlue,
+                size: 36,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                ),
+              ),
+            ],
           ),
           content: Text(
             content,
+            textAlign: TextAlign.center,
             style: const TextStyle(
-              color: AppColors.textSecondary,
               fontSize: 14,
+              color: AppColors.textSecondary,
+              height: 1.4,
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text(
-                "Batal",
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFCCCCCC)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      "Batal",
+                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryBlue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Yakin",
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-                elevation: 0,
-              ),
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text(
-                "Ya, Yakin",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              ],
             ),
           ],
         );
@@ -671,7 +712,8 @@ class _VolunteerApplicationScreenState
                                   index,
                                 ) {
                                   final file = _certificateFiles[index];
-                                  final exists = file.existsSync();
+                                  final imageProvider = ImageLoaderHelper.getImageProvider(file.path);
+                                  final exists = imageProvider != null;
 
                                   return Stack(
                                     clipBehavior: Clip.none,
@@ -689,7 +731,7 @@ class _VolunteerApplicationScreenState
                                           ),
                                           image: exists
                                               ? DecorationImage(
-                                                  image: FileImage(file),
+                                                  image: imageProvider!,
                                                   fit: BoxFit.cover,
                                                 )
                                               : null,

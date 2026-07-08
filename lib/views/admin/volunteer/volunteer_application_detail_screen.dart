@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/repositories/admin_repository_firebase.dart';
 import 'package:resqare_app/utils/date_formater.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 
 class VolunteerApplicationDetailScreen extends StatefulWidget {
   final Map<String, dynamic> application;
@@ -39,59 +38,85 @@ class _VolunteerApplicationDetailScreenState
         ? "Apakah Anda yakin ingin menyetujui pengajuan relawan dari ${_app['fullName']}? Akun pengguna ini akan diubah menjadi Relawan."
         : "Apakah Anda yakin ingin menolak pengajuan relawan dari ${_app['fullName']}?";
 
+    final iconColor = newStatus == 'approved' ? AppColors.primaryBlue : AppColors.emergency;
+    final iconData = newStatus == 'approved' ? Icons.check_circle_outline_rounded : Icons.error_outline_rounded;
+    final confirmBtnText = newStatus == 'approved' ? "Ya, Setujui" : "Ya, Tolak";
+
     final confirmed = await showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              fontSize: 16,
-            ),
+          title: Column(
+            children: [
+              Icon(
+                iconData,
+                color: iconColor,
+                size: 36,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                ),
+              ),
+            ],
           ),
           content: Text(
             message,
+            textAlign: TextAlign.center,
             style: const TextStyle(
+              fontSize: 14,
               color: AppColors.textSecondary,
-              fontSize: 13,
               height: 1.4,
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text(
-                "Batal",
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.bold,
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFCCCCCC)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      "Batal",
+                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: newStatus == 'approved'
-                    ? AppColors.primaryBlue
-                    : AppColors.emergency,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: iconColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      confirmBtnText,
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-                elevation: 0,
-              ),
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(
-                newStatus == 'approved' ? "Ya, Setujui" : "Ya, Tolak",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              ],
             ),
           ],
         );
@@ -168,9 +193,9 @@ class _VolunteerApplicationDetailScreenState
   }
 
   Widget _buildImageViewerContent(String imagePath) {
-    final file = File(imagePath);
-    if (file.existsSync()) {
-      return Image.file(file);
+    final imageProvider = ImageLoaderHelper.getImageProvider(imagePath);
+    if (imageProvider != null) {
+      return ImageLoaderHelper.loadImage(imagePath);
     }
     // Fallback template design
     return Container(
@@ -210,8 +235,8 @@ class _VolunteerApplicationDetailScreenState
       return const SizedBox.shrink();
     }
 
-    final file = File(imagePath);
-    final exists = file.existsSync();
+    final imageProvider = ImageLoaderHelper.getImageProvider(imagePath);
+    final exists = imageProvider != null;
 
     return GestureDetector(
       onTap: () => _openImageViewer(imagePath),
@@ -223,7 +248,7 @@ class _VolunteerApplicationDetailScreenState
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.border),
           image: exists
-              ? DecorationImage(image: FileImage(file), fit: BoxFit.cover)
+              ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
               : null,
         ),
         child: !exists
@@ -352,16 +377,8 @@ class _VolunteerApplicationDetailScreenState
                           child: CircleAvatar(
                             radius: 30,
                             backgroundColor: AppColors.softBlue,
-                            backgroundImage:
-                                imgProfile != null &&
-                                    imgProfile.isNotEmpty &&
-                                    File(imgProfile).existsSync()
-                                ? FileImage(File(imgProfile))
-                                : null,
-                            child:
-                                imgProfile == null ||
-                                    imgProfile.isEmpty ||
-                                    !File(imgProfile).existsSync()
+                            backgroundImage: ImageLoaderHelper.getImageProvider(imgProfile),
+                            child: !ImageLoaderHelper.hasImage(imgProfile)
                                 ? const Icon(
                                     Icons.person_rounded,
                                     size: 32,

@@ -1,12 +1,15 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/constant/app_image.dart';
 import 'package:resqare_app/models/user_model_firebase.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
+import 'package:resqare_app/utils/firebase_storage_helper.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/auth/helper/icon_form.dart';
 import 'package:resqare_app/views/auth/login_screen.dart';
@@ -39,6 +42,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
+  bool _agreeToTerms = false;
 
   // Volunteer Certificate Images
   final List<File> _certificateFiles = [];
@@ -92,59 +96,242 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (BuildContext context) {
+      builder: (context) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Pilih Sumber Foto',
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Unggah Foto Hewan",
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
+                    color: AppColors.textPrimary,
                   ),
                 ),
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.camera_alt_outlined,
-                  color: Color(0xFF005BBF),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          _pickCertificateImage(ImageSource.camera);
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.border),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Column(
+                            children: [
+                              Icon(
+                                Icons.camera_alt_rounded,
+                                color: AppColors.primaryBlue,
+                                size: 28,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                "Ambil Foto",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          _pickCertificateImage(ImageSource.gallery);
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.border),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Column(
+                            children: [
+                              Icon(
+                                Icons.photo_library_rounded,
+                                color: AppColors.primaryBlue,
+                                size: 28,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                "Pilih Galeri",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                title: const Text('Kamera'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickCertificateImage(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.photo_library_outlined,
-                  color: Color(0xFF005BBF),
-                ),
-                title: const Text('Galeri'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickCertificateImage(ImageSource.gallery);
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
+                const SizedBox(height: 12),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
+  // void _showImageSourceBottomSheet() {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     backgroundColor: Colors.white,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+  //     ),
+  //     builder: (BuildContext context) {
+  //       return SafeArea(
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             const Padding(
+  //               padding: EdgeInsets.all(16.0),
+  //               child: Text(
+  //                 'Pilih Sumber Foto',
+  //                 style: TextStyle(
+  //                   fontSize: 16,
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Color(0xFF1F2937),
+  //                 ),
+  //               ),
+  //             ),
+  //             ListTile(
+  //               leading: const Icon(
+  //                 Icons.camera_alt_outlined,
+  //                 color: Color(0xFF005BBF),
+  //               ),
+  //               title: const Text('Kamera'),
+  //               onTap: () {
+  //                 Navigator.pop(context);
+  //                 _pickCertificateImage(ImageSource.camera);
+  //               },
+  //             ),
+  //             ListTile(
+  //               leading: const Icon(
+  //                 Icons.photo_library_outlined,
+  //                 color: Color(0xFF005BBF),
+  //               ),
+  //               title: const Text('Galeri'),
+  //               onTap: () {
+  //                 Navigator.pop(context);
+  //                 _pickCertificateImage(ImageSource.gallery);
+  //               },
+  //             ),
+  //             const SizedBox(height: 8),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
   // Remove Certificate Image
   void _removeCertificateImage(int index) {
     setState(() {
       _certificateFiles.removeAt(index);
     });
+  }
+
+  // Terms & Conditions Dialog
+  void _showTermsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Column(
+            children: [
+              Icon(
+                Icons.policy_rounded,
+                color: AppColors.primaryBlue,
+                size: 36,
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Syarat & Ketentuan",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: MediaQuery.of(context).size.height * 0.4,
+            child: const SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Text(
+                "Selamat datang di ResQare. Dengan menggunakan aplikasi ini, Anda setuju untuk mematuhi ketentuan berikut:\n\n"
+                "1. Pendaftaran Akun: Anda wajib memberikan informasi yang akurat, lengkap, dan terbaru saat melakukan pendaftaran.\n\n"
+                "2. Laporan Darurat: Seluruh laporan mengenai hewan liar atau terlantar yang Anda kirimkan harus bersifat riil dan dapat dipertanggungjawabkan. Laporan palsu atau penyalahgunaan dapat mengakibatkan pemblokiran akun.\n\n"
+                "3. Peran Relawan: Relawan setuju untuk menjalankan aksi penyelamatan secara etis dan aman. ResQare tidak bertanggung jawab atas cedera fisik atau risiko yang terjadi di lapangan selama misi penyelamatan berlangsung.\n\n"
+                "4. Penggunaan Data: Data pribadi Anda (seperti nama, nomor telepon, dan lokasi) hanya akan digunakan untuk keperluan koordinasi penyelamatan hewan di dalam sistem ResQare.",
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                  height: 1.5,
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Saya Mengerti",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Confirmation Alert Dialog
@@ -231,6 +418,10 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
 
   // Handle register for Reporter
   void _registerReporter() async {
+    if (!_agreeToTerms) {
+      _showSnackBar('Harap setujui Syarat & Ketentuan terlebih dahulu.');
+      return;
+    }
     if (!_accountFormKey.currentState!.validate()) return;
 
     final name = _nameController.text.trim();
@@ -295,6 +486,10 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
 
   // Validate Step 2 for Volunteer before moving to Step 3
   void _proceedToVolunteerDetails() async {
+    if (!_agreeToTerms) {
+      _showSnackBar('Harap setujui Syarat & Ketentuan terlebih dahulu.');
+      return;
+    }
     if (!_accountFormKey.currentState!.validate()) return;
 
     final email = _emailController.text.trim();
@@ -340,7 +535,6 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
 
     final experience = _experienceController.text.trim();
     final reason = _reasonController.text.trim();
-    final certificatePaths = _certificateFiles.map((f) => f.path).toList();
 
     final confirm = await _showConfirmationAlert(
       "Apakah Anda yakin ingin mengirim pengajuan pendaftaran relawan?",
@@ -350,8 +544,28 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // Pre-generate a user ID to use for certificate upload
+      final userDocId = FirebaseFirestore.instance.collection('users').doc().id;
+
+      // Upload certificate images to Firebase Storage
+      final List<String> certificateUrls = [];
+      for (int i = 0; i < _certificateFiles.length; i++) {
+        final file = _certificateFiles[i];
+        final downloadUrl = await FirebaseStorageHelper.uploadCertificateImage(
+          file,
+          userDocId,
+          i,
+        );
+        if (downloadUrl != null) {
+          certificateUrls.add(downloadUrl);
+        } else {
+          throw Exception("Gagal mengunggah sertifikat ke Firebase Storage.");
+        }
+      }
+
       // Create user data. Note: primary role in users table is 'reporter' initially!
       final user = UserModelFirebase(
+        id: userDocId,
         email: email,
         password: password,
         fullName: name,
@@ -364,7 +578,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
         user: user,
         experience: experience,
         reason: reason,
-        certificateImages: certificatePaths,
+        certificateImages: certificateUrls,
       );
 
       if (!mounted) return;
@@ -942,6 +1156,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
           _buildTextField(
             label: 'Password',
             typeForm: 'Password',
+            hintText: 'Min. 8 (A-Z, 0-9, & simbol)',
             controller: _passwordController,
             obscureText: _obscurePassword,
             suffixIcon: IconButton(
@@ -960,6 +1175,15 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
               }
               if (val.length < 8) {
                 return 'Password minimal 8 karakter';
+              }
+              if (!val.contains(RegExp(r'[A-Z]'))) {
+                return 'Password harus memiliki huruf besar';
+              }
+              if (!val.contains(RegExp(r'[0-9]'))) {
+                return 'Password harus memiliki angka';
+              }
+              if (!val.contains(RegExp(r'[^a-zA-Z0-9\s]'))) {
+                return 'Password harus memiliki simbol';
               }
               return null;
             },
@@ -993,6 +1217,58 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
               return null;
             },
           ),
+          const SizedBox(height: 20),
+
+          // Checkbox Terms and Conditions
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 24,
+                width: 24,
+                child: Checkbox(
+                  value: _agreeToTerms,
+                  activeColor: AppColors.primaryBlue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      _agreeToTerms = val ?? false;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: RichText(
+                  text: TextSpan(
+                    text: 'Saya menyetujui ',
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontSize: 13,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: 'Syarat & Ketentuan',
+                        style: const TextStyle(
+                          color: AppColors.primaryBlue,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = _showTermsDialog,
+                      ),
+                      const TextSpan(
+                        text: ' yang berlaku.',
+                        style: TextStyle(color: Color(0xFF6B7280)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 24),
 
           // Button Daftar (Reporter) or Lanjut (Volunteer)
@@ -1002,7 +1278,9 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
             child: ElevatedButton(
               onPressed: _isLoading
                   ? null
-                  : (isVolunteer ? _proceedToVolunteerDetails : _registerReporter),
+                  : (isVolunteer
+                        ? _proceedToVolunteerDetails
+                        : _registerReporter),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF005BBF),
                 shape: RoundedRectangleBorder(
@@ -1049,42 +1327,42 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          // const SizedBox(height: 16),
 
           // Button Regist with Google
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: ElevatedButton(
-              onPressed: () {
-                _showSnackBar(
-                  'Fitur pendaftaran dengan Google akan segera hadir!',
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Color(0xFFC1C6D6)),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(AppImages.google, height: 24),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Daftar dengan Google',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   height: 56,
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       _showSnackBar(
+          //         'Fitur pendaftaran dengan Google akan segera hadir!',
+          //       );
+          //     },
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: Colors.white,
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(12),
+          //         side: const BorderSide(color: Color(0xFFC1C6D6)),
+          //       ),
+          //     ),
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       children: [
+          //         Image.asset(AppImages.google, height: 24),
+          //         const SizedBox(width: 12),
+          //         const Text(
+          //           'Daftar dengan Google',
+          //           style: TextStyle(
+          //             color: Colors.black,
+          //             fontWeight: FontWeight.bold,
+          //             fontSize: 14,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

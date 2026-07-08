@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -9,6 +7,8 @@ import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
+import 'package:resqare_app/utils/color_badge.dart';
 
 class ExploreMapScreen extends StatefulWidget {
   const ExploreMapScreen({super.key});
@@ -267,24 +267,23 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   bool _matchStatus(String reportStatus, String selectedStatus) {
     if (selectedStatus == 'Semua') return true;
     final rStatus = reportStatus.toLowerCase().trim();
-    final sStatus = selectedStatus.toLowerCase().trim();
 
-    if (sStatus == 'pending') {
-      return rStatus == 'pending';
+    if (selectedStatus == 'Dilaporkan') {
+      return rStatus == 'pending' || rStatus == 'waiting' || rStatus == 'waiting rescue';
     }
-    if (sStatus == 'assigned') {
+    if (selectedStatus == 'Diterima') {
       return rStatus == 'assigned';
     }
-    if (sStatus == 'on rescue') {
-      return rStatus == 'on rescue';
+    if (selectedStatus == 'Evakuasi') {
+      return rStatus == 'on rescue' || rStatus == 'on progress' || rStatus == 'on progress rescue';
     }
-    if (sStatus == 'completed') {
-      return rStatus == 'completed';
+    if (selectedStatus == 'Selesai') {
+      return rStatus == 'completed' || rStatus == 'rescued';
     }
-    if (sStatus == 'cancelled') {
+    if (selectedStatus == 'Dibatalkan') {
       return rStatus == 'cancelled';
     }
-    return rStatus == sStatus;
+    return rStatus == selectedStatus.toLowerCase().trim();
   }
 
   @override
@@ -664,17 +663,18 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
     imageWidget = FutureBuilder<List<String>>(
       future: _reportRepository.getReportImages(reportId: report.id ?? ""),
       builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-          final file = File(snapshot.data!.first);
-          if (file.existsSync()) {
-            return Image.file(file, fit: BoxFit.cover);
-          }
-        }
-        return Container(
-          color: AppColors.border,
-          child: Icon(
-            Icons.image_not_supported_rounded,
-            color: AppColors.textSecondary,
+        final path = (snapshot.hasData && snapshot.data!.isNotEmpty)
+            ? snapshot.data!.first
+            : null;
+        return ImageLoaderHelper.loadImage(
+          path,
+          fit: BoxFit.cover,
+          errorWidget: Container(
+            color: AppColors.border,
+            child: Icon(
+              Icons.image_not_supported_rounded,
+              color: AppColors.textSecondary,
+            ),
           ),
         );
       },
@@ -765,7 +765,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                status,
+                                ColorUtils.getStatusLabel(status),
                                 style: TextStyle(
                                   color: _getStatusColor(status),
                                   fontSize: 10,
@@ -853,11 +853,11 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   void _showStatusFilterDialog() {
     final list = [
       "Semua",
-      "Pending",
-      "Assigned",
-      "On Rescue",
-      "Completed",
-      "Cancelled",
+      "Dilaporkan",
+      "Diterima",
+      "Evakuasi",
+      "Selesai",
+      "Dibatalkan",
     ];
     _showSelectionSheet("Pilih Status", list, _selectedStatus, (val) {
       setState(() {

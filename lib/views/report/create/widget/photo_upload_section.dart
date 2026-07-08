@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 
 class PhotoUploadSection extends StatelessWidget {
   final List<File> selectedImages;
@@ -110,6 +111,7 @@ class PhotoUploadSection extends StatelessWidget {
                 }
 
                 final file = selectedImages[index];
+                final imageProvider = ImageLoaderHelper.getImageProvider(file.path);
                 return Stack(
                   children: [
                     Container(
@@ -118,10 +120,12 @@ class PhotoUploadSection extends StatelessWidget {
                       margin: const EdgeInsets.only(right: 12),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
-                        image: DecorationImage(
-                          image: FileImage(file),
-                          fit: BoxFit.cover,
-                        ),
+                        image: imageProvider != null
+                            ? DecorationImage(
+                                image: imageProvider,
+                                fit: BoxFit.cover,
+                              )
+                            : null,
                       ),
                     ),
                     Positioned(

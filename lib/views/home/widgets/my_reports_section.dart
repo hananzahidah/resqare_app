@@ -9,6 +9,7 @@ import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/time.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 
 class MyReportsSection extends StatefulWidget {
   final VoidCallback? onRefreshRequired;
@@ -137,12 +138,12 @@ class MyReportsSectionState extends State<MyReportsSection> {
               case 'on rescue':
                 statusBgColor = Color(0xFFEFF6FF);
                 statusTextColor = AppColors.onRescue;
-                statusLabel = "Ditangani";
+                statusLabel = "Evakuasi";
                 break;
               case 'assigned':
                 statusBgColor = Color(0xFFEEF2F6);
                 statusTextColor = AppColors.primaryBlue;
-                statusLabel = "Ditugaskan";
+                statusLabel = "Diterima";
                 break;
               case 'completed':
                 statusBgColor = Color(0xFFECFDF5);
@@ -158,7 +159,7 @@ class MyReportsSectionState extends State<MyReportsSection> {
               default:
                 statusBgColor = Color(0xFFFFF7ED);
                 statusTextColor = AppColors.waitingRescue;
-                statusLabel = "Menunggu";
+                statusLabel = "Dilaporkan";
                 break;
             }
             return GestureDetector(
@@ -196,18 +197,27 @@ class MyReportsSectionState extends State<MyReportsSection> {
                             reportId: report.id ?? "",
                           ),
                           builder: (context, snapshot) {
-                            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                              final file = File(snapshot.data!.first);
-                              if (file.existsSync()) {
-                                return Image.file(file, fit: BoxFit.cover);
-                              }
-                            }
-                            return Container(
-                              color: Colors.grey[200],
-                              child: Icon(
-                                Icons.pets_rounded,
-                                color: Color(0xFF9CA3AF),
-                                size: 24,
+                            final path = (snapshot.hasData && snapshot.data!.isNotEmpty)
+                                ? snapshot.data!.first
+                                : null;
+                            return ImageLoaderHelper.loadImage(
+                              path,
+                              fit: BoxFit.cover,
+                              placeholder: Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.pets_rounded,
+                                  color: Color(0xFF9CA3AF),
+                                  size: 24,
+                                ),
+                              ),
+                              errorWidget: Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.pets_rounded,
+                                  color: Color(0xFF9CA3AF),
+                                  size: 24,
+                                ),
                               ),
                             );
                           },

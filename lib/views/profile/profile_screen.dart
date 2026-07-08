@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/user_model_firebase.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/auth/login_screen.dart';
 import 'package:resqare_app/views/profile/edit_profile_screen.dart';
@@ -40,9 +39,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserProfile() async {
-    setState(() {
-      _isLoading = true;
-    });
+    if (_user == null) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
 
     final userId = PreferenceHandler.userId;
     if (userId.isNotEmpty) {
@@ -79,201 +80,465 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            top: 24,
-            left: 24,
-            right: 24,
-          ),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        bool obscureOldPassword = true;
+        bool obscureNewPassword = true;
+        bool obscureConfirmPassword = true;
+        bool dialogLoading = false;
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                top: 24,
+                left: 24,
+                right: 24,
+              ),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Ganti Kata Sandi",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                     Text(
-                      "Ganti Kata Sandi",
+                      "Kata Sandi Lama",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.close_rounded),
-                      onPressed: () => Navigator.pop(context),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: oldPasswordController,
+                      obscureText: obscureOldPassword,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Masukkan kata sandi lama";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Kata sandi lama Anda",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.border),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscureOldPassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: const Color(0xFF727785),
+                          ),
+                          onPressed: () {
+                            setModalState(() {
+                              obscureOldPassword = !obscureOldPassword;
+                            });
+                          },
+                        ),
+                      ),
                     ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Kata Sandi Baru",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: newPasswordController,
+                      obscureText: obscureNewPassword,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Masukkan kata sandi baru";
+                        }
+                        if (value.length < 8) {
+                          return 'Password minimal 8 karakter';
+                        }
+                        if (!value.contains(RegExp(r'[A-Z]'))) {
+                          return 'Password harus memiliki huruf besar';
+                        }
+                        if (!value.contains(RegExp(r'[0-9]'))) {
+                          return 'Password harus memiliki angka';
+                        }
+                        if (!value.contains(RegExp(r'[^a-zA-Z0-9\s]'))) {
+                          return 'Password harus memiliki simbol';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Kata sandi baru (min. 8 karakter)",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.border),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscureNewPassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: const Color(0xFF727785),
+                          ),
+                          onPressed: () {
+                            setModalState(() {
+                              obscureNewPassword = !obscureNewPassword;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Konfirmasi Kata Sandi Baru",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: confirmPasswordController,
+                      obscureText: obscureConfirmPassword,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Konfirmasi kata sandi baru Anda";
+                        }
+                        if (value != newPasswordController.text) {
+                          return "Konfirmasi kata sandi tidak cocok";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Ulangi kata sandi baru",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.border),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscureConfirmPassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: const Color(0xFF727785),
+                          ),
+                          onPressed: () {
+                            setModalState(() {
+                              obscureConfirmPassword = !obscureConfirmPassword;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryBlue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: dialogLoading
+                            ? null
+                            : () async {
+                                if (formKey.currentState!.validate()) {
+                                  final confirm = await _showConfirmationAlert(
+                                    "Apakah Anda yakin ingin mengganti kata sandi akun Anda?",
+                                  );
+                                  if (!confirm) return;
+
+                                  setModalState(() {
+                                    dialogLoading = true;
+                                  });
+
+                                  final oldPassword =
+                                      oldPasswordController.text;
+                                  final newPassword =
+                                      newPasswordController.text;
+
+                                  final errorMsg = await _userRepository
+                                      .changePassword(
+                                        oldPassword: oldPassword,
+                                        newPassword: newPassword,
+                                      );
+
+                                  if (!context.mounted) return;
+
+                                  setModalState(() {
+                                    dialogLoading = false;
+                                  });
+
+                                  if (errorMsg == null) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                          "Kata sandi berhasil diperbarui",
+                                        ),
+                                        backgroundColor: AppColors.success,
+                                      ),
+                                    );
+                                    _loadUserProfile();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(errorMsg),
+                                        backgroundColor: AppColors.emergency,
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                        child: dialogLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                "Ganti Kata Sandi",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                   ],
                 ),
-                SizedBox(height: 16),
-                Text(
-                  "Kata Sandi Lama",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: 8),
-                TextFormField(
-                  controller: oldPasswordController,
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Masukkan kata sandi lama";
-                    }
-                    if (value != _user!.password) {
-                      return "Kata sandi lama salah";
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Kata sandi lama Anda",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  "Kata Sandi Baru",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: 8),
-                TextFormField(
-                  controller: newPasswordController,
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Masukkan kata sandi baru";
-                    }
-                    if (value.length < 6) {
-                      return "Kata sandi baru minimal 6 karakter";
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Kata sandi baru (min. 6 karakter)",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  "Konfirmasi Kata Sandi Baru",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: 8),
-                TextFormField(
-                  controller: confirmPasswordController,
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Konfirmasi kata sandi baru Anda";
-                    }
-                    if (value != newPasswordController.text) {
-                      return "Konfirmasi kata sandi tidak cocok";
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Ulangi kata sandi baru",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryBlue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    onPressed: () async {
-                      if (formKey.currentState!.validate()) {
-                        final newPassword = newPasswordController.text;
-
-                        final success = await _userRepository.updateUser(
-                          userId: _user!.id!,
-                          data: {'password': newPassword},
-                        );
-
-                        if (!context.mounted) return;
-
-                        if (success) {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Kata sandi berhasil diperbarui"),
-                              backgroundColor: AppColors.success,
-                            ),
-                          );
-                          _loadUserProfile();
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Gagal memperbarui kata sandi"),
-                              backgroundColor: AppColors.emergency,
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    child: Text(
-                      "Ganti Kata Sandi",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 24),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
 
+  Future<bool> _showConfirmationAlert(String message) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Column(
+            children: [
+              Icon(
+                Icons.warning_rounded,
+                color: AppColors.primaryBlue,
+                size: 36,
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Konfirmasi Perubahan",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFCCCCCC)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      "Batal",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Yakin",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+    return confirmed ?? false;
+  }
+
   // Logout dialog confirmation
   void _showLogoutConfirmation() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Column(
+            children: const [
+              Icon(Icons.logout_rounded, color: AppColors.emergency, size: 36),
+              SizedBox(height: 10),
+              Text(
+                "Konfirmasi Keluar",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          ),
+          content: const Text(
+            "Apakah Anda yakin ingin keluar dari akun ResQare saat ini?",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFCCCCCC)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      "Batal",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await PreferenceHandler.logOut();
+                      if (!context.mounted) return;
+                      Navigator.pop(context); // Close dialog
+                      context.pushAndRemoveAll(LoginScreen());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.emergency,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Keluar",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showHelpCenterDialog() {
     showDialog(
       context: context,
       builder: (context) {
@@ -282,50 +547,327 @@ class _ProfileScreenState extends State<ProfileScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: Text(
-            "Konfirmasi Keluar",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+          title: const Column(
+            children: [
+              Icon(
+                Icons.support_agent_rounded,
+                color: AppColors.primaryBlue,
+                size: 36,
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Pusat Bantuan",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: MediaQuery.of(context).size.height * 0.45,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Pertanyaan yang Sering Diajukan (FAQ):",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildFaqItem(
+                    "Bagaimana cara melaporkan hewan liar/terluka?",
+                    "Buka halaman utama, tekan tombol tambah laporan (+), ambil foto kondisi hewan, tentukan lokasi koordinat, lalu unggah laporan Anda.",
+                  ),
+                  const Divider(height: 20),
+                  _buildFaqItem(
+                    "Bagaimana cara bergabung menjadi Relawan?",
+                    "Masuk ke halaman Profil Anda, tekan 'Daftar sebagai Relawan', lalu lengkapi dokumen sertifikat kemahiran atau pengalaman penyelamatan Anda.",
+                  ),
+                  const Divider(height: 20),
+                  _buildFaqItem(
+                    "Bagaimana cara koordinasi dengan Relawan?",
+                    "Gunakan fitur Live Chat yang tersedia di halaman detail laporan Anda untuk terhubung langsung dengan relawan yang menangani kasus tersebut.",
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.softBlue.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.primaryBlue.withOpacity(0.2),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Punya pertanyaan lain?",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: AppColors.primaryBlue,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          "Hubungi tim dukungan kami kapan saja melalui email berikut:",
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: const [
+                            Icon(
+                              Icons.email_outlined,
+                              size: 16,
+                              color: AppColors.primaryBlue,
+                            ),
+                            SizedBox(width: 8),
+                            SelectableText(
+                              "resqare@support.com",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          content: Text(
-            "Apakah Anda yakin ingin keluar dari akun ResQare saat ini?",
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
-          actionsPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                "Batal",
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Tutup",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildFaqItem(String question, String answer) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          question,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          answer,
+          style: const TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+            height: 1.4,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showPrivacyPolicyDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Column(
+            children: [
+              Icon(
+                Icons.security_rounded,
+                color: AppColors.primaryBlue,
+                size: 36,
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Kebijakan Privasi",
+                textAlign: TextAlign.center,
                 style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: MediaQuery.of(context).size.height * 0.45,
+            child: const SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Text(
+                "Kebijakan Privasi ini menjelaskan bagaimana ResQare mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda:\n\n"
+                "1. Informasi yang Kami Kumpulkan:\n"
+                "Kami memerlukan Nama, Email, Nomor Telepon, dan data Koordinat GPS lokasi Anda untuk mendaftarkan akun dan mempermudah pencarian lokasi hewan liar/terluka.\n\n"
+                "2. Penggunaan Informasi:\n"
+                "Informasi lokasi GPS hanya dibagikan secara transparan untuk memetakan koordinat laporan hewan liar di peta, agar relawan terdekat dapat melakukan tindakan penyelamatan secara presisi.\n\n"
+                "3. Keamanan Data:\n"
+                "Sandi Anda dikelola secara terenkripsi menggunakan Firebase Authentication. Kami berkomitmen penuh menjaga kerahasiaan data pengguna dari akses tidak sah.\n\n"
+                "4. Layanan Pengguna & Pertanyaan:\n"
+                "Apabila Anda ingin menghapus data akun atau memiliki pertanyaan seputar privasi data pribadi, silakan hubungi tim kami di: resqare@support.com",
+                style: TextStyle(
+                  fontSize: 12,
                   color: AppColors.textSecondary,
-                  fontWeight: FontWeight.bold,
+                  height: 1.5,
                 ),
               ),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.emergency,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Saya Mengerti",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
-                elevation: 0,
-              ),
-              onPressed: () async {
-                await PreferenceHandler.logOut();
-                if (!context.mounted) return;
-                Navigator.pop(context); // Close dialog
-                context.pushAndRemoveAll(LoginScreen());
-              },
-              child: Text(
-                "Keluar",
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAboutUsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Column(
+            children: [
+              Icon(Icons.pets_rounded, color: AppColors.primaryBlue, size: 36),
+              SizedBox(height: 10),
+              Text(
+                "Tentang ResQare",
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
                 ),
               ),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: MediaQuery.of(context).size.height * 0.45,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  const Text(
+                    "Versi 1.0.0",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "ResQare adalah platform berbasis komunitas yang didesain untuk menjembatani pelapor dan relawan dalam menyelamatkan hewan liar maupun peliharaan yang terlantar, tersesat, atau terluka.\n\n"
+                    "Melalui integrasi laporan instan dan peta sebaran, kami memfasilitasi tindakan evakuasi cepat yang transparan dan kolaboratif demi masa depan hewan yang lebih layak.\n\n"
+                    "Hubungi kami di: resqare@support.com",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Tutup",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -445,16 +987,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 radius: 36,
                                 backgroundColor: AppColors.softBlue,
                                 backgroundImage:
-                                    _user?.imgProfile != null &&
-                                        _user!.imgProfile!.isNotEmpty &&
-                                        File(_user!.imgProfile!).existsSync()
-                                    ? FileImage(File(_user!.imgProfile!))
-                                    : null,
+                                    ImageLoaderHelper.getImageProvider(
+                                      _user?.imgProfile,
+                                    ),
                                 child:
-                                    _user?.imgProfile == null ||
-                                        _user!.imgProfile!.isEmpty ||
-                                        !File(_user!.imgProfile!).existsSync()
-                                    ? Icon(
+                                    !ImageLoaderHelper.hasImage(
+                                      _user?.imgProfile,
+                                    )
+                                    ? const Icon(
                                         Icons.person_rounded,
                                         size: 40,
                                         color: AppColors.primaryBlue,
@@ -788,47 +1328,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           icon: Icons.help_outline_rounded,
                           title: "Pusat Bantuan",
                           subtitle: "Tanya jawab & kontak admin",
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Bantuan akan segera hadir"),
-                              ),
-                            );
-                          },
+                          onTap: _showHelpCenterDialog,
                         ),
                         Divider(height: 1, color: AppColors.divider),
                         _buildMenuTile(
                           icon: Icons.policy_outlined,
                           title: "Kebijakan Privasi",
                           subtitle: "Pelajari bagaimana data Anda dikelola",
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Kebijakan Privasi")),
-                            );
-                          },
+                          onTap: _showPrivacyPolicyDialog,
                         ),
                         Divider(height: 1, color: AppColors.divider),
                         _buildMenuTile(
                           icon: Icons.info_outline_rounded,
                           title: "Tentang ResQare",
                           subtitle: "Versi 1.0.0",
-                          onTap: () {
-                            showAboutDialog(
-                              context: context,
-                              applicationName: "ResQare",
-                              applicationVersion: "v1.0.0",
-                              applicationIcon: Icon(
-                                Icons.pets_rounded,
-                                color: AppColors.primaryBlue,
-                                size: 36,
-                              ),
-                              children: [
-                                Text(
-                                  "Aplikasi Penyelamatan Hewan Terlantar & Terluka.",
-                                ),
-                              ],
-                            );
-                          },
+                          onTap: _showAboutUsDialog,
                         ),
                       ],
                     ),
