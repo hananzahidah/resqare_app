@@ -9,12 +9,14 @@ class NotificationRepositoryFirebase {
     return _firestore
         .collection('notifications')
         .where('recipientId', isEqualTo: recipientId)
-        .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
+      final list = snapshot.docs.map((doc) {
         return NotificationModelFirebase.fromFirestore(doc.data(), doc.id);
       }).toList();
+      // Sort in-memory by createdAt descending
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return list;
     });
   }
 

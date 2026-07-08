@@ -23,12 +23,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
   final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
 
   late final String _currentUserId;
+  late Stream<List<NotificationModelFirebase>> _notificationsStream;
   bool _isHandlingTap = false;
 
   @override
   void initState() {
     super.initState();
     _currentUserId = PreferenceHandler.userId;
+    _refreshNotifications();
+  }
+
+  void _refreshNotifications() {
+    setState(() {
+      _notificationsStream = _notificationRepository.streamNotifications(_currentUserId);
+    });
   }
 
   String _formatDate(String isoString) {
@@ -211,164 +219,181 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<List<NotificationModelFirebase>>(
-        stream: _notificationRepository.streamNotifications(_currentUserId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  AppColors.primaryBlue,
-                ),
-              ),
-            );
-          }
-
-          final notifications = snapshot.data ?? [];
-
-          if (notifications.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryBlue.withOpacity(0.08),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.notifications_none_rounded,
-                      color: AppColors.primaryBlue,
-                      size: 48,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    "Belum Ada Notifikasi",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    "Aktivitas penyelamatan & pesan Anda\nakan tampil di sini.",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            physics: const BouncingScrollPhysics(),
-            itemCount: notifications.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final notif = notifications[index];
-              final iconColor = _getColorForType(notif.type);
-
-              return Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: Color(0xFFEDEEF1), width: 1),
-                ),
-                color: notif.isRead
-                    ? Colors.white
-                    : AppColors.softBlue.withOpacity(0.1),
-                child: InkWell(
-                  onTap: () => _handleNotificationTap(notif),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Icon indicator
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: iconColor.withOpacity(0.12),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            _getIconForType(notif.type),
-                            color: iconColor,
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        // Text content
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      notif.title,
-                                      style: TextStyle(
-                                        fontWeight: notif.isRead
-                                            ? FontWeight.bold
-                                            : FontWeight.w900,
-                                        fontSize: 14,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                  if (!notif.isRead)
-                                    Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.primaryBlue,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                notif.body,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondary,
-                                  height: 1.4,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                _formatDate(notif.createdAt),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: AppColors.textSecondary.withOpacity(
-                                    0.8,
-                                  ),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          _refreshNotifications();
+          await Future.delayed(const Duration(milliseconds: 500));
+        },
+        color: AppColors.primaryBlue,
+        child: StreamBuilder<List<NotificationModelFirebase>>(
+          stream: _notificationsStream,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.primaryBlue,
                   ),
                 ),
               );
-            },
-          );
-        },
+            }
+
+            final notifications = snapshot.data ?? [];
+
+            if (notifications.isEmpty) {
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Container(
+                      height: constraints.maxHeight,
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryBlue.withOpacity(0.08),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.notifications_none_rounded,
+                              color: AppColors.primaryBlue,
+                              size: 48,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            "Belum Ada Notifikasi",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            "Aktivitas penyelamatan & pesan Anda\nakan tampil di sini.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              );
+            }
+
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              itemCount: notifications.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final notif = notifications[index];
+                final iconColor = _getColorForType(notif.type);
+
+                return Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: Color(0xFFEDEEF1), width: 1),
+                  ),
+                  color: notif.isRead
+                      ? Colors.white
+                      : AppColors.softBlue.withOpacity(0.1),
+                  child: InkWell(
+                    onTap: () => _handleNotificationTap(notif),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Icon indicator
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: iconColor.withOpacity(0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _getIconForType(notif.type),
+                              color: iconColor,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          // Text content
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        notif.title,
+                                        style: TextStyle(
+                                          fontWeight: notif.isRead
+                                              ? FontWeight.bold
+                                              : FontWeight.w900,
+                                          fontSize: 14,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ),
+                                    if (!notif.isRead)
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.primaryBlue,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  notif.body,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                    height: 1.4,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _formatDate(notif.createdAt),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.textSecondary.withOpacity(
+                                      0.8,
+                                    ),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
