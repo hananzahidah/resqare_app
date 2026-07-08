@@ -190,8 +190,9 @@ class _CarouselSectionState extends State<CarouselSection> {
                                   } else if (index == 1) {
                                     final userId = PreferenceHandler.userId;
                                     if (userId.isNotEmpty) {
-                                      final user = await UserRepositoryFirebase()
-                                          .getUserById(userId);
+                                      final user =
+                                          await UserRepositoryFirebase()
+                                              .getUserById(userId);
                                       if (user != null && mounted) {
                                         Navigator.push(
                                           context,

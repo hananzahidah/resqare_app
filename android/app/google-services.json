@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:407008405238:android:afd24a220b3f2441adaed7",
         "android_client_info": {
-          "package_name": "com.example.resqare_app"
+          "package_name": "com.hnzr.resqare"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "407008405238-m8f7d54n6kb2h8ac439oqgdrfa3qtc0m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.resqare_app",
+            "package_name": "com.hnzr.resqare",
             "certificate_hash": "f9b04f06a0c8cd8b29188624a1ff0c2fedd86626"
           }
         },

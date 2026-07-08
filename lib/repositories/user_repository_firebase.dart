@@ -1,5 +1,8 @@
 import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:resqare_app/models/login_model.dart';
 import 'package:resqare_app/models/user_model_firebase.dart';
 
@@ -9,11 +12,13 @@ class UserRepositoryFirebase {
   // Register New User
   Future<bool> registerUser(UserModelFirebase pengguna) async {
     try {
-      final docRef = pengguna.id != null 
+      final docRef = pengguna.id != null
           ? _firestore.collection('users').doc(pengguna.id)
           : _firestore.collection('users').doc();
-      
-      final userToSave = pengguna.id != null ? pengguna : pengguna.copyWith(id: docRef.id);
+
+      final userToSave = pengguna.id != null
+          ? pengguna
+          : pengguna.copyWith(id: docRef.id);
       await docRef.set(userToSave.toMap());
       return true;
     } catch (e) {
@@ -30,7 +35,7 @@ class UserRepositoryFirebase {
           .where('email', isEqualTo: email)
           .limit(1)
           .get();
-      
+
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       log("Error checking email: ${e.toString()}");
@@ -46,7 +51,7 @@ class UserRepositoryFirebase {
           .where('phone', isEqualTo: phone)
           .limit(1)
           .get();
-      
+
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       log("Error checking phone: ${e.toString()}");
@@ -63,13 +68,61 @@ class UserRepositoryFirebase {
           .where('password', isEqualTo: pengguna.password)
           .limit(1)
           .get();
-      
+
       if (querySnapshot.docs.isNotEmpty) {
         return UserModelFirebase.fromFirestore(querySnapshot.docs.first);
       }
       return null;
     } catch (e) {
       log("Error logging in: ${e.toString()}");
+      return null;
+    }
+  }
+
+  // Sign in with Google
+  Future<UserModelFirebase?> signInWithGoogle() async {
+    try {
+      final googleUser = await GoogleSignIn.instance.authenticate();
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(credential);
+      final User? firebaseUser = userCredential.user;
+
+      if (firebaseUser == null) return null;
+
+      // Check if user exists in Firestore
+      final doc = await _firestore
+          .collection('users')
+          .doc(firebaseUser.uid)
+          .get();
+      if (doc.exists) {
+        return UserModelFirebase.fromFirestore(doc);
+      } else {
+        // Create new user in Firestore
+        final newUser = UserModelFirebase(
+          id: firebaseUser.uid,
+          email: firebaseUser.email ?? "",
+          password: "", // No password for Google Sign-In users
+          fullName: firebaseUser.displayName ?? "Pengguna Google",
+          phone: firebaseUser.phoneNumber,
+          role: "reporter", // Default role
+          isVerified: 0,
+          imgProfile: firebaseUser.photoURL,
+        );
+
+        await _firestore
+            .collection('users')
+            .doc(firebaseUser.uid)
+            .set(newUser.toMap());
+        return newUser;
+      }
+    } catch (e) {
+      log("Error signing in with Google: ${e.toString()}");
       return null;
     }
   }
@@ -118,17 +171,17 @@ class UserRepositoryFirebase {
       final reportsCreated = reportsQuery.docs.length;
 
       // Get rescue count from volunteers collection
-      final volunteerDoc = await _firestore.collection('volunteers').doc(userId).get();
+      final volunteerDoc = await _firestore
+          .collection('volunteers')
+          .doc(userId)
+          .get();
       int rescueCount = 0;
       if (volunteerDoc.exists) {
         final data = volunteerDoc.data();
         rescueCount = data?['rescueCount'] as int? ?? 0;
       }
 
-      return {
-        'reportsCreated': reportsCreated,
-        'rescueCount': rescueCount,
-      };
+      return {'reportsCreated': reportsCreated, 'rescueCount': rescueCount};
     } catch (e) {
       log("Error getting user stats: ${e.toString()}");
       return {'reportsCreated': 0, 'rescueCount': 0};
@@ -152,7 +205,9 @@ class UserRepositoryFirebase {
   // Update volunteer status
   Future<bool> updateVolunteerStatus(String userId, String status) async {
     try {
-      await _firestore.collection('volunteers').doc(userId).update({'status': status});
+      await _firestore.collection('volunteers').doc(userId).update({
+        'status': status,
+      });
       return true;
     } catch (e) {
       log("Error updating volunteer status: ${e.toString()}");
@@ -182,21 +237,31 @@ class UserRepositoryFirebase {
   }) async {
     try {
       final batch = _firestore.batch();
-      
-      final userDocRef = user.id != null 
+
+      final userDocRef = user.id != null
           ? _firestore.collection('users').doc(user.id)
           : _firestore.collection('users').doc();
-      final userToSave = user.id != null ? user : user.copyWith(id: userDocRef.id);
-      
+      final userToSave = user.id != null
+          ? user
+          : user.copyWith(id: userDocRef.id);
+
       batch.set(userDocRef, userToSave.toMap());
-      
-      final String? img1 = certificateImages.isNotEmpty ? certificateImages[0] : null;
-      final String? img2 = certificateImages.length > 1 ? certificateImages[1] : null;
-      final String? img3 = certificateImages.length > 2 ? certificateImages[2] : null;
-      
+
+      final String? img1 = certificateImages.isNotEmpty
+          ? certificateImages[0]
+          : null;
+      final String? img2 = certificateImages.length > 1
+          ? certificateImages[1]
+          : null;
+      final String? img3 = certificateImages.length > 2
+          ? certificateImages[2]
+          : null;
+
       final now = DateTime.now().toIso8601String();
-      final appDocRef = _firestore.collection('volunteer_applications').doc(userToSave.id);
-      
+      final appDocRef = _firestore
+          .collection('volunteer_applications')
+          .doc(userToSave.id);
+
       batch.set(appDocRef, {
         'userId': userToSave.id,
         'experience': experience,
@@ -208,7 +273,7 @@ class UserRepositoryFirebase {
         'createdAt': now,
         'updatedAt': now,
       });
-      
+
       await batch.commit();
       return true;
     } catch (e) {
@@ -253,7 +318,10 @@ class UserRepositoryFirebase {
   // Get volunteer application by userId
   Future<Map<String, dynamic>?> getVolunteerApplication(String userId) async {
     try {
-      final doc = await _firestore.collection('volunteer_applications').doc(userId).get();
+      final doc = await _firestore
+          .collection('volunteer_applications')
+          .doc(userId)
+          .get();
       if (doc.exists) {
         return doc.data();
       }
@@ -264,7 +332,7 @@ class UserRepositoryFirebase {
           .orderBy('createdAt', descending: true)
           .limit(1)
           .get();
-      
+
       if (query.docs.isNotEmpty) {
         return query.docs.first.data();
       }
@@ -285,21 +353,28 @@ class UserRepositoryFirebase {
   }) async {
     try {
       final batch = _firestore.batch();
-      
+
       if (newPhone != null && newPhone.trim().isNotEmpty) {
-        batch.update(
-          _firestore.collection('users').doc(userId),
-          {'phone': newPhone.trim()},
-        );
+        batch.update(_firestore.collection('users').doc(userId), {
+          'phone': newPhone.trim(),
+        });
       }
-      
-      final String? img1 = certificateImages.isNotEmpty ? certificateImages[0] : null;
-      final String? img2 = certificateImages.length > 1 ? certificateImages[1] : null;
-      final String? img3 = certificateImages.length > 2 ? certificateImages[2] : null;
-      
+
+      final String? img1 = certificateImages.isNotEmpty
+          ? certificateImages[0]
+          : null;
+      final String? img2 = certificateImages.length > 1
+          ? certificateImages[1]
+          : null;
+      final String? img3 = certificateImages.length > 2
+          ? certificateImages[2]
+          : null;
+
       final now = DateTime.now().toIso8601String();
-      final appDocRef = _firestore.collection('volunteer_applications').doc(userId);
-      
+      final appDocRef = _firestore
+          .collection('volunteer_applications')
+          .doc(userId);
+
       batch.set(appDocRef, {
         'userId': userId,
         'experience': experience,
@@ -311,7 +386,7 @@ class UserRepositoryFirebase {
         'createdAt': now,
         'updatedAt': now,
       });
-      
+
       await batch.commit();
       return true;
     } catch (e) {
@@ -330,21 +405,28 @@ class UserRepositoryFirebase {
   }) async {
     try {
       final batch = _firestore.batch();
-      
+
       if (newPhone != null && newPhone.trim().isNotEmpty) {
-        batch.update(
-          _firestore.collection('users').doc(userId),
-          {'phone': newPhone.trim()},
-        );
+        batch.update(_firestore.collection('users').doc(userId), {
+          'phone': newPhone.trim(),
+        });
       }
-      
-      final String? img1 = certificateImages.isNotEmpty ? certificateImages[0] : null;
-      final String? img2 = certificateImages.length > 1 ? certificateImages[1] : null;
-      final String? img3 = certificateImages.length > 2 ? certificateImages[2] : null;
-      
+
+      final String? img1 = certificateImages.isNotEmpty
+          ? certificateImages[0]
+          : null;
+      final String? img2 = certificateImages.length > 1
+          ? certificateImages[1]
+          : null;
+      final String? img3 = certificateImages.length > 2
+          ? certificateImages[2]
+          : null;
+
       final now = DateTime.now().toIso8601String();
-      final appDocRef = _firestore.collection('volunteer_applications').doc(userId);
-      
+      final appDocRef = _firestore
+          .collection('volunteer_applications')
+          .doc(userId);
+
       batch.set(appDocRef, {
         'experience': experience,
         'reason': reason,
@@ -353,7 +435,7 @@ class UserRepositoryFirebase {
         'image3': img3,
         'updatedAt': now,
       }, SetOptions(merge: true));
-      
+
       await batch.commit();
       return true;
     } catch (e) {

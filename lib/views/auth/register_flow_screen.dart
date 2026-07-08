@@ -636,18 +636,9 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                     ),
                     SizedBox(height: 16),
 
-                    if (_isLoading)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 24.0),
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF005BBF),
-                        ),
-                      )
-                    else ...[
-                      if (_currentStep == 0) _buildStep0RoleSelection(),
-                      if (_currentStep == 1) _buildStep1AccountForm(),
-                      if (_currentStep == 2) _buildStep2VolunteerForm(),
-                    ],
+                    if (_currentStep == 0) _buildStep0RoleSelection(),
+                    if (_currentStep == 1) _buildStep1AccountForm(),
+                    if (_currentStep == 2) _buildStep2VolunteerForm(),
 
                     SizedBox(height: 32),
 
@@ -1009,23 +1000,32 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed: isVolunteer
-                  ? _proceedToVolunteerDetails
-                  : _registerReporter,
+              onPressed: _isLoading
+                  ? null
+                  : (isVolunteer ? _proceedToVolunteerDetails : _registerReporter),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF005BBF),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: Text(
-                isVolunteer ? 'Lanjut' : 'Daftar',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.5,
+                      ),
+                    )
+                  : Text(
+                      isVolunteer ? 'Lanjut' : 'Daftar',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 16),
@@ -1239,21 +1239,30 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed: _registerVolunteer,
+              onPressed: _isLoading ? null : _registerVolunteer,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF005BBF),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                'Daftar',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.5,
+                      ),
+                    )
+                  : const Text(
+                      'Daftar',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
         ],

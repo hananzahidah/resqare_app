@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool passVisible = false;
+  bool _isLoading = false;
   final UserRepositoryFirebase repository = UserRepositoryFirebase();
 
   void login() async {
@@ -43,27 +44,105 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final user = await repository.loginUser(
-      LoginModel(email: inputEmail, password: inputPass),
+    setState(() => _isLoading = true);
+
+    try {
+      final user = await repository.loginUser(
+        LoginModel(email: inputEmail, password: inputPass),
+      );
+
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      if (user != null) {
+        await PreferenceHandler.setLogin(true);
+        await PreferenceHandler.setUserId(user.id!);
+        await PreferenceHandler.setUserRole(user.role);
+        if (!mounted) return;
+        context.pushAndRemoveAll(BottomNavigator());
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Login gagal! Email atau Password salah.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color(0xFF005BBF),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Terjadi kesalahan: ${e.toString()}',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color(0xFF005BBF),
+          ),
+        );
+      }
+    }
+  }
+
+  void loginWithGoogle() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    if (!mounted) return;
+    try {
+      final user = await repository.signInWithGoogle();
 
-    if (user != null) {
-      await PreferenceHandler.setLogin(true);
-      await PreferenceHandler.setUserId(user.id!);
-      await PreferenceHandler.setUserRole(user.role);
-      context.pushAndRemoveAll(BottomNavigator());
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Login gagal! Email atau Password salah.',
-            style: TextStyle(color: Colors.white),
+      if (!mounted) return;
+      Navigator.pop(context); // Dismiss loading dialog
+
+      if (user != null) {
+        await PreferenceHandler.setLogin(true);
+        await PreferenceHandler.setUserId(user.id!);
+        await PreferenceHandler.setUserRole(user.role);
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Selamat Datang, ${user.fullName}!',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color(0xFF005BBF),
           ),
-          backgroundColor: Color(0xFF005BBF),
-        ),
-      );
+        );
+
+        context.pushAndRemoveAll(BottomNavigator());
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Gagal masuk dengan Google.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color(0xFF005BBF),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Dismiss loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Terjadi kesalahan: ${e.toString()}',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color(0xFF005BBF),
+          ),
+        );
+      }
     }
   }
 
@@ -144,14 +223,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
 
-                                Text(
-                                  "Lupa Password?",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF005BBF),
-                                  ),
-                                ),
+                                // Text(
+                                //   "Lupa Password?",
+                                //   style: TextStyle(
+                                //     fontSize: 12,
+                                //     fontWeight: FontWeight.bold,
+                                //     color: Color(0xFF005BBF),
+                                //   ),
+                                // ),
                               ],
                             ),
 
@@ -167,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           height: 56,
                           child: ElevatedButton(
-                            onPressed: login,
+                            onPressed: _isLoading ? null : login,
 
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color(0xFF005BBF),
@@ -175,13 +254,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadiusGeometry.circular(12),
                               ),
                             ),
-                            child: Text(
-                              "Masuk",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                : Text(
+                                    "Masuk",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
@@ -213,34 +301,34 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   // Button Login with
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadiusGeometry.circular(12),
-                        ),
-                      ),
-                      child: Row(
-                        spacing: 16,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(AppImages.google),
-                          Text(
-                            "Masuk dengan Google",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   height: 56,
+                  //   child: ElevatedButton(
+                  //     onPressed: _isLoading ? null : loginWithGoogle,
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: Colors.white,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadiusGeometry.circular(12),
+                  //       ),
+                  //     ),
+                  //     child: Row(
+                  //       spacing: 16,
+                  //       mainAxisAlignment: MainAxisAlignment.center,
+                  //       children: [
+                  //         Image.asset(AppImages.google),
+                  //         Text(
+                  //           "Masuk dengan Google",
+                  //           style: TextStyle(
+                  //             color: Colors.black,
+                  //             fontWeight: FontWeight.bold,
+                  //             fontSize: 14,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
 
