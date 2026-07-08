@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/repositories/admin_repository_firebase.dart';
+import 'package:resqare_app/views/notification/widget/notification_bell.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   final bool isActive;
@@ -59,6 +60,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
         ),
         centerTitle: true,
+        actions: const [
+          NotificationBell(),
+        ],
       ),
       body: _isLoading
           ? const Center(

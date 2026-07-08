@@ -10,6 +10,7 @@ import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/report_repository_firebase.dart';
+import 'package:resqare_app/repositories/notification_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/firebase_storage_helper.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
@@ -386,6 +387,14 @@ class _FormReportScreenState extends State<FormReportScreen> {
       final reportId = await _reportRepository.createReport(report);
 
       if (reportId.isNotEmpty) {
+        final notifRepo = NotificationRepositoryFirebase();
+        await notifRepo.sendNotification(
+          recipientId: PreferenceHandler.userId,
+          title: "Laporan Berhasil Dibuat",
+          body: "Laporan '${report.title}' berhasil dikirim dan menunggu relawan.",
+          type: "report_created",
+          referenceId: reportId,
+        );
         // Save images
         for (int i = 0; i < _selectedImages.length; i++) {
           final file = _selectedImages[i];

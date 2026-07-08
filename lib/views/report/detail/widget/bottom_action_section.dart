@@ -4,6 +4,7 @@ import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
+import 'package:resqare_app/repositories/notification_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/report/create/edit_form_screen.dart';
 
@@ -277,6 +278,55 @@ class _BottomActionSectionState extends State<BottomActionSection> {
         if (status == 'completed') {
           await _userRepository.incrementVolunteerRescueCount(currentUserId);
         }
+
+        // Send notifications based on the status change
+        final notifRepo = NotificationRepositoryFirebase();
+        if (status == 'assigned') {
+          await notifRepo.sendNotification(
+            recipientId: widget.report.createdBy,
+            title: "Laporan Diterima",
+            body: "Laporan penyelamatan Anda telah diterima oleh Relawan.",
+            type: "report_claimed",
+            referenceId: widget.report.id ?? "",
+          );
+        } else if (status == 'on rescue') {
+          await notifRepo.sendNotification(
+            recipientId: widget.report.createdBy,
+            title: "Evakuasi Dimulai",
+            body: "Relawan sedang menuju ke lokasi untuk mengevakuasi hewan.",
+            type: "rescue_status",
+            referenceId: widget.report.id ?? "",
+          );
+        } else if (status == 'completed') {
+          await notifRepo.sendNotification(
+            recipientId: widget.report.createdBy,
+            title: "Evakuasi Selesai",
+            body: "Hewan pada laporan Anda telah berhasil dievakuasi.",
+            type: "rescue_status",
+            referenceId: widget.report.id ?? "",
+          );
+        } else if (status == 'cancelled') {
+          if (isVolunteerCancel) {
+            await notifRepo.sendNotification(
+              recipientId: widget.report.createdBy,
+              title: "Penyelamatan Dibatalkan",
+              body: "Relawan membatalkan proses penyelamatan laporan Anda.",
+              type: "rescue_status",
+              referenceId: widget.report.id ?? "",
+            );
+          } else {
+            if (widget.report.rescuedBy != null) {
+              await notifRepo.sendNotification(
+                recipientId: widget.report.rescuedBy!,
+                title: "Laporan Dibatalkan",
+                body: "Laporan yang Anda tangani telah dibatalkan oleh Pelapor.",
+                type: "rescue_status",
+                referenceId: widget.report.id ?? "",
+              );
+            }
+          }
+        }
+
         await _checkActiveMission();
         widget.onActionCompleted();
       } else {

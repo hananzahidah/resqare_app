@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/repositories/admin_repository_firebase.dart';
+import 'package:resqare_app/repositories/notification_repository_firebase.dart';
 import 'package:resqare_app/utils/date_formater.dart';
 import 'package:resqare_app/utils/image_loader_helper.dart';
 
@@ -38,9 +39,15 @@ class _VolunteerApplicationDetailScreenState
         ? "Apakah Anda yakin ingin menyetujui pengajuan relawan dari ${_app['fullName']}? Akun pengguna ini akan diubah menjadi Relawan."
         : "Apakah Anda yakin ingin menolak pengajuan relawan dari ${_app['fullName']}?";
 
-    final iconColor = newStatus == 'approved' ? AppColors.primaryBlue : AppColors.emergency;
-    final iconData = newStatus == 'approved' ? Icons.check_circle_outline_rounded : Icons.error_outline_rounded;
-    final confirmBtnText = newStatus == 'approved' ? "Ya, Setujui" : "Ya, Tolak";
+    final iconColor = newStatus == 'approved'
+        ? AppColors.primaryBlue
+        : AppColors.emergency;
+    final iconData = newStatus == 'approved'
+        ? Icons.check_circle_outline_rounded
+        : Icons.error_outline_rounded;
+    final confirmBtnText = newStatus == 'approved'
+        ? "Ya, Setujui"
+        : "Ya, Tolak";
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -53,11 +60,7 @@ class _VolunteerApplicationDetailScreenState
           ),
           title: Column(
             children: [
-              Icon(
-                iconData,
-                color: iconColor,
-                size: 36,
-              ),
+              Icon(iconData, color: iconColor, size: 36),
               const SizedBox(height: 10),
               Text(
                 title,
@@ -94,7 +97,10 @@ class _VolunteerApplicationDetailScreenState
                     ),
                     child: const Text(
                       "Batal",
-                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -112,7 +118,10 @@ class _VolunteerApplicationDetailScreenState
                     ),
                     child: Text(
                       confirmBtnText,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -140,6 +149,19 @@ class _VolunteerApplicationDetailScreenState
         });
 
         if (success) {
+          final notifRepo = NotificationRepositoryFirebase();
+          await notifRepo.sendNotification(
+            recipientId: _app['userId'],
+            title: newStatus == 'approved'
+                ? "Pengajuan Relawan Disetujui"
+                : "Pengajuan Relawan Ditolak",
+            body: newStatus == 'approved'
+                ? "Selamat! Pengajuan Anda sebagai Relawan telah disetujui oleh Admin."
+                : "Pengajuan Anda sebagai Relawan ditolak. Silakan periksa dokumen Anda dan ajukan kembali.",
+            type: "volunteer_status",
+            referenceId: _app['id'],
+          );
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -377,7 +399,9 @@ class _VolunteerApplicationDetailScreenState
                           child: CircleAvatar(
                             radius: 30,
                             backgroundColor: AppColors.softBlue,
-                            backgroundImage: ImageLoaderHelper.getImageProvider(imgProfile),
+                            backgroundImage: ImageLoaderHelper.getImageProvider(
+                              imgProfile,
+                            ),
                             child: !ImageLoaderHelper.hasImage(imgProfile)
                                 ? const Icon(
                                     Icons.person_rounded,

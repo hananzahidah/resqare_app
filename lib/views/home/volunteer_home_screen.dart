@@ -10,7 +10,7 @@ import 'package:resqare_app/views/home/widgets/current_rescue_section.dart';
 import 'package:resqare_app/views/home/widgets/location_card_section.dart';
 import 'package:resqare_app/views/home/widgets/nearby_report_section.dart';
 import 'package:resqare_app/views/home/widgets/quick_action_section.dart';
-
+import 'package:resqare_app/views/notification/widget/notification_bell.dart';
 class VolunteerHomeScreen extends StatefulWidget {
   final bool isActive;
   const VolunteerHomeScreen({super.key, this.isActive = false});
@@ -102,10 +102,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                   ),
                 ],
               ),
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.notifications_none_outlined),
-              ),
+              const NotificationBell(),
             ],
           ),
         ),

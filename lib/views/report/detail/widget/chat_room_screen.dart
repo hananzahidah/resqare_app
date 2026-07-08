@@ -5,6 +5,8 @@ import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/chat_message_model_firebase.dart';
 import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/chat_repository_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
+import 'package:resqare_app/repositories/notification_repository_firebase.dart';
 import 'package:resqare_app/utils/date_formater.dart';
 
 class ChatRoomScreen extends StatefulWidget {
@@ -25,6 +27,7 @@ class ChatRoomScreen extends StatefulWidget {
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
   final ChatRepositoryFirebase _chatRepository = ChatRepositoryFirebase();
+  final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   
@@ -33,11 +36,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   bool _isLoading = true;
   bool _isReadOnly = false;
   late String _currentUserId;
+  String _senderName = "Pengguna ResQare";
 
   @override
   void initState() {
     super.initState();
     _currentUserId = PreferenceHandler.userId;
+    _loadSenderName();
     
     // Sesi chat menjadi Read-Only jika:
     // 1. Status laporan adalah "completed" (atau "rescued")
@@ -50,6 +55,17 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     _loadMessages();
     _startPolling();
+  }
+
+  void _loadSenderName() async {
+    final user = await _userRepository.getUserById(_currentUserId);
+    if (user != null) {
+      if (mounted) {
+        setState(() {
+          _senderName = user.fullName;
+        });
+      }
+    }
   }
 
   @override
@@ -137,6 +153,19 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       await _chatRepository.sendMessage(newMessage);
       _loadMessages(isSilent: true);
       _scrollToBottom();
+
+      final recipientId = _currentUserId == widget.volunteerId
+          ? widget.report.createdBy
+          : widget.volunteerId;
+
+      final notifRepo = NotificationRepositoryFirebase();
+      await notifRepo.sendNotification(
+        recipientId: recipientId,
+        title: "Pesan Baru dari $_senderName",
+        body: text,
+        type: "new_chat",
+        referenceId: widget.report.id ?? "",
+      );
     } catch (e) {
       debugPrint("Error sending message: $e");
     }

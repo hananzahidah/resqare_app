@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
+import 'package:resqare_app/views/home/rescue_guide_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class QuickActionSection extends StatefulWidget {
@@ -109,7 +110,14 @@ class _QuickActionSectionState extends State<QuickActionSection> {
         "icon": Icons.health_and_safety_rounded,
         "color": Color(0xFFE6F9F3),
         "iconColor": AppColors.success,
-        "onTap": () {},
+        "onTap": () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RescueGuideScreen(),
+            ),
+          );
+        },
       },
     ];
 

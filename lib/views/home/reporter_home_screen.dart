@@ -12,7 +12,7 @@ import 'package:resqare_app/views/home/widgets/location_card_section.dart';
 import 'package:resqare_app/views/home/widgets/my_reports_section.dart';
 import 'package:resqare_app/views/home/widgets/nearby_report_section.dart';
 import 'package:resqare_app/views/home/widgets/quick_action_section.dart';
-
+import 'package:resqare_app/views/notification/widget/notification_bell.dart';
 class ReporterHomeScreen extends StatefulWidget {
   final bool isActive;
   const ReporterHomeScreen({super.key, this.isActive = false});
@@ -107,10 +107,7 @@ class _ReporterHomeScreenState extends State<ReporterHomeScreen> {
                   ),
                 ],
               ),
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.notifications_none_outlined),
-              ),
+              const NotificationBell(),
             ],
           ),
         ),
