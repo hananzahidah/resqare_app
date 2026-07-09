@@ -223,4 +223,64 @@ class ReportRepositoryFirebase {
       return {'total': 0, 'completed': 0, 'active': 0, 'cancelled': 0};
     }
   }
+
+  // Stream single report data by ID
+  Stream<ReportModelFirebase?> streamReportById(String reportId) {
+    return _firestore
+        .collection('reports')
+        .doc(reportId)
+        .snapshots()
+        .map((doc) => doc.exists ? ReportModelFirebase.fromFirestore(doc) : null);
+  }
+
+  // Stream all reports data
+  Stream<List<ReportModelFirebase>> streamAllReports() {
+    return _firestore
+        .collection('reports')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => ReportModelFirebase.fromFirestore(doc))
+            .toList());
+  }
+
+  // Stream active reports created by the user (latest 3)
+  Stream<List<ReportModelFirebase>> streamMyActiveReports(String userId) {
+    return _firestore
+        .collection('reports')
+        .where('createdBy', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          final reports = snapshot.docs
+              .map((doc) => ReportModelFirebase.fromFirestore(doc))
+              .toList();
+          // Sort client-side
+          reports.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return reports.take(3).toList();
+        });
+  }
+
+  // Stream active mission for a volunteer
+  Stream<ReportModelFirebase?> streamActiveMission(String userId) {
+    return _firestore
+        .collection('reports')
+        .where('rescuedBy', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          final activeReports = snapshot.docs
+              .map((doc) => ReportModelFirebase.fromFirestore(doc))
+              .where((report) {
+                final status = report.status.toLowerCase();
+                return status != 'completed' &&
+                       status != 'rescued' &&
+                       status != 'cancelled';
+              })
+              .toList();
+
+          if (activeReports.isNotEmpty) {
+            activeReports.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+            return activeReports.first;
+          }
+          return null;
+        });
+  }
 }

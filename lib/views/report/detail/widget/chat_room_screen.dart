@@ -1,12 +1,13 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/chat_message_model_firebase.dart';
 import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/chat_repository_firebase.dart';
-import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/repositories/notification_repository_firebase.dart';
+import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/date_formater.dart';
 
 class ChatRoomScreen extends StatefulWidget {
@@ -30,9 +31,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   final UserRepositoryFirebase _userRepository = UserRepositoryFirebase();
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  
+
   List<ChatMessageModelFirebase> _messages = [];
-  Timer? _pollingTimer;
+  StreamSubscription<List<ChatMessageModelFirebase>>? _messagesSubscription;
   bool _isLoading = true;
   bool _isReadOnly = false;
   late String _currentUserId;
@@ -43,18 +44,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     super.initState();
     _currentUserId = PreferenceHandler.userId;
     _loadSenderName();
-    
+
     // Sesi chat menjadi Read-Only jika:
     // 1. Status laporan adalah "completed" (atau "rescued")
     // 2. ATAU volunteerId obrolan ini tidak sama dengan rescuedBy laporan saat ini (karena volunteer tersebut sudah membatalkan tugas)
     final reportStatus = widget.report.status.toLowerCase();
-    final isReportFinished = reportStatus == 'completed' || reportStatus == 'rescued';
+    final isReportFinished =
+        reportStatus == 'completed' || reportStatus == 'rescued';
     final isNotActiveVolunteer = widget.report.rescuedBy != widget.volunteerId;
 
     _isReadOnly = isReportFinished || isNotActiveVolunteer;
 
-    _loadMessages();
-    _startPolling();
+    _listenToMessages();
   }
 
   void _loadSenderName() async {
@@ -70,64 +71,53 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   @override
   void dispose() {
-    _pollingTimer?.cancel();
+    _messagesSubscription?.cancel();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _startPolling() {
-    _pollingTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      _loadMessages(isSilent: true);
+  void _listenToMessages() {
+    setState(() {
+      _isLoading = true;
     });
-  }
 
-  Future<void> _loadMessages({bool isSilent = false}) async {
-    if (!isSilent) {
-      setState(() {
-        _isLoading = true;
-      });
-    }
+    _messagesSubscription = _chatRepository
+        .getMessagesStream(widget.report.id ?? "", widget.volunteerId)
+        .listen(
+          (messages) {
+            if (mounted) {
+              setState(() {
+                _messages = messages;
+                _isLoading = false;
+              });
 
-    try {
-      final messages = await _chatRepository.getMessages(
-        widget.report.id ?? "",
-        widget.volunteerId,
-      );
+              // Tandai pesan belum dibaca sebagai dibaca
+              _chatRepository.markAsRead(
+                widget.report.id ?? "",
+                widget.volunteerId,
+                _currentUserId,
+              );
 
-      // Tandai pesan belum dibaca sebagai dibaca
-      await _chatRepository.markAsRead(
-        widget.report.id ?? "",
-        widget.volunteerId,
-        _currentUserId,
-      );
-
-      if (mounted) {
-        setState(() {
-          _messages = messages;
-          _isLoading = false;
-        });
-
-        // Scroll ke bawah jika ada pesan baru
-        if (!isSilent) {
-          _scrollToBottom();
-        }
-      }
-    } catch (e) {
-      debugPrint("Error loading messages: $e");
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+              _scrollToBottom();
+            }
+          },
+          onError: (e) {
+            debugPrint("Error listening to messages: $e");
+            if (mounted) {
+              setState(() {
+                _isLoading = false;
+              });
+            }
+          },
+        );
   }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          0.0,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -151,8 +141,20 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     try {
       await _chatRepository.sendMessage(newMessage);
-      _loadMessages(isSilent: true);
       _scrollToBottom();
+
+      // Ambil data chat terbaru langsung dari firebase tanpa mengubah _isLoading (tanpa loading indicator)
+      final latestMessages = await _chatRepository.getMessages(
+        widget.report.id ?? "",
+        widget.volunteerId,
+      );
+
+      if (mounted) {
+        setState(() {
+          _messages = latestMessages;
+        });
+        _scrollToBottom();
+      }
 
       final recipientId = _currentUserId == widget.volunteerId
           ? widget.report.createdBy
@@ -175,7 +177,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Widget build(BuildContext context) {
     // Menentukan sub-role label (Pelapor vs Relawan)
     final isReporter = widget.report.createdBy == widget.volunteerId;
-    final otherRoleLabel = isReporter ? "Pelapor Laporan" : "Relawan Penyelamat";
+    final otherRoleLabel = isReporter
+        ? "Pelapor Laporan"
+        : "Relawan Penyelamat";
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -184,7 +188,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         elevation: 0.5,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.textPrimary,
+            size: 20,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Row(
@@ -193,7 +201,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               radius: 18,
               backgroundColor: AppColors.primaryBlue,
               child: Text(
-                widget.otherUserName.isNotEmpty ? widget.otherUserName[0].toUpperCase() : '?',
+                widget.otherUserName.isNotEmpty
+                    ? widget.otherUserName[0].toUpperCase()
+                    : '?',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -246,41 +256,55 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              textAlign: Alignment.center.x == 0 ? TextAlign.center : TextAlign.start,
+              textAlign: Alignment.center.x == 0
+                  ? TextAlign.center
+                  : TextAlign.start,
             ),
           ),
-          
+
           // Chat Messages List
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _messages.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.chat_bubble_outline_rounded, size: 48, color: AppColors.textSecondary.withValues(alpha: 0.5)),
-                            const SizedBox(height: 12),
-                            Text(
-                              "Belum ada obrolan",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary.withValues(alpha: 0.8),
-                              ),
-                            ),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          size: 48,
+                          color: AppColors.textSecondary.withValues(alpha: 0.5),
                         ),
-                      )
-                    : ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                        itemCount: _messages.length,
-                        itemBuilder: (context, index) {
-                          final msg = _messages[index];
-                          final isMe = msg.senderId == _currentUserId;
-                          return _buildChatBubble(msg, isMe);
-                        },
-                      ),
+                        const SizedBox(height: 12),
+                        Text(
+                          "Belum ada obrolan",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary.withValues(
+                              alpha: 0.8,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    controller: _scrollController,
+                    reverse: true,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 20,
+                    ),
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      // Karena reverse: true, index 0 adalah pesan terbaru (paling bawah)
+                      final msg = _messages[_messages.length - 1 - index];
+                      final isMe = msg.senderId == _currentUserId;
+                      return _buildChatBubble(msg, isMe);
+                    },
+                  ),
           ),
 
           // Message Input / Read Only Banner
@@ -299,7 +323,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         child: Column(
-          crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: isMe
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -344,7 +370,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   Icon(
                     Icons.done_all_rounded,
                     size: 13,
-                    color: msg.isRead == 1 ? AppColors.primaryBlue : AppColors.textSecondary,
+                    color: msg.isRead == 1
+                        ? AppColors.primaryBlue
+                        : AppColors.textSecondary,
                   ),
                 ],
               ],
@@ -373,7 +401,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.lock_outline_rounded, color: Colors.amber.shade800, size: 20),
+                Icon(
+                  Icons.lock_outline_rounded,
+                  color: Colors.amber.shade800,
+                  size: 20,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -415,12 +447,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   minLines: 1,
                   decoration: const InputDecoration(
                     hintText: "Tulis pesan...",
-                    hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                    hintStyle: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                    ),
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.symmetric(vertical: 10),
                   ),
-                  style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
             ),

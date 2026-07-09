@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:resqare_app/constant/app_color.dart';
@@ -9,9 +10,9 @@ import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/color_badge.dart';
 import 'package:resqare_app/utils/date_formater.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
-import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/widget/bottom_action_section.dart';
 import 'package:resqare_app/views/report/detail/widget/chat_room_screen.dart';
@@ -50,11 +51,40 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
   double? _userLng;
 
   String? _distanceText;
+  StreamSubscription<ReportModelFirebase?>? _reportSubscription;
 
   @override
   void initState() {
     super.initState();
     _loadAllData();
+    _listenToReport();
+  }
+
+  void _listenToReport() {
+    _reportSubscription = _reportRepository.streamReportById(widget.reportId).listen((reportData) async {
+      if (reportData != null && mounted) {
+        UserModelFirebase? volunteerData = _volunteer;
+        // Fetch new volunteer data if rescuedBy changes
+        if (reportData.rescuedBy != _report?.rescuedBy) {
+          if (reportData.rescuedBy != null) {
+            volunteerData = await _userRepository.getUserById(reportData.rescuedBy!);
+          } else {
+            volunteerData = null;
+          }
+        }
+
+        setState(() {
+          _report = reportData;
+          _volunteer = volunteerData;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _reportSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _getUserLocation() async {
@@ -664,13 +694,6 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                                   ],
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: AppColors.primaryBlue,
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -731,13 +754,6 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: AppColors.primaryBlue,
                                   ),
                                 ),
                               ],

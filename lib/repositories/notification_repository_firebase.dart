@@ -5,19 +5,21 @@ class NotificationRepositoryFirebase {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Stream of notifications for a recipient
-  Stream<List<NotificationModelFirebase>> streamNotifications(String recipientId) {
+  Stream<List<NotificationModelFirebase>> streamNotifications(
+    String recipientId,
+  ) {
     return _firestore
         .collection('notifications')
         .where('recipientId', isEqualTo: recipientId)
         .snapshots()
         .map((snapshot) {
-      final list = snapshot.docs.map((doc) {
-        return NotificationModelFirebase.fromFirestore(doc.data(), doc.id);
-      }).toList();
-      // Sort in-memory by createdAt descending
-      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return list;
-    });
+          final list = snapshot.docs.map((doc) {
+            return NotificationModelFirebase.fromFirestore(doc.data(), doc.id);
+          }).toList();
+          // Sort in-memory by createdAt descending
+          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return list;
+        });
   }
 
   // Stream unread count for badge
@@ -31,9 +33,13 @@ class NotificationRepositoryFirebase {
   }
 
   // Create a notification
-  Future<bool> createNotification(NotificationModelFirebase notification) async {
+  Future<bool> createNotification(
+    NotificationModelFirebase notification,
+  ) async {
     try {
-      await _firestore.collection('notifications').add(notification.toFirestore());
+      await _firestore
+          .collection('notifications')
+          .add(notification.toFirestore());
       return true;
     } catch (e) {
       return false;
@@ -62,7 +68,9 @@ class NotificationRepositoryFirebase {
   // Mark a notification as read
   Future<bool> markAsRead(String notificationId) async {
     try {
-      await _firestore.collection('notifications').doc(notificationId).update({'isRead': true});
+      await _firestore.collection('notifications').doc(notificationId).update({
+        'isRead': true,
+      });
       return true;
     } catch (e) {
       return false;

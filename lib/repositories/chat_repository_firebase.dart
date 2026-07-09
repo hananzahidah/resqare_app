@@ -21,12 +21,35 @@ class ChatRepositoryFirebase {
         .collection('chat_messages')
         .where('reportId', isEqualTo: reportId)
         .where('volunteerId', isEqualTo: volunteerId)
-        .orderBy('createdAt', descending: false)
         .get();
 
-    return snapshot.docs
+    final messages = snapshot.docs
         .map((doc) => ChatMessageModelFirebase.fromFirestore(doc))
         .toList();
+
+    // Sort client-side to avoid composite index requirement
+    messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return messages;
+  }
+
+  // Get real-time stream of messages for a reporter and volunteer
+  Stream<List<ChatMessageModelFirebase>> getMessagesStream(
+    String reportId,
+    String volunteerId,
+  ) {
+    return _firestore
+        .collection('chat_messages')
+        .where('reportId', isEqualTo: reportId)
+        .where('volunteerId', isEqualTo: volunteerId)
+        .snapshots()
+        .map((snapshot) {
+          final list = snapshot.docs
+              .map((doc) => ChatMessageModelFirebase.fromFirestore(doc))
+              .toList();
+          // Sort client-side to avoid composite index requirement
+          list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+          return list;
+        });
   }
 
   // Get all volunteers who have a chat history on a report

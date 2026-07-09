@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
@@ -29,22 +30,39 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
   bool _isActive = false;
   bool _isLoading = true;
   ReportModelFirebase? _activeMission;
+  StreamSubscription<ReportModelFirebase?>? _activeMissionSubscription;
 
   Future<void> loadVolunteerData() async {
+    _activeMissionSubscription?.cancel();
+
+    if (_activeMission == null) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
     try {
       final userId = PreferenceHandler.userId;
       if (userId.isNotEmpty) {
         final active = await _userRepository.isVolunteerActive(userId);
-        final mission = await _reportRepository.getActiveMission(userId);
-
-        if (mounted) {
-          setState(() {
-            _isActive = active;
-            _activeMission = mission;
-            _isLoading = false;
-          });
-          widget.onActiveStatusChanged(active);
-        }
+        
+        _activeMissionSubscription = _reportRepository.streamActiveMission(userId).listen((mission) {
+          if (mounted) {
+            setState(() {
+              _isActive = active;
+              _activeMission = mission;
+              _isLoading = false;
+            });
+            widget.onActiveStatusChanged(active);
+          }
+        }, onError: (e) {
+          debugPrint("Error in active mission stream: $e");
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+          }
+        });
       } else {
         if (mounted) {
           setState(() {
@@ -66,6 +84,12 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
   void initState() {
     super.initState();
     loadVolunteerData();
+  }
+
+  @override
+  void dispose() {
+    _activeMissionSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _toggleStatus(bool newValue) async {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -23,18 +24,35 @@ class MyReportsSectionState extends State<MyReportsSection> {
   final ReportRepositoryFirebase _reportRepository = ReportRepositoryFirebase();
   List<ReportModelFirebase> myReports = [];
   bool isLoading = true;
+  StreamSubscription<List<ReportModelFirebase>>? _myReportsSubscription;
 
   Future<void> loadMyReports() async {
+    _myReportsSubscription?.cancel();
+
+    if (myReports.isEmpty) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+
     try {
       final userId = PreferenceHandler.userId;
       if (userId.isNotEmpty) {
-        final reports = await _reportRepository.getMyActiveReports(userId);
-        if (mounted) {
-          setState(() {
-            myReports = reports;
-            isLoading = false;
-          });
-        }
+        _myReportsSubscription = _reportRepository.streamMyActiveReports(userId).listen((reports) {
+          if (mounted) {
+            setState(() {
+              myReports = reports;
+              isLoading = false;
+            });
+          }
+        }, onError: (e) {
+          debugPrint("Error in my reports stream: $e");
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
+        });
       } else {
         if (mounted) {
           setState(() {
@@ -57,6 +75,12 @@ class MyReportsSectionState extends State<MyReportsSection> {
   void initState() {
     super.initState();
     loadMyReports();
+  }
+
+  @override
+  void dispose() {
+    _myReportsSubscription?.cancel();
+    super.dispose();
   }
 
   @override

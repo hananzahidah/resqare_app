@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -30,11 +31,18 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
   bool isLoadingReports = true;
   double? _userLat;
   double? _userLng;
+  StreamSubscription<List<ReportModelFirebase>>? _reportsSubscription;
 
   Future<void> loadReports() async {
-    try {
-      final reports = await _reportRepository.getAllReports();
+    _reportsSubscription?.cancel();
 
+    if (dbReports.isEmpty) {
+      setState(() {
+        isLoadingReports = true;
+      });
+    }
+
+    try {
       double userLat = -6.1754;
       double userLng = 106.8271;
 
@@ -49,43 +57,53 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
         }
       }
 
-      List<ReportModelFirebase> targetedReports = reports;
-      final userRole = PreferenceHandler.userRole.toLowerCase();
-      if (userRole == 'volunteer') {
-        targetedReports = reports
-            .where(
-              (report) =>
-                  report.rescuedBy == null ||
-                  report.status.toLowerCase() == 'pending',
-            )
-            .toList();
-      }
+      _reportsSubscription = _reportRepository.streamAllReports().listen((reports) {
+        List<ReportModelFirebase> targetedReports = reports;
+        final userRole = PreferenceHandler.userRole.toLowerCase();
+        if (userRole == 'volunteer') {
+          targetedReports = reports
+              .where(
+                (report) =>
+                    report.rescuedBy == null ||
+                    report.status.toLowerCase() == 'pending',
+              )
+              .toList();
+        }
 
-      targetedReports.sort((a, b) {
-        final distA = Geolocator.distanceBetween(
-          userLat,
-          userLng,
-          a.latitude,
-          a.longitude,
-        );
-        final distB = Geolocator.distanceBetween(
-          userLat,
-          userLng,
-          b.latitude,
-          b.longitude,
-        );
-        return distA.compareTo(distB);
-      });
-
-      final limited = targetedReports.take(5).toList();
-      if (mounted) {
-        setState(() {
-          dbReports = limited;
-          _userLat = userLat;
-          _userLng = userLng;
-          isLoadingReports = false;
+        targetedReports.sort((a, b) {
+          final distA = Geolocator.distanceBetween(
+            userLat,
+            userLng,
+            a.latitude,
+            a.longitude,
+          );
+          final distB = Geolocator.distanceBetween(
+            userLat,
+            userLng,
+            b.latitude,
+            b.longitude,
+          );
+          return distA.compareTo(distB);
         });
-      }
+
+        final limited = targetedReports.take(5).toList();
+
+        if (mounted) {
+          setState(() {
+            dbReports = limited;
+            _userLat = userLat;
+            _userLng = userLng;
+            isLoadingReports = false;
+          });
+        }
+      }, onError: (e) {
+        debugPrint("Error in reports stream: $e");
+        if (mounted) {
+          setState(() {
+            isLoadingReports = false;
+          });
+        }
+      });
     } catch (e, stack) {
       debugPrint("Error loading reports in nearby: $e\n$stack");
       if (mounted) {
@@ -100,6 +118,12 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
   void initState() {
     super.initState();
     loadReports();
+  }
+
+  @override
+  void dispose() {
+    _reportsSubscription?.cancel();
+    super.dispose();
   }
 
   @override

@@ -286,11 +286,12 @@ class _VolunteerApplicationScreenState
           savedPaths.add(file.path);
         } else {
           // Upload new file to Firebase Storage
-          final downloadUrl = await FirebaseStorageHelper.uploadCertificateImage(
-            file,
-            _currentUser!.id!,
-            i,
-          );
+          final downloadUrl =
+              await FirebaseStorageHelper.uploadCertificateImage(
+                file,
+                _currentUser!.id!,
+                i,
+              );
           if (downloadUrl != null) {
             savedPaths.add(downloadUrl);
           } else {
@@ -407,7 +408,10 @@ class _VolunteerApplicationScreenState
                     ),
                     child: const Text(
                       "Batal",
-                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -425,7 +429,10 @@ class _VolunteerApplicationScreenState
                     ),
                     child: const Text(
                       "Yakin",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -712,7 +719,10 @@ class _VolunteerApplicationScreenState
                                   index,
                                 ) {
                                   final file = _certificateFiles[index];
-                                  final imageProvider = ImageLoaderHelper.getImageProvider(file.path);
+                                  final imageProvider =
+                                      ImageLoaderHelper.getImageProvider(
+                                        file.path,
+                                      );
                                   final exists = imageProvider != null;
 
                                   return Stack(
@@ -731,7 +741,7 @@ class _VolunteerApplicationScreenState
                                           ),
                                           image: exists
                                               ? DecorationImage(
-                                                  image: imageProvider!,
+                                                  image: imageProvider,
                                                   fit: BoxFit.cover,
                                                 )
                                               : null,
