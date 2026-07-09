@@ -23,7 +23,7 @@ class PhotoUploadSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: const Color(0xFFEDEEF1),
@@ -36,7 +36,7 @@ class PhotoUploadSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
                   Icon(
                     Icons.add_a_photo_rounded,
@@ -55,7 +55,7 @@ class PhotoUploadSection extends StatelessWidget {
               ),
               Text(
                 "${selectedImages.length}/$maxPhotos",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textSecondary,

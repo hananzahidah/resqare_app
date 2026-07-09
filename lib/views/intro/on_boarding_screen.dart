@@ -94,10 +94,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                           child: Text(
                             item.title,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -113,7 +113,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               height: 1.5,
-                              color: Colors.grey.shade700,
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ),
@@ -164,7 +164,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     decoration: BoxDecoration(
                       color: index == i
                           ? AppColors.primaryBlue
-                          : Colors.grey.shade400,
+                          : AppColors.border,
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),

@@ -201,7 +201,7 @@ class _EditFormScreenState extends State<EditFormScreen> {
   void _showImageSourceBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -213,7 +213,7 @@ class _EditFormScreenState extends State<EditFormScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Unggah Foto Hewan",
                   style: TextStyle(
                     fontSize: 18,
@@ -556,11 +556,11 @@ class _EditFormScreenState extends State<EditFormScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Column(
+          title: Column(
             children: [
               Icon(
                 Icons.warning_amber_rounded,
@@ -579,7 +579,7 @@ class _EditFormScreenState extends State<EditFormScreen> {
               ),
             ],
           ),
-          content: const Text(
+          content: Text(
             "Apakah Anda yakin ingin memperbarui data laporan ini?",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -641,10 +641,10 @@ class _EditFormScreenState extends State<EditFormScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           "Edit Laporan Rescue",
           style: TextStyle(
             fontSize: 16,
@@ -669,7 +669,7 @@ class _EditFormScreenState extends State<EditFormScreen> {
                     _isSubmitting
                         ? "Memperbarui laporan darurat..."
                         : "Memuat data laporan...",
-                    style: const TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: AppColors.textSecondary),
                   ),
                 ],
               ),

@@ -163,7 +163,7 @@ class _LocationCardSectionState extends State<LocationCardSection> {
       margin: EdgeInsets.symmetric(horizontal: 20),
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
 
         // color: AppColors.primaryBlue.withOpacity(0.06),
         borderRadius: BorderRadius.circular(20),
@@ -225,7 +225,7 @@ class _LocationCardSectionState extends State<LocationCardSection> {
                         children: [
                           Text(
                             _currentAddress,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,

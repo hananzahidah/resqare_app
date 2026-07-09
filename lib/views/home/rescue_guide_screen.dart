@@ -23,54 +23,58 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
       "title": "Mendekati Hewan Liar atau Ketakutan",
       "category": "Penanganan Khusus",
       "icon": Icons.pets_rounded,
-      "summary": "Langkah aman mendekati kucing atau anjing liar yang takut agar tidak menyerang.",
+      "summary":
+          "Langkah aman mendekati kucing atau anjing liar yang takut agar tidak menyerang.",
       "steps": [
         "Jaga ketenangan: Jangan melakukan gerakan tiba-tiba atau bersuara keras.",
         "Merendahkan posisi tubuh: Jongkok perlahan agar Anda terlihat tidak mengintimidasi.",
         "Hindari kontak mata langsung: Kontak mata langsung dapat dianggap sebagai ancaman.",
         "Biarkan hewan mencium aroma Anda: Ulurkan punggung tangan dengan santai dari jarak aman.",
-        "Gunakan makanan penarik: Letakkan makanan kering/basah di dekatnya secara perlahan."
-      ]
+        "Gunakan makanan penarik: Letakkan makanan kering/basah di dekatnya secara perlahan.",
+      ],
     },
     {
       "title": "Pertolongan Pertama pada Pendarahan",
       "category": "Pertolongan Pertama",
       "icon": Icons.healing_rounded,
-      "summary": "Cara menghentikan pendarahan luar akibat luka sayat atau gigitan.",
+      "summary":
+          "Cara menghentikan pendarahan luar akibat luka sayat atau gigitan.",
       "steps": [
         "Pastikan keamanan diri sendiri menggunakan sarung tangan jika ada.",
         "Gunakan kain bersih atau kassa steril untuk menekan langsung pada luka.",
         "Terapkan tekanan lembut secara konstan selama 3-5 menit.",
         "Jangan melepas kain jika darah menembusnya; tambahkan kain baru di atasnya.",
-        "Segera buat laporan penyelamatan di aplikasi ResQare untuk evakuasi medis lanjut."
-      ]
+        "Segera buat laporan penyelamatan di aplikasi ResQare untuk evakuasi medis lanjut.",
+      ],
     },
     {
       "title": "Menolong Hewan Dehidrasi & Lemas",
       "category": "Pertolongan Pertama",
       "icon": Icons.water_drop_rounded,
-      "summary": "Tindakan awal mengatasi lemas akibat kekurangan cairan dan cuaca panas.",
+      "summary":
+          "Tindakan awal mengatasi lemas akibat kekurangan cairan dan cuaca panas.",
       "steps": [
         "Pindahkan hewan ke tempat yang teduh, sejuk, dan memiliki sirkulasi udara baik.",
         "Sediakan air bersih bersuhu ruang. Jangan paksa minum jika hewan setengah sadar.",
         "Basahi telapak kaki dan telinga hewan dengan air biasa (bukan air es) untuk menurunkan suhu.",
         "Biarkan hewan beristirahat dan pantau pernapasannya.",
-        "Kirim laporan ResQare dengan tanda tingkat urgensi darurat."
-      ]
+        "Kirim laporan ResQare dengan tanda tingkat urgensi darurat.",
+      ],
     },
     {
       "title": "Perlengkapan Rescue Mandiri",
       "category": "Alat & Bahan",
       "icon": Icons.backpack_rounded,
-      "summary": "Daftar alat sederhana yang wajib ada di kendaraan untuk evakuasi darurat.",
+      "summary":
+          "Daftar alat sederhana yang wajib ada di kendaraan untuk evakuasi darurat.",
       "steps": [
         "Handuk besar atau selimut tebal untuk memegang kucing liar yang agresif.",
         "Tali leash (penuntun) cadangan untuk mengamankan anjing terlantar.",
         "Makanan kering / camilan wangi (wet food) sebagai penarik perhatian.",
         "Plester, kassa gulung, dan cairan antiseptik pembersih luka ringan.",
-        "Pet cargo / kandang jinjing portabel berukuran sedang."
-      ]
-    }
+        "Pet cargo / kandang jinjing portabel berukuran sedang.",
+      ],
+    },
   ];
 
   @override
@@ -82,10 +86,10 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           "Panduan Penyelamatan",
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -95,7 +99,11 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.textPrimary,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -119,8 +127,8 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
                   color: const Color(0xFF0F766E).withOpacity(0.3),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
-                )
-              ]
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -153,7 +161,7 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
                   Icons.menu_book_rounded,
                   color: Colors.white30,
                   size: 60,
-                )
+                ),
               ],
             ),
           ),
@@ -180,17 +188,23 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
                     margin: const EdgeInsets.only(right: 12),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.primaryBlue : Colors.white,
+                      color: isSelected
+                          ? AppColors.primaryBlue
+                          : AppColors.white,
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
-                        color: isSelected ? Colors.transparent : const Color(0xFFEDEEF1),
+                        color: isSelected
+                            ? Colors.transparent
+                            : const Color(0xFFEDEEF1),
                       ),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       cat,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : AppColors.textSecondary,
+                        color: isSelected
+                            ? Colors.white
+                            : AppColors.textSecondary,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -206,17 +220,24 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
           // Search Guides Results List
           Expanded(
             child: filteredGuides.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
                       "Belum ada panduan di kategori ini.",
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
                     ),
                   )
                 : ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 4,
+                    ),
                     physics: const BouncingScrollPhysics(),
                     itemCount: filteredGuides.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 14),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 14),
                     itemBuilder: (context, index) {
                       final item = filteredGuides[index];
                       return _buildGuideCard(item);
@@ -231,7 +252,7 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
   Widget _buildGuideCard(Map<String, dynamic> item) {
     return Card(
       elevation: 0,
-      color: Colors.white,
+      color: AppColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: Color(0xFFEDEEF1), width: 1),
@@ -253,7 +274,7 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
           ),
           title: Text(
             item["title"] as String,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14,
               color: AppColors.textPrimary,
@@ -263,18 +284,21 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
             padding: const EdgeInsets.only(top: 4.0),
             child: Text(
               item["summary"] as String,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
             ),
           ),
-          childrenPadding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+          childrenPadding: const EdgeInsets.only(
+            left: 20,
+            right: 20,
+            bottom: 20,
+          ),
           children: [
             const Divider(color: Color(0xFFEDEEF1), height: 20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: (item["steps"] as List<String>).asMap().entries.map((entry) {
+              children: (item["steps"] as List<String>).asMap().entries.map((
+                entry,
+              ) {
                 final idx = entry.key + 1;
                 final text = entry.value;
 
@@ -305,7 +329,7 @@ class _RescueGuideScreenState extends State<RescueGuideScreen> {
                       Expanded(
                         child: Text(
                           text,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textPrimary,
                             height: 1.4,

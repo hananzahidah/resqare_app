@@ -64,7 +64,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _showImageSourceBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -173,13 +173,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Column(
+          title: Column(
             children: [
-              Icon(Icons.warning_rounded, color: AppColors.primaryBlue, size: 36),
+              Icon(
+                Icons.warning_rounded,
+                color: AppColors.primaryBlue,
+                size: 36,
+              ),
               SizedBox(height: 10),
               Text(
                 "Konfirmasi Perubahan",
@@ -195,7 +199,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           content: Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
               height: 1.4,
@@ -216,7 +220,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     child: const Text(
                       "Batal",
-                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -234,7 +241,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     child: const Text(
                       "Simpan",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -351,7 +361,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -494,7 +504,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         },
                         decoration: InputDecoration(
                           hintText: "Masukkan nama lengkap",
-                          fillColor: Colors.white,
+                          fillColor: AppColors.white,
                           filled: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -532,7 +542,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                           hintText: "Masukkan nomor telepon",
-                          fillColor: Colors.white,
+                          fillColor: AppColors.white,
                           filled: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -571,7 +581,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         style: TextStyle(color: Colors.grey),
                         decoration: InputDecoration(
                           hintText: "Alamat email",
-                          fillColor: Color(0xFFF3F4F6),
+                          fillColor: AppColors.white,
                           filled: true,
                           suffixIcon: Icon(
                             Icons.lock_outline_rounded,

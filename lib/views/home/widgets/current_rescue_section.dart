@@ -116,7 +116,7 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
         padding: const EdgeInsets.all(16),
         height: 80,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFEDEEF1), width: 1),
         ),
@@ -146,7 +146,7 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(
+                      color: AppColors.white.withValues(
                         alpha: _isActive ? 0.25 : 0.1,
                       ),
                       shape: BoxShape.circle,
@@ -253,7 +253,7 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
                         children: [
                           Text(
                             _activeMission!.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
                               color: AppColors
@@ -265,7 +265,7 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.near_me_rounded,
                                 size: 11,
                                 color: AppColors.textSecondary,
@@ -274,7 +274,7 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
                               Expanded(
                                 child: Text(
                                   _activeMission!.address,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.textSecondary,
@@ -370,7 +370,7 @@ class CurrentRescueSectionState extends State<CurrentRescueSection> {
                     ),
                   ),
                   const SizedBox(width: 14),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       "Saat ini Anda istirahat",
                       style: TextStyle(

@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/report_repository_firebase.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/time.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
+import 'package:resqare_app/utils/color_badge.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
-import 'package:resqare_app/utils/image_loader_helper.dart';
 
 class MyReportsSection extends StatefulWidget {
   final VoidCallback? onRefreshRequired;
@@ -38,21 +38,26 @@ class MyReportsSectionState extends State<MyReportsSection> {
     try {
       final userId = PreferenceHandler.userId;
       if (userId.isNotEmpty) {
-        _myReportsSubscription = _reportRepository.streamMyActiveReports(userId).listen((reports) {
-          if (mounted) {
-            setState(() {
-              myReports = reports;
-              isLoading = false;
-            });
-          }
-        }, onError: (e) {
-          debugPrint("Error in my reports stream: $e");
-          if (mounted) {
-            setState(() {
-              isLoading = false;
-            });
-          }
-        });
+        _myReportsSubscription = _reportRepository
+            .streamMyActiveReports(userId)
+            .listen(
+              (reports) {
+                if (mounted) {
+                  setState(() {
+                    myReports = reports;
+                    isLoading = false;
+                  });
+                }
+              },
+              onError: (e) {
+                debugPrint("Error in my reports stream: $e");
+                if (mounted) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }
+              },
+            );
       } else {
         if (mounted) {
           setState(() {
@@ -153,39 +158,10 @@ class MyReportsSectionState extends State<MyReportsSection> {
           itemBuilder: (context, index) {
             final report = myReports[index];
 
-            // Color settings for statuses
-            Color statusBgColor;
-            Color statusTextColor;
-            String statusLabel = report.status;
-
-            switch (report.status.toLowerCase()) {
-              case 'on rescue':
-                statusBgColor = Color(0xFFEFF6FF);
-                statusTextColor = AppColors.onRescue;
-                statusLabel = "Evakuasi";
-                break;
-              case 'assigned':
-                statusBgColor = Color(0xFFEEF2F6);
-                statusTextColor = AppColors.primaryBlue;
-                statusLabel = "Diterima";
-                break;
-              case 'completed':
-                statusBgColor = Color(0xFFECFDF5);
-                statusTextColor = AppColors.rescued;
-                statusLabel = "Selesai";
-                break;
-              case 'cancelled':
-                statusBgColor = Color(0xFFFEF2F2);
-                statusTextColor = AppColors.emergency;
-                statusLabel = "Dibatalkan";
-                break;
-              case 'pending':
-              default:
-                statusBgColor = Color(0xFFFFF7ED);
-                statusTextColor = AppColors.waitingRescue;
-                statusLabel = "Dilaporkan";
-                break;
-            }
+            // Color settings for statuses using ColorUtils
+            final statusTextColor = ColorUtils.getStatusColor(report.status);
+            final statusBgColor = statusTextColor.withOpacity(0.08);
+            final statusLabel = ColorUtils.getStatusLabel(report.status);
             return GestureDetector(
               onTap: () async {
                 await context.push(
@@ -197,7 +173,7 @@ class MyReportsSectionState extends State<MyReportsSection> {
               child: Container(
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.border, width: 1),
                   boxShadow: [
@@ -221,7 +197,8 @@ class MyReportsSectionState extends State<MyReportsSection> {
                             reportId: report.id ?? "",
                           ),
                           builder: (context, snapshot) {
-                            final path = (snapshot.hasData && snapshot.data!.isNotEmpty)
+                            final path =
+                                (snapshot.hasData && snapshot.data!.isNotEmpty)
                                 ? snapshot.data!.first
                                 : null;
                             return ImageLoaderHelper.loadImage(
@@ -277,7 +254,7 @@ class MyReportsSectionState extends State<MyReportsSection> {
                           // Location
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on_outlined,
                                 size: 12,
                                 color: AppColors.textSecondary,
@@ -286,7 +263,7 @@ class MyReportsSectionState extends State<MyReportsSection> {
                               Expanded(
                                 child: Text(
                                   report.address,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10,
                                     color: AppColors.textSecondary,
                                   ),

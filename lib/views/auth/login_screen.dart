@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/constant/app_image.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/login_model.dart';
@@ -149,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFAF9FD),
+      backgroundColor: AppColors.background,
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Padding(
@@ -170,7 +171,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   Text(
                     "Masuk untuk melanjutkan aksi penyelamatan",
-                    style: TextStyle(fontSize: 14, color: Color(0xFF414754)),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -249,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: _isLoading ? null : login,
 
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF005BBF),
+                              backgroundColor: AppColors.primaryBlue,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadiusGeometry.circular(12),
                               ),
@@ -282,20 +286,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     children: [
                       Expanded(
-                        child: Container(height: 1, color: Color(0xFFC1C6D6)),
+                        child: Container(height: 1, color: AppColors.divider),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
                           "atau",
                           style: TextStyle(
-                            color: Color(0xFF414754),
+                            color: AppColors.textSecondary,
                             fontSize: 12,
                           ),
                         ),
                       ),
                       Expanded(
-                        child: Container(height: 1, color: Color(0xFFC1C6D6)),
+                        child: Container(height: 1, color: AppColors.divider),
                       ),
                     ],
                   ),
@@ -307,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   //   child: ElevatedButton(
                   //     onPressed: _isLoading ? null : loginWithGoogle,
                   //     style: ElevatedButton.styleFrom(
-                  //       backgroundColor: Colors.white,
+                  //       backgroundColor: AppColors.white,
                   //       shape: RoundedRectangleBorder(
                   //         borderRadius: BorderRadiusGeometry.circular(12),
                   //       ),
@@ -338,7 +342,10 @@ class _LoginScreenState extends State<LoginScreen> {
               Text.rich(
                 TextSpan(
                   text: "Belum memiliki akun?",
-                  style: TextStyle(color: Color(0xFF414754), fontSize: 14),
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
 
                   children: [
                     TextSpan(text: "   "),
@@ -347,7 +354,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ..onTap = () => context.push(RegisterFlowScreen()),
                       text: "Daftar",
                       style: TextStyle(
-                        color: Color(0xFF005BBF),
+                        color: AppColors.primaryBlue,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

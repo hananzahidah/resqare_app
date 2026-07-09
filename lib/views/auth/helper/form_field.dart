@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/views/auth/helper/icon_form.dart';
 
 class FormFieldTemplate extends StatefulWidget {
@@ -63,7 +64,7 @@ class _FormFieldTemplateState extends State<FormFieldTemplate> {
         ),
 
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.white,
 
         suffixIcon: widget.typeForm == "Password"
             ? IconButton(

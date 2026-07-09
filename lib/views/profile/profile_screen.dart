@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/user_model_firebase.dart';
+import 'package:resqare_app/providers/theme_provider.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/utils/navigator.dart';
@@ -75,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -363,11 +365,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Column(
+          title: Column(
             children: [
               Icon(
                 Icons.warning_rounded,
@@ -389,7 +391,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           content: Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
               height: 1.4,
@@ -454,12 +456,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           title: Column(
-            children: const [
+            children: [
               Icon(Icons.logout_rounded, color: AppColors.emergency, size: 36),
               SizedBox(height: 10),
               Text(
@@ -473,7 +475,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
-          content: const Text(
+          content: Text(
             "Apakah Anda yakin ingin keluar dari akun ResQare saat ini?",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -543,11 +545,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Column(
+          title: Column(
             children: [
               Icon(
                 Icons.support_agent_rounded,
@@ -574,7 +576,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "Pertanyaan yang Sering Diajukan (FAQ):",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -619,7 +621,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
+                        Text(
                           "Hubungi tim dukungan kami kapan saja melalui email berikut:",
                           style: TextStyle(
                             fontSize: 11,
@@ -628,7 +630,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 8),
                         Row(
-                          children: const [
+                          children: [
                             Icon(
                               Icons.email_outlined,
                               size: 16,
@@ -689,7 +691,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Text(
           question,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 12,
             color: AppColors.textPrimary,
@@ -698,7 +700,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 4),
         Text(
           answer,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             color: AppColors.textSecondary,
             height: 1.4,
@@ -713,11 +715,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Column(
+          title: Column(
             children: [
               Icon(
                 Icons.security_rounded,
@@ -739,7 +741,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           content: SizedBox(
             width: double.maxFinite,
             height: MediaQuery.of(context).size.height * 0.45,
-            child: const SingleChildScrollView(
+            child: SingleChildScrollView(
               physics: BouncingScrollPhysics(),
               child: Text(
                 "Kebijakan Privasi ini menjelaskan bagaimana ResQare mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda:\n\n"
@@ -795,11 +797,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Column(
+          title: Column(
             children: [
               Icon(Icons.pets_rounded, color: AppColors.primaryBlue, size: 36),
               SizedBox(height: 10),
@@ -821,7 +823,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     "Versi 1.0.0",
                     style: TextStyle(
                       fontSize: 12,
@@ -829,7 +831,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     "ResQare adalah platform berbasis komunitas yang didesain untuk menjembatani pelapor dan relawan dalam menyelamatkan hewan liar maupun peliharaan yang terlantar, tersesat, atau terluka.\n\n"
                     "Melalui integrasi laporan instan dan peta sebaran, kami memfasilitasi tindakan evakuasi cepat yang transparan dan kolaboratif demi masa depan hewan yang lebih layak.\n\n"
                     "Hubungi kami di: resqare@support.com",
@@ -877,6 +879,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     if (_isLoading) {
       return Scaffold(
         backgroundColor: AppColors.background,
@@ -919,7 +922,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   right: -30,
                   child: CircleAvatar(
                     radius: 70,
-                    backgroundColor: Colors.white.withOpacity(0.08),
+                    backgroundColor: AppColors.white.withOpacity(0.08),
                   ),
                 ),
                 Positioned(
@@ -927,7 +930,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   left: -20,
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundColor: Colors.white.withOpacity(0.05),
+                    backgroundColor: AppColors.white.withOpacity(0.05),
                   ),
                 ),
                 // Content of Header
@@ -962,7 +965,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         margin: EdgeInsets.symmetric(horizontal: 20.0),
                         padding: EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
@@ -1111,7 +1114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: const Color(0xFFEDEEF1),
@@ -1143,13 +1146,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 12),
                             Text(
                               "$_reportsCreated",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                            const Text(
+                            Text(
                               "Laporan Dibuat",
                               style: TextStyle(
                                 fontSize: 11,
@@ -1166,7 +1169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: const Color(0xFFEDEEF1),
@@ -1198,13 +1201,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 12),
                             Text(
                               "$_rescueCount",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                            const Text(
+                            Text(
                               "Penyelamatan",
                               style: TextStyle(
                                 fontSize: 11,
@@ -1229,7 +1232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   if (!isAdmin) ...[
                     const SizedBox(height: 12),
                     // Group 1: Akun & Keamanan
-                    const Text(
+                    Text(
                       "Akun & Keamanan",
                       style: TextStyle(
                         fontSize: 13,
@@ -1240,12 +1243,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: const Color(0xFFEDEEF1),
-                          width: 1,
-                        ),
+                        border: Border.all(color: AppColors.border, width: 1),
                       ),
                       child: Column(
                         children: [
@@ -1269,7 +1269,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               }
                             },
                           ),
-                          const Divider(height: 1, color: AppColors.divider),
+                          Divider(height: 1, color: AppColors.divider),
                           _buildMenuTile(
                             icon: Icons.lock_outline_rounded,
                             title: "Ganti Kata Sandi",
@@ -1277,7 +1277,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             onTap: _showChangePasswordBottomSheet,
                           ),
                           if (_user?.role.toLowerCase() != 'admin') ...[
-                            const Divider(height: 1, color: AppColors.divider),
+                            Divider(height: 1, color: AppColors.divider),
                             _buildMenuTile(
                               icon: Icons.volunteer_activism_outlined,
                               title: "Relawan",
@@ -1318,9 +1318,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Color(0xFFEDEEF1), width: 1),
+                      border: Border.all(color: AppColors.border, width: 1),
                     ),
                     child: Column(
                       children: [
@@ -1344,6 +1344,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           subtitle: "Versi 1.0.0",
                           onTap: _showAboutUsDialog,
                         ),
+                        // Divider(height: 1, color: AppColors.divider),
+                        // _buildToggleMenuTile(
+                        //   icon: Icons.dark_mode_outlined,
+                        //   title: "Mode Gelap",
+                        //   value: themeProvider.isDarkMode,
+                        //   onChanged: (newValue) {
+                        //     themeProvider.toggleTheme(newValue);
+                        //   },
+                        // ),
                       ],
                     ),
                   ),

@@ -132,7 +132,7 @@ class _VolunteerApplicationScreenState
   void _showImageSourceBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -144,7 +144,7 @@ class _VolunteerApplicationScreenState
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Unggah Sertifikat Pendukung",
                   style: TextStyle(
                     fontSize: 18,
@@ -361,7 +361,7 @@ class _VolunteerApplicationScreenState
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -376,7 +376,7 @@ class _VolunteerApplicationScreenState
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
                   fontSize: 20,
@@ -387,7 +387,7 @@ class _VolunteerApplicationScreenState
           content: Text(
             content,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
               height: 1.4,
@@ -456,14 +456,14 @@ class _VolunteerApplicationScreenState
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
           _status == 'none'
               ? "Daftar Menjadi Relawan"
               : "Status Pengajuan Relawan",
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -517,7 +517,7 @@ class _VolunteerApplicationScreenState
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: const Color(0xFFEDEEF1),
@@ -534,7 +534,7 @@ class _VolunteerApplicationScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Row(
+                            Row(
                               children: [
                                 Icon(
                                   Icons.volunteer_activism_rounded,
@@ -555,7 +555,7 @@ class _VolunteerApplicationScreenState
                             const Divider(height: 24),
 
                             // Phone field
-                            const Text(
+                            Text(
                               "Nomor Telepon (Wajib untuk Relawan)",
                               style: TextStyle(
                                 fontSize: 11,
@@ -590,13 +590,13 @@ class _VolunteerApplicationScreenState
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.border,
                                   ),
                                 ),
                                 disabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.border,
                                   ),
                                 ),
@@ -606,7 +606,7 @@ class _VolunteerApplicationScreenState
                             const SizedBox(height: 16),
 
                             // Experience field
-                            const Text(
+                            Text(
                               "Pengalaman Terkait Penanganan Hewan",
                               style: TextStyle(
                                 fontSize: 11,
@@ -638,13 +638,13 @@ class _VolunteerApplicationScreenState
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.border,
                                   ),
                                 ),
                                 disabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.border,
                                   ),
                                 ),
@@ -654,7 +654,7 @@ class _VolunteerApplicationScreenState
                             const SizedBox(height: 16),
 
                             // Reason field
-                            const Text(
+                            Text(
                               "Alasan Ingin Bergabung",
                               style: TextStyle(
                                 fontSize: 11,
@@ -686,13 +686,13 @@ class _VolunteerApplicationScreenState
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.border,
                                   ),
                                 ),
                                 disabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
+                                  borderSide: BorderSide(
                                     color: AppColors.border,
                                   ),
                                 ),
@@ -702,7 +702,7 @@ class _VolunteerApplicationScreenState
                             const SizedBox(height: 20),
 
                             // Certificates list
-                            const Text(
+                            Text(
                               "Foto Sertifikat Pendukung (Maksimal 3)",
                               style: TextStyle(
                                 fontSize: 11,
@@ -747,7 +747,7 @@ class _VolunteerApplicationScreenState
                                               : null,
                                         ),
                                         child: !exists
-                                            ? const Center(
+                                            ? Center(
                                                 child: Icon(
                                                   Icons.broken_image_rounded,
                                                   color:
@@ -788,14 +788,14 @@ class _VolunteerApplicationScreenState
                                       width: 80,
                                       height: 80,
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
                                           color: AppColors.border,
                                           style: BorderStyle.solid,
                                         ),
                                       ),
-                                      child: const Column(
+                                      child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [

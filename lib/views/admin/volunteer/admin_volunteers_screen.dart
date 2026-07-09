@@ -170,10 +170,10 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           "Kelola Relawan",
           style: TextStyle(
             fontSize: 16,
@@ -292,7 +292,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                       controller: _searchController,
                       onChanged: _onSearchChanged,
                       textAlignVertical: TextAlignVertical.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppColors.textPrimary,
                       ),
@@ -301,18 +301,18 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                         hintText: _activeTab == 0
                             ? "Cari nama, email, telepon..."
                             : "Cari pelamar...",
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
                         ),
-                        prefixIcon: const Icon(
+                        prefixIcon: Icon(
                           Icons.search_rounded,
                           color: AppColors.textSecondary,
                           size: 20,
                         ),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.close_rounded,
                                   color: AppColors.textSecondary,
                                   size: 18,
@@ -379,7 +379,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 "Tidak Ada Data Ditemukan",
                 style: TextStyle(
                   fontSize: 14,
@@ -388,7 +388,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "Silakan ubah kata pencarian untuk melihat data.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -454,7 +454,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.border, width: 1),
         boxShadow: [
@@ -471,7 +471,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
           Container(
             height: 48,
             width: 48,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.softBlue,
               shape: BoxShape.circle,
             ),
@@ -489,7 +489,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
               children: [
                 Text(
                   fullName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -500,7 +500,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                 const SizedBox(height: 2),
                 Text(
                   email,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColors.textSecondary,
                   ),
@@ -510,7 +510,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                 const SizedBox(height: 2),
                 Text(
                   "Telp: $phone",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColors.textSecondary,
                   ),
@@ -613,7 +613,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.border, width: 1),
           boxShadow: [
@@ -648,7 +648,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                 children: [
                   Text(
                     fullName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -661,7 +661,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                     dateString.isNotEmpty
                         ? "Diajukan: ${DateFormatter.toReadableDateTime(dateString)}"
                         : '-',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       color: AppColors.textSecondary,
                     ),
@@ -670,7 +670,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                   // Small reason/experience
                   Text(
                     "Alasan: ${app['reason'] ?? '-'}",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
                     ),
@@ -704,7 +704,7 @@ class _AdminVolunteersScreenState extends State<AdminVolunteersScreen>
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Icon(
+                Icon(
                   Icons.chevron_right_rounded,
                   color: AppColors.textSecondary,
                   size: 20,

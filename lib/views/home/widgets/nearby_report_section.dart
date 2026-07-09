@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -8,12 +7,12 @@ import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/report_repository_firebase.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/utils/string_exntension.dart';
 import 'package:resqare_app/utils/time.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
-import 'package:resqare_app/utils/image_loader_helper.dart';
 
 class NearbyReportSection extends StatefulWidget {
   final VoidCallback? onRefreshRequired;
@@ -57,53 +56,56 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
         }
       }
 
-      _reportsSubscription = _reportRepository.streamAllReports().listen((reports) {
-        List<ReportModelFirebase> targetedReports = reports;
-        final userRole = PreferenceHandler.userRole.toLowerCase();
-        if (userRole == 'volunteer') {
-          targetedReports = reports
-              .where(
-                (report) =>
-                    report.rescuedBy == null ||
-                    report.status.toLowerCase() == 'pending',
-              )
-              .toList();
-        }
+      _reportsSubscription = _reportRepository.streamAllReports().listen(
+        (reports) {
+          List<ReportModelFirebase> targetedReports = reports;
+          final userRole = PreferenceHandler.userRole.toLowerCase();
+          if (userRole == 'volunteer') {
+            targetedReports = reports
+                .where(
+                  (report) =>
+                      report.rescuedBy == null ||
+                      report.status.toLowerCase() == 'pending',
+                )
+                .toList();
+          }
 
-        targetedReports.sort((a, b) {
-          final distA = Geolocator.distanceBetween(
-            userLat,
-            userLng,
-            a.latitude,
-            a.longitude,
-          );
-          final distB = Geolocator.distanceBetween(
-            userLat,
-            userLng,
-            b.latitude,
-            b.longitude,
-          );
-          return distA.compareTo(distB);
-        });
-
-        final limited = targetedReports.take(5).toList();
-
-        if (mounted) {
-          setState(() {
-            dbReports = limited;
-            _userLat = userLat;
-            _userLng = userLng;
-            isLoadingReports = false;
+          targetedReports.sort((a, b) {
+            final distA = Geolocator.distanceBetween(
+              userLat,
+              userLng,
+              a.latitude,
+              a.longitude,
+            );
+            final distB = Geolocator.distanceBetween(
+              userLat,
+              userLng,
+              b.latitude,
+              b.longitude,
+            );
+            return distA.compareTo(distB);
           });
-        }
-      }, onError: (e) {
-        debugPrint("Error in reports stream: $e");
-        if (mounted) {
-          setState(() {
-            isLoadingReports = false;
-          });
-        }
-      });
+
+          final limited = targetedReports.take(5).toList();
+
+          if (mounted) {
+            setState(() {
+              dbReports = limited;
+              _userLat = userLat;
+              _userLng = userLng;
+              isLoadingReports = false;
+            });
+          }
+        },
+        onError: (e) {
+          debugPrint("Error in reports stream: $e");
+          if (mounted) {
+            setState(() {
+              isLoadingReports = false;
+            });
+          }
+        },
+      );
     } catch (e, stack) {
       debugPrint("Error loading reports in nearby: $e\n$stack");
       if (mounted) {
@@ -230,14 +232,16 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
 
                     return GestureDetector(
                       onTap: () async {
-                        await context.push(DetailReportScreen(reportId: data.id ?? ""));
+                        await context.push(
+                          DetailReportScreen(reportId: data.id ?? ""),
+                        );
                         loadReports();
                         widget.onRefreshRequired?.call();
                       },
                       child: Container(
                         width: 155,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: AppColors.border, width: 1),
                           boxShadow: [
@@ -266,7 +270,9 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
                                         reportId: data.id ?? "",
                                       ),
                                       builder: (context, snapshot) {
-                                        final path = (snapshot.hasData && snapshot.data!.isNotEmpty)
+                                        final path =
+                                            (snapshot.hasData &&
+                                                snapshot.data!.isNotEmpty)
                                             ? snapshot.data!.first
                                             : null;
                                         return ImageLoaderHelper.loadImage(
@@ -299,7 +305,7 @@ class NearbyReportSectionState extends State<NearbyReportSection> {
                                     child: Text(
                                       data.priorityLevel.capitalizeFirst(),
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 10,
                                       ),

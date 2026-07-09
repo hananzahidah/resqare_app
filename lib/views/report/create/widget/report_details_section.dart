@@ -24,7 +24,7 @@ class ReportDetailsSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: const Color(0xFFEDEEF1),
@@ -34,7 +34,7 @@ class ReportDetailsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(
                 Icons.pets_rounded,
@@ -54,7 +54,7 @@ class ReportDetailsSection extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Report Title
-          const Text(
+          Text(
             "Judul Kejadian Laporan",
             style: TextStyle(
               fontSize: 11,
@@ -73,13 +73,13 @@ class ReportDetailsSection extends StatelessWidget {
             },
             decoration: InputDecoration(
               hintText: "Contoh: Kucing Terjebak di Atap Toko",
-              hintStyle: const TextStyle(
+              hintStyle: TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
               ),
               fillColor: AppColors.background,
               filled: true,
-              prefixIcon: const Icon(
+              prefixIcon: Icon(
                 Icons.edit_note_rounded,
                 color: AppColors.textSecondary,
                 size: 22,
@@ -90,7 +90,7 @@ class ReportDetailsSection extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
+                borderSide: BorderSide(
                   color: AppColors.border,
                 ),
               ),
@@ -111,7 +111,7 @@ class ReportDetailsSection extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Category Dropdown
-          const Text(
+          Text(
             "Kategori Hewan",
             style: TextStyle(
               fontSize: 11,
@@ -135,7 +135,7 @@ class ReportDetailsSection extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
+                borderSide: BorderSide(
                   color: AppColors.border,
                 ),
               ),
@@ -186,7 +186,7 @@ class ReportDetailsSection extends StatelessWidget {
           // If "Lainnya" is selected, show field
           if (selectedCategory == "Lainnya") ...[
             const SizedBox(height: 14),
-            const Text(
+            Text(
               "Tulis Jenis Hewan Lainnya",
               style: TextStyle(
                 fontSize: 11,
@@ -205,13 +205,13 @@ class ReportDetailsSection extends StatelessWidget {
             },
             decoration: InputDecoration(
               hintText: "Contoh: Musang, Iguana, Tupai...",
-              hintStyle: const TextStyle(
+              hintStyle: TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
               ),
               fillColor: AppColors.background,
               filled: true,
-              prefixIcon: const Icon(
+              prefixIcon: Icon(
                 Icons.category_rounded,
                 color: AppColors.textSecondary,
                 size: 20,
@@ -222,7 +222,7 @@ class ReportDetailsSection extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
+                borderSide: BorderSide(
                   color: AppColors.border,
                 ),
               ),
@@ -244,7 +244,7 @@ class ReportDetailsSection extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Description
-          const Text(
+          Text(
             "Deskripsi Kondisi Hewan",
             style: TextStyle(
               fontSize: 11,
@@ -264,7 +264,7 @@ class ReportDetailsSection extends StatelessWidget {
             },
             decoration: InputDecoration(
               hintText: "Jelaskan keadaan fisik hewan, cedera, atau bahaya di sekitarnya.",
-              hintStyle: const TextStyle(
+              hintStyle: TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
               ),
@@ -277,7 +277,7 @@ class ReportDetailsSection extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
+                borderSide: BorderSide(
                   color: AppColors.border,
                 ),
               ),

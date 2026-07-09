@@ -69,7 +69,7 @@ class _StatusBarSectionState extends State<StatusBarSection> {
       margin: EdgeInsets.symmetric(vertical: 16),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Color(0xFFEDEEF1)),
         boxShadow: [

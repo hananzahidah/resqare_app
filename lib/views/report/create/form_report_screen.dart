@@ -139,7 +139,7 @@ class _FormReportScreenState extends State<FormReportScreen> {
   void _showImageSourceBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -151,7 +151,7 @@ class _FormReportScreenState extends State<FormReportScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Unggah Foto Hewan",
                   style: TextStyle(
                     fontSize: 18,
@@ -487,11 +487,11 @@ class _FormReportScreenState extends State<FormReportScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Column(
+          title: Column(
             children: [
               Icon(
                 Icons.warning_amber_rounded,
@@ -510,7 +510,7 @@ class _FormReportScreenState extends State<FormReportScreen> {
               ),
             ],
           ),
-          content: const Text(
+          content: Text(
             "Apakah Anda yakin ingin mengirim laporan darurat ini?",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -572,10 +572,10 @@ class _FormReportScreenState extends State<FormReportScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           "Buat Laporan Rescue",
           style: TextStyle(
             fontSize: 16,
@@ -586,7 +586,7 @@ class _FormReportScreenState extends State<FormReportScreen> {
         centerTitle: true,
       ),
       body: _isSubmitting
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

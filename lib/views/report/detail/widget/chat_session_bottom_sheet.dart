@@ -54,9 +54,9 @@ class _ChatSessionBottomSheetState extends State<ChatSessionBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 30),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: MainContentWidget(
         isLoading: _isLoading,
@@ -104,7 +104,7 @@ class MainContentWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           "Pilih Sesi Obrolan",
           style: TextStyle(
             fontSize: 16,
@@ -113,7 +113,7 @@ class MainContentWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           "Laporan ini ditangani oleh beberapa relawan. Pilih sesi obrolan yang ingin Anda lihat.",
           style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
@@ -124,7 +124,7 @@ class MainContentWidget extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: widget.volunteerIds.length,
             separatorBuilder: (context, index) =>
-                const Divider(color: AppColors.border, height: 1),
+                Divider(color: AppColors.border, height: 1),
             itemBuilder: (context, index) {
               final vId = widget.volunteerIds[index];
               final volunteer = _volunteersData[vId];
@@ -182,7 +182,7 @@ class MainContentWidget extends StatelessWidget {
                 ),
                 title: Text(
                   name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -219,7 +219,7 @@ class MainContentWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(
+                    Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 14,
                       color: AppColors.textSecondary,

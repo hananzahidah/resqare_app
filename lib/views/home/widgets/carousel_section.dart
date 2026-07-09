@@ -5,9 +5,9 @@ import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
 import 'package:resqare_app/utils/navigator.dart';
+import 'package:resqare_app/views/home/rescue_guide_screen.dart';
 import 'package:resqare_app/views/navigator/bottom_navigator.dart';
 import 'package:resqare_app/views/profile/volunteer_application_screen.dart';
-import 'package:resqare_app/views/home/rescue_guide_screen.dart';
 
 class CarouselSection extends StatefulWidget {
   const CarouselSection({super.key});
@@ -210,7 +210,8 @@ class _CarouselSectionState extends State<CarouselSection> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const RescueGuideScreen(),
+                                        builder: (context) =>
+                                            const RescueGuideScreen(),
                                       ),
                                     );
                                   }

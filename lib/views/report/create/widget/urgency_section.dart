@@ -52,7 +52,9 @@ class UrgencySection extends StatelessWidget {
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: selected ? AppColors.softBlue.withValues(alpha: 0.4) : Colors.white,
+          color: selected
+              ? AppColors.softBlue.withValues(alpha: 0.4)
+              : AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected ? AppColors.primaryBlue : AppColors.border,
@@ -80,7 +82,9 @@ class UrgencySection extends StatelessWidget {
               ),
               child: Icon(
                 icon,
-                color: selected ? AppColors.primaryBlue : AppColors.textSecondary,
+                color: selected
+                    ? AppColors.primaryBlue
+                    : AppColors.textSecondary,
                 size: 20,
               ),
             ),
@@ -91,7 +95,9 @@ class UrgencySection extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-                  color: selected ? AppColors.textPrimary : AppColors.textSecondary,
+                  color: selected
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
                 ),
               ),
             ),
@@ -106,17 +112,14 @@ class UrgencySection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFEDEEF1),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFFEDEEF1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(
                 Icons.emergency_rounded,
@@ -134,12 +137,9 @@ class UrgencySection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             "Pilih kondisi darurat yang dialami hewan saat ini.",
-            style: TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
 
@@ -202,7 +202,7 @@ class UrgencySection extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "Total Poin Urgensi",
                     style: TextStyle(
                       fontSize: 10,
@@ -212,7 +212,7 @@ class UrgencySection extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     "$totalPoints Poin",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -228,10 +228,7 @@ class UrgencySection extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: priorityColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: priorityColor,
-                    width: 1.5,
-                  ),
+                  border: Border.all(color: priorityColor, width: 1.5),
                 ),
                 child: Text(
                   priorityName,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/database/preference_handler.dart';
+import 'package:resqare_app/providers/theme_provider.dart';
 import 'package:resqare_app/views/admin/dashboard/admin_dashboard_screen.dart';
 import 'package:resqare_app/views/admin/volunteer/admin_volunteers_screen.dart';
 import 'package:resqare_app/views/explore/explore_map_screen.dart';
@@ -49,6 +52,8 @@ class _BottomNavigatorState extends State<BottomNavigator> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen to theme changes to trigger rebuild of navigator and tabs
+    Provider.of<ThemeProvider>(context);
     final bool isAdmin = PreferenceHandler.userRole.toLowerCase() == 'admin';
 
     final List<Widget> pages = isAdmin
@@ -91,8 +96,8 @@ class _BottomNavigatorState extends State<BottomNavigator> {
         body: IndexedStack(index: _selectedIndex, children: pages),
 
         bottomNavigationBar: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: AppColors.white,
             border: Border(
               top: BorderSide(
                 color: Color.fromARGB(160, 237, 238, 241),

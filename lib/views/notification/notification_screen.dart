@@ -35,7 +35,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   void _refreshNotifications() {
     setState(() {
-      _notificationsStream = _notificationRepository.streamNotifications(_currentUserId);
+      _notificationsStream = _notificationRepository.streamNotifications(
+        _currentUserId,
+      );
     });
   }
 
@@ -177,10 +179,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           "Notifikasi",
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -190,7 +192,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: AppColors.textPrimary,
             size: 20,
@@ -264,7 +266,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          const Text(
+                          Text(
                             "Belum Ada Notifikasi",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -273,7 +275,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
+                          Text(
                             "Aktivitas penyelamatan & pesan Anda\nakan tampil di sini.",
                             style: TextStyle(
                               fontSize: 12,
@@ -285,7 +287,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       ),
                     ),
                   );
-                }
+                },
               );
             }
 
@@ -307,7 +309,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     side: const BorderSide(color: Color(0xFFEDEEF1), width: 1),
                   ),
                   color: notif.isRead
-                      ? Colors.white
+                      ? AppColors.white
                       : AppColors.softBlue.withOpacity(0.1),
                   child: InkWell(
                     onTap: () => _handleNotificationTap(notif),
@@ -337,7 +339,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Text(
@@ -365,7 +368,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 const SizedBox(height: 4),
                                 Text(
                                   notif.body,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary,
                                     height: 1.4,

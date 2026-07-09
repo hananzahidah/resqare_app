@@ -86,7 +86,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
           barrierDismissible: false,
           builder: (BuildContext context) {
             return AlertDialog(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -101,7 +101,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
                   Text(
                     title,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
                       fontSize: 20,
@@ -112,7 +112,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
               content: Text(
                 content,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                   height: 1.4,
@@ -557,7 +557,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
             width: double.infinity,
             height: 48,
             alignment: Alignment.center,
-            child: const Text(
+            child: Text(
               "Laporan telah diterima oleh relawan lain",
               style: TextStyle(
                 fontSize: 14,
@@ -613,7 +613,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
             width: double.infinity,
             height: 48,
             alignment: Alignment.center,
-            child: const Text(
+            child: Text(
               "Laporan sedang dievakuasi oleh relawan lain",
               style: TextStyle(
                 fontSize: 14,
@@ -742,7 +742,7 @@ class _BottomActionSectionState extends State<BottomActionSection> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),

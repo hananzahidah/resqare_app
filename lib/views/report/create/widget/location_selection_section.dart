@@ -25,7 +25,7 @@ class LocationSelectionSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: const Color(0xFFEDEEF1),
@@ -38,7 +38,7 @@ class LocationSelectionSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
                   Icon(
                     Icons.location_on_rounded,
@@ -116,13 +116,13 @@ class LocationSelectionSection extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.map_rounded,
                       size: 40,
                       color: AppColors.textSecondary,
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       "Peta belum memuat lokasi Anda",
                       style: TextStyle(
                         fontSize: 11,
@@ -194,7 +194,7 @@ class LocationSelectionSection extends StatelessWidget {
             ),
 
           const SizedBox(height: 12),
-          const Text(
+          Text(
             "Alamat Penemuan:",
             style: TextStyle(
               fontSize: 10,
@@ -205,7 +205,7 @@ class LocationSelectionSection extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             locationAddress,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               color: AppColors.textPrimary,
             ),

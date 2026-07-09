@@ -13,26 +13,28 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
+  static bool isDark = false;
+
   // =======================================================
   // PRIMARY COLORS
   // =======================================================
 
   static const Color primaryBlue = Color(0xFF327AF4);
-  static const Color softBlue = Color(0xFFDCEBFF);
+  static Color get softBlue => isDark ? const Color(0xFF1A2A4D) : const Color(0xFFDCEBFF);
 
   // =======================================================
   // BACKGROUND COLORS
   // =======================================================
 
-  static const Color background = Color(0xFFFAF9FD);
-  static const Color white = Color(0xFFFFFFFF);
+  static Color get background => isDark ? const Color(0xFF121212) : const Color(0xFFFAF9FD);
+  static Color get white => isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFFFF);
 
   // =======================================================
   // TEXT COLORS
   // =======================================================
 
-  static const Color textPrimary = Color(0xFF1C1C1E);
-  static const Color textSecondary = Color(0xFF6B7280);
+  static Color get textPrimary => isDark ? const Color(0xFFFFFFFF) : const Color(0xFF1C1C1E);
+  static Color get textSecondary => isDark ? const Color(0xFFB0B0B8) : const Color(0xFF6B7280);
 
   // =======================================================
   // STATUS COLORS
@@ -47,9 +49,9 @@ class AppColors {
   // BORDER & UI
   // =======================================================
 
-  static const Color border = Color(0xFFEDEEF1);
+  static Color get border => isDark ? const Color(0xFF2C2C2E) : const Color(0xFFEDEEF1);
   static const Color cardShadow = Color(0x14000000);
-  static const Color divider = Color(0xFFEEEEEE);
+  static Color get divider => isDark ? const Color(0xFF2C2C2E) : const Color(0xFFEEEEEE);
 
   // =======================================================
   // OPTIONAL EXTRA COLORS

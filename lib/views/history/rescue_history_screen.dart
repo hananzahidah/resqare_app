@@ -132,7 +132,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Rescue History',
           style: TextStyle(
             fontSize: 18,
@@ -140,7 +140,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
             color: AppColors.textPrimary,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         centerTitle: false,
       ),
@@ -358,7 +358,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
           // Search bar
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.border),
             ),
@@ -368,7 +368,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
                   _searchQuery = val;
                 });
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Cari laporan rescue...',
                 hintStyle: TextStyle(
                   color: AppColors.textSecondary,
@@ -458,7 +458,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.border),
         boxShadow: [
@@ -502,7 +502,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
                           width: 80,
                           height: 80,
                           color: AppColors.border,
-                          child: const Icon(
+                          child: Icon(
                             Icons.broken_image,
                             color: AppColors.textSecondary,
                           ),
@@ -558,7 +558,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
                       // Location
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.location_on_outlined,
                             size: 12,
                             color: AppColors.textSecondary,
@@ -567,7 +567,7 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
                           Expanded(
                             child: Text(
                               report.address,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
                                 color: AppColors.textSecondary,
                               ),
@@ -661,14 +661,14 @@ class _RescueHistoryScreenState extends State<RescueHistoryScreen> {
             _showRescueHistory
                 ? 'Tidak ada riwayat rescue'
                 : 'Tidak ada riwayat laporan',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Coba ganti filter atau cari kata kunci lain.',
             style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
           ),

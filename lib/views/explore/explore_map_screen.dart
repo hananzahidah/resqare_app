@@ -5,10 +5,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/models/report_model_firebase.dart';
 import 'package:resqare_app/repositories/report_repository_firebase.dart';
+import 'package:resqare_app/utils/color_badge.dart';
+import 'package:resqare_app/utils/image_loader_helper.dart';
 import 'package:resqare_app/utils/navigator.dart';
 import 'package:resqare_app/views/report/detail/detail_report_screen.dart';
-import 'package:resqare_app/utils/image_loader_helper.dart';
-import 'package:resqare_app/utils/color_badge.dart';
 
 class ExploreMapScreen extends StatefulWidget {
   const ExploreMapScreen({super.key});
@@ -269,13 +269,17 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
     final rStatus = reportStatus.toLowerCase().trim();
 
     if (selectedStatus == 'Dilaporkan') {
-      return rStatus == 'pending' || rStatus == 'waiting' || rStatus == 'waiting rescue';
+      return rStatus == 'pending' ||
+          rStatus == 'waiting' ||
+          rStatus == 'waiting rescue';
     }
     if (selectedStatus == 'Diterima') {
       return rStatus == 'assigned';
     }
     if (selectedStatus == 'Evakuasi') {
-      return rStatus == 'on rescue' || rStatus == 'on progress' || rStatus == 'on progress rescue';
+      return rStatus == 'on rescue' ||
+          rStatus == 'on progress' ||
+          rStatus == 'on progress rescue';
     }
     if (selectedStatus == 'Selesai') {
       return rStatus == 'completed' || rStatus == 'rescued';
@@ -335,7 +339,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                                   height: 22,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black26,
@@ -408,7 +412,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                                         shape: BoxShape.circle,
                                         color: color,
                                         border: Border.all(
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                           width: 2.5,
                                         ),
                                         boxShadow: [
@@ -448,7 +452,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                   // Search Box
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
@@ -540,7 +544,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
             child: FloatingActionButton(
               mini: true,
               onPressed: _isLocatingUser ? null : _goToMyLocation,
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.white,
               foregroundColor: AppColors.primaryBlue,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -605,7 +609,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(100),
           border: Border.all(color: Color(0xFFEDEEF1)),
           boxShadow: [
@@ -682,7 +686,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -895,7 +899,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   ) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),

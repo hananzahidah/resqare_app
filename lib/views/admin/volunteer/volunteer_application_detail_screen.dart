@@ -54,7 +54,7 @@ class _VolunteerApplicationDetailScreenState
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -65,7 +65,7 @@ class _VolunteerApplicationDetailScreenState
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
                   fontSize: 20,
@@ -76,7 +76,7 @@ class _VolunteerApplicationDetailScreenState
           content: Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
               height: 1.4,
@@ -290,7 +290,7 @@ class _VolunteerApplicationDetailScreenState
                         imagePath.split('/').last,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 9,
                           color: AppColors.textSecondary,
                           fontWeight: FontWeight.bold,
@@ -344,10 +344,10 @@ class _VolunteerApplicationDetailScreenState
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           "Detail Pengajuan Relawan",
           style: TextStyle(
             fontSize: 16,
@@ -375,7 +375,7 @@ class _VolunteerApplicationDetailScreenState
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(color: AppColors.border),
                       boxShadow: [
@@ -418,7 +418,7 @@ class _VolunteerApplicationDetailScreenState
                             children: [
                               Text(
                                 fullName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.textPrimary,
@@ -427,7 +427,7 @@ class _VolunteerApplicationDetailScreenState
                               const SizedBox(height: 4),
                               Text(
                                 email,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   color: AppColors.textSecondary,
                                 ),
@@ -435,7 +435,7 @@ class _VolunteerApplicationDetailScreenState
                               const SizedBox(height: 2),
                               Text(
                                 "No. HP: $phone",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   color: AppColors.textSecondary,
                                 ),
@@ -454,7 +454,7 @@ class _VolunteerApplicationDetailScreenState
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(color: AppColors.border),
                       boxShadow: [
@@ -472,7 +472,7 @@ class _VolunteerApplicationDetailScreenState
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               "Status Dokumen",
                               style: TextStyle(
                                 fontSize: 11,
@@ -507,7 +507,7 @@ class _VolunteerApplicationDetailScreenState
                           const SizedBox(height: 6),
                           Text(
                             "Diajukan pada: ${DateFormatter.toReadableDateTime(createdAt)}",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
                               color: AppColors.textSecondary,
                             ),
@@ -516,7 +516,7 @@ class _VolunteerApplicationDetailScreenState
                         const Divider(height: 24),
 
                         // Experience Section
-                        const Row(
+                        Row(
                           children: [
                             Icon(
                               Icons.pets_rounded,
@@ -537,7 +537,7 @@ class _VolunteerApplicationDetailScreenState
                         const SizedBox(height: 8),
                         Text(
                           experience.isNotEmpty ? experience : "-",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textPrimary,
                             height: 1.4,
@@ -546,7 +546,7 @@ class _VolunteerApplicationDetailScreenState
                         const Divider(height: 24),
 
                         // Reason Section
-                        const Row(
+                        Row(
                           children: [
                             Icon(
                               Icons.favorite_rounded,
@@ -567,7 +567,7 @@ class _VolunteerApplicationDetailScreenState
                         const SizedBox(height: 8),
                         Text(
                           reason.isNotEmpty ? reason : "-",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textPrimary,
                             height: 1.4,
@@ -581,7 +581,7 @@ class _VolunteerApplicationDetailScreenState
 
                   // Supporting Certificates
                   if (hasCertificates) ...[
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(left: 4.0, bottom: 10),
                       child: Text(
                         "Sertifikat Pendukung",
@@ -596,14 +596,14 @@ class _VolunteerApplicationDetailScreenState
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: AppColors.border),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             "Ketuk gambar untuk melihat pratinjau penuh atau memperbesar sertifikat.",
                             style: TextStyle(
                               fontSize: 10,
@@ -647,7 +647,7 @@ class _VolunteerApplicationDetailScreenState
                   vertical: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.06),
@@ -655,7 +655,7 @@ class _VolunteerApplicationDetailScreenState
                       offset: const Offset(0, -4),
                     ),
                   ],
-                  border: const Border(
+                  border: Border(
                     top: BorderSide(color: AppColors.border),
                   ),
                 ),

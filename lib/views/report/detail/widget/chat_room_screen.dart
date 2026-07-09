@@ -184,11 +184,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0.5,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: AppColors.textPrimary,
             size: 20,
@@ -219,7 +219,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 children: [
                   Text(
                     widget.otherUserName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -229,7 +229,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   ),
                   Text(
                     otherRoleLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
                     ),
@@ -330,7 +330,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isMe ? AppColors.primaryBlue : Colors.white,
+                color: isMe ? AppColors.primaryBlue : AppColors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -360,7 +360,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               children: [
                 Text(
                   DateFormatter.toTimeOnly(msg.createdAt),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10,
                     color: AppColors.textSecondary,
                   ),
@@ -388,7 +388,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           border: Border(top: BorderSide(color: AppColors.border)),
         ),
         child: SafeArea(
@@ -426,8 +426,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: AppColors.white,
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
       child: SafeArea(
@@ -445,7 +445,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   controller: _messageController,
                   maxLines: 4,
                   minLines: 1,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "Tulis pesan...",
                     hintStyle: TextStyle(
                       color: AppColors.textSecondary,
@@ -455,10 +455,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     isDense: true,
                     contentPadding: EdgeInsets.symmetric(vertical: 10),
                   ),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                 ),
               ),
             ),

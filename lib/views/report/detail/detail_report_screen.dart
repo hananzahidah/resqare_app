@@ -638,7 +638,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                         Container(
                           padding: EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Color(0xFFEDEEF1)),
                             boxShadow: [
@@ -704,7 +704,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                           Container(
                             padding: EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: Color(0xFFEDEEF1)),
                               boxShadow: [
@@ -764,7 +764,7 @@ class _DetailReportScreenState extends State<DetailReportScreen> {
                           Container(
                             padding: EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: Color(0xFFEDEEF1)),
                               boxShadow: [

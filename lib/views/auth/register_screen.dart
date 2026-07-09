@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:resqare_app/constant/app_color.dart';
 import 'package:resqare_app/constant/app_image.dart';
 import 'package:resqare_app/models/user_model_firebase.dart';
 import 'package:resqare_app/repositories/user_repository_firebase.dart';
@@ -143,7 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFAF9FD),
+      backgroundColor: AppColors.background,
 
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -164,7 +165,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   Text(
                     "Bergabunglah bersama kami & bantu lebih banyak hewan.",
-                    style: TextStyle(fontSize: 14, color: Color(0xFF414754)),
+                    style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -272,7 +273,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             onPressed: register,
 
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF005BBF),
+                              backgroundColor: AppColors.primaryBlue,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadiusGeometry.circular(12),
                               ),
@@ -296,20 +297,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     children: [
                       Expanded(
-                        child: Container(height: 1, color: Color(0xFFC1C6D6)),
+                        child: Container(height: 1, color: AppColors.divider),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
                           "atau",
                           style: TextStyle(
-                            color: Color(0xFF414754),
+                            color: AppColors.textSecondary,
                             fontSize: 12,
                           ),
                         ),
                       ),
                       Expanded(
-                        child: Container(height: 1, color: Color(0xFFC1C6D6)),
+                        child: Container(height: 1, color: AppColors.divider),
                       ),
                     ],
                   ),
@@ -321,7 +322,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppColors.white,
                         // side: BorderSide(),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadiusGeometry.circular(12),
@@ -335,7 +336,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Text(
                             "Daftar dengan Google",
                             style: TextStyle(
-                              color: Colors.black,
+                              color: AppColors.textPrimary,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -353,7 +354,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Text.rich(
                 TextSpan(
                   text: "Sudah memiliki akun?",
-                  style: TextStyle(color: Color(0xFF414754), fontSize: 14),
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
 
                   children: [
                     TextSpan(text: "   "),
@@ -362,7 +363,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ..onTap = () => context.push(LoginScreen()),
                       text: "Masuk",
                       style: TextStyle(
-                        color: Color(0xFF005BBF),
+                        color: AppColors.primaryBlue,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

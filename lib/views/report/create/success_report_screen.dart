@@ -49,7 +49,7 @@ class SuccessReportScreen extends StatelessWidget {
                 isUpdate
                     ? "Data Laporan Berhasil Diperbarui!"
                     : "Laporan Berhasil Dikirim!",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -62,7 +62,7 @@ class SuccessReportScreen extends StatelessWidget {
                 isUpdate
                     ? "Perubahan pada laporan darurat Anda telah berhasil disimpan."
                     : "Laporan darurat Anda telah sukses terdaftar di sistem. Relawan terdekat akan segera menerima notifikasi untuk memulai proses penyelamatan.",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                   height: 1.5,

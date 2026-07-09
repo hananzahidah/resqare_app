@@ -68,7 +68,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Maksimal 3 foto sertifikat.'),
-          backgroundColor: Color(0xFF005BBF),
+          backgroundColor: AppColors.primaryBlue,
         ),
       );
       return;
@@ -94,7 +94,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
   void _showImageSourceBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -106,7 +106,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Unggah Foto Hewan",
                   style: TextStyle(
                     fontSize: 18,
@@ -198,7 +198,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
   // void _showImageSourceBottomSheet() {
   //   showModalBottomSheet(
   //     context: context,
-  //     backgroundColor: Colors.white,
+  //     backgroundColor: AppColors.white,
   //     shape: const RoundedRectangleBorder(
   //       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
   //     ),
@@ -214,14 +214,14 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
   //                 style: TextStyle(
   //                   fontSize: 16,
   //                   fontWeight: FontWeight.bold,
-  //                   color: Color(0xFF1F2937),
+  //                   color: AppColors.textPrimary,
   //                 ),
   //               ),
   //             ),
   //             ListTile(
   //               leading: const Icon(
   //                 Icons.camera_alt_outlined,
-  //                 color: Color(0xFF005BBF),
+  //                 color: AppColors.primaryBlue,
   //               ),
   //               title: const Text('Kamera'),
   //               onTap: () {
@@ -232,7 +232,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
   //             ListTile(
   //               leading: const Icon(
   //                 Icons.photo_library_outlined,
-  //                 color: Color(0xFF005BBF),
+  //                 color: AppColors.primaryBlue,
   //               ),
   //               title: const Text('Galeri'),
   //               onTap: () {
@@ -261,11 +261,11 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Column(
+          title: Column(
             children: [
               Icon(
                 Icons.policy_rounded,
@@ -287,7 +287,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
           content: SizedBox(
             width: double.maxFinite,
             height: MediaQuery.of(context).size.height * 0.4,
-            child: const SingleChildScrollView(
+            child: SingleChildScrollView(
               physics: BouncingScrollPhysics(),
               child: Text(
                 "Selamat datang di ResQare. Dengan menggunakan aplikasi ini, Anda setuju untuk mematuhi ketentuan berikut:\n\n"
@@ -341,13 +341,17 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           title: Column(
             children: const [
-              Icon(Icons.warning_rounded, color: Color(0xFF005BBF), size: 36),
+              Icon(
+                Icons.warning_rounded,
+                color: AppColors.primaryBlue,
+                size: 36,
+              ),
               SizedBox(height: 10),
               Text(
                 "Konfirmasi Pendaftaran",
@@ -360,9 +364,9 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
           content: Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: Color(0xFF4A4A4A),
+              color: AppColors.textSecondary,
               height: 1.4,
             ),
           ),
@@ -374,7 +378,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(false),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFCCCCCC)),
+                      side: BorderSide(color: AppColors.border),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -393,7 +397,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF005BBF),
+                      backgroundColor: AppColors.primaryBlue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -604,9 +608,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message, style: const TextStyle(color: Colors.white)),
-        backgroundColor: isSuccess
-            ? const Color(0xFF2E7D32)
-            : const Color(0xFF005BBF),
+        backgroundColor: isSuccess ? Color(0xFF2E7D32) : AppColors.primaryBlue,
       ),
     );
   }
@@ -628,10 +630,10 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1F2937),
+            color: AppColors.textPrimary,
           ),
         ),
         TextFormField(
@@ -648,23 +650,23 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
               : TextInputType.text,
           decoration: InputDecoration(
             hintText: hintText ?? _getHintTextForType(typeForm),
-            hintStyle: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+            hintStyle: TextStyle(fontSize: 14, color: AppColors.textSecondary),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFC1C6D6)),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFC1C6D6)),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: AppColors.white,
             suffixIcon: suffixIcon,
             prefixIcon: typeForm.isEmpty
                 ? null
                 : Icon(
                     iconForm(typeForm.toLowerCase()),
-                    color: const Color(0xFF727785),
+                    color: AppColors.textSecondary,
                   ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -672,7 +674,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFC1C6D6)),
+              borderSide: BorderSide(color: AppColors.border),
             ),
           ),
           validator: validator,
@@ -714,8 +716,8 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                   color: stepIndex == 0
                       ? Colors.transparent
                       : (isCompleted || isActive
-                            ? const Color(0xFF005BBF)
-                            : const Color(0xFFE5E7EB)),
+                            ? AppColors.primaryBlue
+                            : Color(0xFFE5E7EB)),
                 ),
               ),
               AnimatedContainer(
@@ -725,14 +727,14 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isCompleted
-                      ? const Color(0xFF005BBF)
+                      ? AppColors.primaryBlue
                       : isActive
-                      ? const Color(0xFF005BBF)
+                      ? AppColors.primaryBlue
                       : Colors.white,
                   border: Border.all(
                     color: isCompleted || isActive
-                        ? const Color(0xFF005BBF)
-                        : const Color(0xFFD1D5DB),
+                        ? AppColors.primaryBlue
+                        : Color(0xFFD1D5DB),
                     width: 2,
                   ),
                 ),
@@ -746,7 +748,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                             fontWeight: FontWeight.bold,
                             color: isActive || isCompleted
                                 ? Colors.white
-                                : const Color(0xFF6B7280),
+                                : AppColors.textSecondary,
                           ),
                         ),
                 ),
@@ -757,8 +759,8 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                   color: stepIndex == (_selectedRole == 'volunteer' ? 2 : 1)
                       ? Colors.transparent
                       : (isCompleted
-                            ? const Color(0xFF005BBF)
-                            : const Color(0xFFE5E7EB)),
+                            ? AppColors.primaryBlue
+                            : Color(0xFFE5E7EB)),
                 ),
               ),
             ],
@@ -772,8 +774,8 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                   ? FontWeight.bold
                   : FontWeight.normal,
               color: isActive || isCompleted
-                  ? const Color(0xFF1F2937)
-                  : const Color(0xFF9CA3AF),
+                  ? AppColors.textPrimary
+                  : Color(0xFF9CA3AF),
             ),
           ),
         ],
@@ -792,7 +794,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
         });
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFFAF9FD),
+        backgroundColor: AppColors.background,
 
         body: SafeArea(
           child: GestureDetector(
@@ -824,7 +826,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                           "Bergabung bersama kami & bantu hewan.",
                           style: TextStyle(
                             fontSize: 14,
-                            color: Color(0xFF414754),
+                            color: AppColors.textSecondary,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -861,7 +863,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                         TextSpan(
                           text: "Sudah memiliki akun?",
                           style: TextStyle(
-                            color: Color(0xFF414754),
+                            color: AppColors.textSecondary,
                             fontSize: 14,
                           ),
 
@@ -874,7 +876,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                                 ),
                               text: "Masuk",
                               style: TextStyle(
-                                color: Color(0xFF005BBF),
+                                color: AppColors.primaryBlue,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -909,18 +911,18 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: _selectedRole == 'reporter'
-                    ? const Color(0xFF005BBF)
-                    : const Color(0xFFE5E7EB),
+                    ? AppColors.primaryBlue
+                    : Color(0xFFE5E7EB),
                 width: _selectedRole == 'reporter' ? 2 : 1.5,
               ),
               boxShadow: [
                 BoxShadow(
                   color: _selectedRole == 'reporter'
-                      ? const Color(0xFF005BBF).withOpacity(0.05)
+                      ? AppColors.primaryBlue.withOpacity(0.05)
                       : Colors.black.withOpacity(0.02),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
@@ -935,13 +937,13 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: _selectedRole == 'reporter'
-                        ? const Color(0xFF005BBF).withOpacity(0.1)
+                        ? AppColors.primaryBlue.withOpacity(0.1)
                         : const Color(0xFFF3F4F6),
                   ),
                   child: Icon(
                     Icons.campaign_rounded,
                     color: _selectedRole == 'reporter'
-                        ? const Color(0xFF005BBF)
+                        ? AppColors.primaryBlue
                         : const Color(0xFF4B5563),
                     size: 28,
                   ),
@@ -951,20 +953,20 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Menjadi Pelapor',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F2937),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'Laporkan hewan telantar, terluka, atau membutuhkan bantuan di sekitar Anda.',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF6B7280),
+                          color: AppColors.textSecondary,
                           height: 1.4,
                         ),
                       ),
@@ -988,18 +990,18 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: _selectedRole == 'volunteer'
-                    ? const Color(0xFF005BBF)
+                    ? AppColors.primaryBlue
                     : const Color(0xFFE5E7EB),
                 width: _selectedRole == 'volunteer' ? 2 : 1.5,
               ),
               boxShadow: [
                 BoxShadow(
                   color: _selectedRole == 'volunteer'
-                      ? const Color(0xFF005BBF).withOpacity(0.05)
+                      ? AppColors.primaryBlue.withOpacity(0.05)
                       : Colors.black.withOpacity(0.02),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
@@ -1014,13 +1016,13 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: _selectedRole == 'volunteer'
-                        ? const Color(0xFF005BBF).withOpacity(0.1)
+                        ? AppColors.primaryBlue.withOpacity(0.1)
                         : const Color(0xFFF3F4F6),
                   ),
                   child: Icon(
                     Icons.volunteer_activism_rounded,
                     color: _selectedRole == 'volunteer'
-                        ? const Color(0xFF005BBF)
+                        ? AppColors.primaryBlue
                         : const Color(0xFF4B5563),
                     size: 28,
                   ),
@@ -1030,20 +1032,20 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Menjadi Relawan',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F2937),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'Daftar sebagai anggota penyelamat hewan & ikut serta dalam misi penyelamatan.',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF6B7280),
+                          color: AppColors.textSecondary,
                           height: 1.4,
                         ),
                       ),
@@ -1067,7 +1069,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
               });
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF005BBF),
+              backgroundColor: AppColors.primaryBlue,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -1164,7 +1166,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                 _obscurePassword
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
-                color: const Color(0xFF727785),
+                color: AppColors.textSecondary,
               ),
               onPressed: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
@@ -1201,7 +1203,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                 _obscureConfirmPassword
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
-                color: const Color(0xFF727785),
+                color: AppColors.textSecondary,
               ),
               onPressed: () => setState(
                 () => _obscureConfirmPassword = !_obscureConfirmPassword,
@@ -1244,8 +1246,8 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                 child: RichText(
                   text: TextSpan(
                     text: 'Saya menyetujui ',
-                    style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
                       fontSize: 13,
                     ),
                     children: [
@@ -1259,9 +1261,9 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                         recognizer: TapGestureRecognizer()
                           ..onTap = _showTermsDialog,
                       ),
-                      const TextSpan(
+                      TextSpan(
                         text: ' yang berlaku.',
-                        style: TextStyle(color: Color(0xFF6B7280)),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                     ],
                   ),
@@ -1282,7 +1284,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                         ? _proceedToVolunteerDetails
                         : _registerReporter),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF005BBF),
+                backgroundColor: AppColors.primaryBlue,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1312,19 +1314,18 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: Container(height: 1, color: const Color(0xFFC1C6D6)),
-              ),
-              const Padding(
+              Expanded(child: Container(height: 1, color: AppColors.border)),
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Text(
                   'atau',
-                  style: TextStyle(color: Color(0xFF414754), fontSize: 12),
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                  ),
                 ),
               ),
-              Expanded(
-                child: Container(height: 1, color: const Color(0xFFC1C6D6)),
-              ),
+              Expanded(child: Container(height: 1, color: AppColors.border)),
             ],
           ),
           // const SizedBox(height: 16),
@@ -1340,10 +1341,10 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
           //       );
           //     },
           //     style: ElevatedButton.styleFrom(
-          //       backgroundColor: Colors.white,
+          //       backgroundColor: AppColors.white,
           //       shape: RoundedRectangleBorder(
           //         borderRadius: BorderRadius.circular(12),
-          //         side: const BorderSide(color: Color(0xFFC1C6D6)),
+          //         side: const BorderSide(color: AppColors.border),
           //       ),
           //     ),
           //     child: Row(
@@ -1382,12 +1383,12 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
-                const Text(
+                Text(
                   'Sertifikat Pendukung (Opsional, Maksimal 3)',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
+                    color: AppColors.textPrimary,
                   ),
                 ),
 
@@ -1409,7 +1410,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                       height: 80,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFC1C6D6)),
+                        border: Border.all(color: AppColors.border),
                         image: DecorationImage(
                           image: FileImage(_certificateFiles[index]),
                           fit: BoxFit.cover,
@@ -1447,19 +1448,19 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: const Color(0xFFC1C6D6),
+                        color: AppColors.border,
                         style: BorderStyle.solid,
                       ),
                     ),
-                    child: const Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.add_photo_alternate_outlined,
-                          color: Color(0xFF727785),
+                          color: AppColors.textSecondary,
                           size: 28,
                         ),
                         SizedBox(height: 4),
@@ -1467,7 +1468,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
                           'Unggah',
                           style: TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF727785),
+                            color: AppColors.textSecondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -1519,7 +1520,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _registerVolunteer,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF005BBF),
+                backgroundColor: AppColors.primaryBlue,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

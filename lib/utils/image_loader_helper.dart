@@ -45,7 +45,7 @@ class ImageLoaderHelper {
           width: width,
           height: height,
           color: AppColors.border,
-          child: const Icon(Icons.pets_rounded, color: AppColors.textSecondary, size: 24),
+          child: Icon(Icons.pets_rounded, color: AppColors.textSecondary, size: 24),
         );
 
     final defaultError = errorWidget ??
@@ -53,7 +53,7 @@ class ImageLoaderHelper {
           width: width,
           height: height,
           color: AppColors.border,
-          child: const Icon(Icons.broken_image_rounded, color: AppColors.textSecondary, size: 24),
+          child: Icon(Icons.broken_image_rounded, color: AppColors.textSecondary, size: 24),
         );
 
     if (path == null || path.isEmpty) {

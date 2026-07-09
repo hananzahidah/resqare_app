@@ -37,6 +37,16 @@ class PreferenceHandler {
     return _prefs.getString(_keyUserRole) ?? "";
   }
 
+  static const _keyIsDarkMode = "isDarkMode";
+
+  static Future<void> setDarkMode(bool isDarkMode) async {
+    await _prefs.setBool(_keyIsDarkMode, isDarkMode);
+  }
+
+  static bool get isDarkMode {
+    return _prefs.getBool(_keyIsDarkMode) ?? false;
+  }
+
   static Future<void> logOut() async {
     await _prefs.remove(_keyIsLogin);
     await _prefs.remove(_keyUserId);
